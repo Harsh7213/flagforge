@@ -1,0 +1,94 @@
+/* ===================================================================
+   FlagForge — index.css (Tailwind-first + Dynamic Light/Dark Theme)
+   =================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Light Mode CSS Variables ─────────────────────────────────────── */
+:root, html, html.light, [data-theme="light"] {
+  --bg-base: #f4f6fa;
+  --bg-card: #ffffff;
+  --bg-elevated: #eef2f7;
+  --bg-overlay: #e2e8f0;
+
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --border-subtle: #e2e8f0;
+  --border-main: #cbd5e1;
+  --border-strong: #94a3b8;
+
+  color-scheme: light;
+}
+
+/* ── Dark Mode Overrides ──────────────────────────────────────────── */
+html.dark, [data-theme="dark"] {
+  --bg-base: #0b0d14;
+  --bg-card: #121520;
+  --bg-elevated: #181c2b;
+  --bg-overlay: #21263a;
+
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --border-subtle: #1e293b;
+  --border-main: #334155;
+  --border-strong: #475569;
+
+  color-scheme: dark;
+}
+
+/* ── Base resets ─────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    @apply box-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    @apply font-sans antialiased min-h-screen transition-colors duration-200;
+  }
+
+  ::selection {
+    @apply bg-brand-500/40 text-white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border-main);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-strong);
+  }
+}
+
+/* ── Component utilities ─────────────────────────────────────────── */
+@layer components {
+  .spinner {
+    @apply inline-block w-4 h-4 rounded-full border-2 border-brand-400/30 border-t-brand-400 animate-spin;
+  }
+
+  .skeleton {
+    @apply rounded-md animate-pulse;
+    background-color: var(--bg-elevated);
+  }
+
+  .glass {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    @apply backdrop-blur-md rounded-xl;
+  }
+}
