@@ -46,19 +46,14 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       organizationId = existingOrg.rows[0].id;
       actualOrgName = existingOrg.rows[0].name;
     } else {
-      // Create new organization
+      // Create new organization without a default project, so users can create
+      // their own project structure from scratch.
       const orgResult = await client.query(
         'INSERT INTO organizations (name) VALUES ($1) RETURNING id, name',
         [organizationName.trim()]
       );
       organizationId = orgResult.rows[0].id;
       actualOrgName = orgResult.rows[0].name;
-
-      // Create default project for newly created organization
-      await client.query(
-        'INSERT INTO projects (organization_id, name) VALUES ($1, $2)',
-        [organizationId, 'Default Project']
-      );
     }
 
     // Create user under the organization

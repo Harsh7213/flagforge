@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { useListProjectsQuery, useCreateProjectMutation, useUpdateProjectMutation } from '../store/api/projectsApi';
+import {
+  useListProjectsQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+} from '../store/api/projectsApi';
 import { useAppDispatch, useAppSelector } from '../store';
-import { setActiveProject, addToast } from '../store/slices/uiSlice';
+import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
 
 const ProjectsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -9,6 +14,7 @@ const ProjectsPage: React.FC = () => {
   const { data, isLoading } = useListProjectsQuery();
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
+  const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
   const [newName, setNewName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -55,6 +61,21 @@ const ProjectsPage: React.FC = () => {
       cancelEditing();
     } catch {
       dispatch(addToast({ type: 'error', message: 'Failed to rename project' }));
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    const confirmed = window.confirm(`Delete project "${name}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await deleteProject(id).unwrap();
+      dispatch(addToast({ type: 'success', message: `Project "${name}" deleted` }));
+      if (activeProjectId === id) {
+        dispatch(clearActiveProject());
+      }
+    } catch {
+      dispatch(addToast({ type: 'error', message: 'Failed to delete project' }));
     }
   };
 
@@ -206,6 +227,14 @@ const ProjectsPage: React.FC = () => {
                       Set Active
                     </button>
                   )}
+                  <button
+                    id={`delete-project-${project.id}`}
+                    disabled={isDeleting}
+                    onClick={() => handleDelete(project.id, project.name)}
+                    className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             </div>
