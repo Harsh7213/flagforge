@@ -1,6 +1,6 @@
 # FlagForge - Feature Flag Management System
 
-A full-stack feature flag management system built with React, Node.js, and PostgreSQL.
+Feature flag management system built with React, Redux Toolkit, Node.js, and PostgreSQL.
 
 ## Features
 
