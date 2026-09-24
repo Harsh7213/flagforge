@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth, apiKeyAuth } from '../middleware/auth';
-import { getProjects, createProject, updateProject, deleteProject } from '../controllers/projects.controller';
+import { getProjects, createProject, updateProject, deleteProject, rotateApiKey, revokeApiKey } from '../controllers/projects.controller';
 import { listFlags, getFlag, createFlag, updateFlag, deleteFlag, toggleEnvironment, getFlagAuditLogs, getStats, addRule, deleteRule } from '../controllers/flags.controller';
 import { evaluate, batchEvaluate } from '../controllers/evaluation.controller';
 import { getAuditLogs } from '../controllers/audit.controller';
@@ -19,6 +19,8 @@ router.get('/projects', requireAuth, getProjects);
 router.post('/projects', requireAuth, createProject);
 router.patch('/projects/:id', requireAuth, updateProject);
 router.delete('/projects/:id', requireAuth, deleteProject);
+router.post('/projects/:id/api-key/rotate', requireAuth, rotateApiKey);
+router.delete('/projects/:id/api-key', requireAuth, revokeApiKey);
 
 router.get('/flags', requireAuth, listFlags);
 router.post('/flags', requireAuth, createFlag);

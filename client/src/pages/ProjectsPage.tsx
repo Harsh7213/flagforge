@@ -4,6 +4,8 @@ import {
   useCreateProjectMutation,
   useUpdateProjectMutation,
   useDeleteProjectMutation,
+  useRotateApiKeyMutation,
+  useRevokeApiKeyMutation,
 } from '../store/api/projectsApi';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
@@ -15,9 +17,12 @@ const ProjectsPage: React.FC = () => {
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
+  const [rotateApiKey, { isLoading: isRotatingKey }] = useRotateApiKeyMutation();
+  const [revokeApiKey, { isLoading: isRevokingKey }] = useRevokeApiKeyMutation();
   const [newName, setNewName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [revealedKeys, setRevealedKeys] = useState<Record<string, string>>({});
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
 
@@ -28,10 +33,37 @@ const ProjectsPage: React.FC = () => {
       const result = await createProject({ name: newName.trim() }).unwrap();
       dispatch(addToast({ type: 'success', message: `Project "${newName}" created!` }));
       dispatch(setActiveProject(result.data.id));
+      if (result.data.api_key) {
+        setRevealedKeys((keys) => ({ ...keys, [result.data.id]: result.data.api_key! }));
+      }
       setNewName('');
       setShowCreate(false);
     } catch {
       dispatch(addToast({ type: 'error', message: 'Failed to create project' }));
+    }
+  };
+
+  const handleRotateKey = async (id: string, name: string) => {
+    if (!window.confirm(`Rotate the API key for "${name}"? The current key will stop working.`)) return;
+    try {
+      const result = await rotateApiKey(id).unwrap();
+      if (result.data.api_key) {
+        setRevealedKeys((keys) => ({ ...keys, [id]: result.data.api_key! }));
+      }
+      dispatch(addToast({ type: 'success', message: 'New API key generated. Copy it now; it will not be shown again.' }));
+    } catch {
+      dispatch(addToast({ type: 'error', message: 'Failed to rotate API key' }));
+    }
+  };
+
+  const handleRevokeKey = async (id: string, name: string) => {
+    if (!window.confirm(`Revoke the API key for "${name}"? SDK requests will stop working.`)) return;
+    try {
+      await revokeApiKey(id).unwrap();
+      setRevealedKeys(({ [id]: _removed, ...keys }) => keys);
+      dispatch(addToast({ type: 'success', message: 'API key revoked' }));
+    } catch {
+      dispatch(addToast({ type: 'error', message: 'Failed to revoke API key' }));
     }
   };
 
@@ -191,17 +223,17 @@ const ProjectsPage: React.FC = () => {
                   )}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-500 dark:text-slate-400">API Key:</span>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated border border-border-subtle">
-                      <code className="text-xs font-mono text-slate-800 dark:text-slate-300 truncate max-w-xs">{project.api_key}</code>
+                    {revealedKeys[project.id] ? <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated border border-border-subtle">
+                      <code className="text-xs font-mono text-slate-800 dark:text-slate-300 truncate max-w-xs">{revealedKeys[project.id]}</code>
                       <button
                         id={`copy-api-key-${project.id}`}
-                        onClick={() => handleCopyKey(project.api_key)}
+                        onClick={() => handleCopyKey(revealedKeys[project.id])}
                         title="Copy API key"
                         className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors text-xs"
                       >
-                        {copiedKey === project.api_key ? '✓' : '📋'}
+                        {copiedKey === revealedKeys[project.id] ? '✓' : '📋'}
                       </button>
-                    </div>
+                    </div> : <span className="text-xs text-slate-500 dark:text-slate-400">Hidden. Rotate to generate a new key.</span>}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Created {new Date(project.created_at).toLocaleDateString()}</p>
                 </div>
@@ -227,6 +259,22 @@ const ProjectsPage: React.FC = () => {
                       Set Active
                     </button>
                   )}
+                  <button
+                    id={`rotate-api-key-${project.id}`}
+                    disabled={isRotatingKey}
+                    onClick={() => handleRotateKey(project.id, project.name)}
+                    className="px-4 py-2 rounded-xl bg-surface-elevated hover:bg-amber-500/20 border border-border-subtle hover:border-amber-500/30 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
+                  >
+                    {isRotatingKey ? 'Rotating...' : 'Rotate key'}
+                  </button>
+                  <button
+                    id={`revoke-api-key-${project.id}`}
+                    disabled={isRevokingKey}
+                    onClick={() => handleRevokeKey(project.id, project.name)}
+                    className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
+                  >
+                    {isRevokingKey ? 'Revoking...' : 'Revoke key'}
+                  </button>
                   <button
                     id={`delete-project-${project.id}`}
                     disabled={isDeleting}

@@ -5,7 +5,7 @@ export type AuditAction = 'created' | 'updated' | 'deleted' | 'toggled' | 'rule_
 export interface Project {
   id: string;
   name: string;
-  api_key: string;
+  api_key?: string;
   created_at: string;
 }
 

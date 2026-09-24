@@ -22,6 +22,16 @@ export const projectsApi = createApi({
       invalidatesTags: [{ type: 'Project', id: 'LIST' }],
     }),
 
+    rotateApiKey: builder.mutation<ApiResponse<Project>, string>({
+      query: (id) => ({ url: `/projects/${id}/api-key/rotate`, method: 'POST' }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+    }),
+
+    revokeApiKey: builder.mutation<void, string>({
+      query: (id) => ({ url: `/projects/${id}/api-key`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+    }),
+
     deleteProject: builder.mutation<void, string>({
       query: (id) => ({ url: `/projects/${id}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'Project', id: 'LIST' }],
@@ -29,5 +39,5 @@ export const projectsApi = createApi({
   }),
 });
 
-export const { useListProjectsQuery, useCreateProjectMutation, useUpdateProjectMutation, useDeleteProjectMutation } =
+export const { useListProjectsQuery, useCreateProjectMutation, useUpdateProjectMutation, useDeleteProjectMutation, useRotateApiKeyMutation, useRevokeApiKeyMutation } =
   projectsApi;

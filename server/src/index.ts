@@ -2,12 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
+import './config';
 import router from './routes';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import migrate from './db/migrate';
-
-dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);

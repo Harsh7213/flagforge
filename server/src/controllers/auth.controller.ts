@@ -4,6 +4,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { SESSION_COOKIE } from '../middleware/auth';
+import { JWT_SECRET } from '../config';
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -17,7 +18,6 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_dev_only';
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 
 const setSessionCookie = (res: Response, token: string) => {
