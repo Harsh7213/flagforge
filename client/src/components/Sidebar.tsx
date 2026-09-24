@@ -5,7 +5,7 @@ import { logout } from '../store/slices/authSlice';
 import { clearActiveProject } from '../store/slices/uiSlice';
 import { flagsApi } from '../store/api/flagsApi';
 import { projectsApi } from '../store/api/projectsApi';
-import { authApi } from '../store/api/authApi';
+import { authApi, useLogoutMutation } from '../store/api/authApi';
 
 const navItems = [
   { to: '/app', label: 'Dashboard', icon: '⬡', exact: true },
@@ -20,9 +20,11 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const sidebarOpen = useAppSelector((s) => s.ui.sidebarOpen);
   const user = useAppSelector((s) => s.auth.user);
+  const [requestLogout] = useLogoutMutation();
   const initials = user?.name?.trim().slice(0, 1).toUpperCase() || 'U';
 
   const handleLogout = () => {
+    void requestLogout(undefined);
     dispatch(logout());
     dispatch(clearActiveProject());
     dispatch(flagsApi.util.resetApiState());

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store';
 import { toggleTheme } from '../store/slices/uiSlice';
 
@@ -95,16 +95,9 @@ const CodeSnippet = () => (
 );
 
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const token = useAppSelector((s) => s.auth.token);
   const theme = useAppSelector((s) => s.ui.theme);
   const [scrolled, setScrolled] = useState(false);
-
-  // Redirect already-authenticated users to app
-  useEffect(() => {
-    if (token) navigate('/app', { replace: true });
-  }, [token, navigate]);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);

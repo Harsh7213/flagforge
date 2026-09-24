@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export const SESSION_DURATION_MS = 60 * 60 * 1000;
+
 export interface User {
   id: string;
   name: string;
@@ -9,13 +11,13 @@ export interface User {
 }
 
 interface AuthState {
-  token: string | null;
   user: User | null;
+  sessionExpiresAt: number | null;
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem('token'),
-  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null,
+  user: null,
+  sessionExpiresAt: Number(sessionStorage.getItem('sessionExpiresAt')) || null,
 };
 
 const authSlice = createSlice({
@@ -24,18 +26,17 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; token: string }>
+      action: PayloadAction<{ user: User; expiresAt?: number }>
     ) => {
+      const expiresAt = action.payload.expiresAt ?? Date.now() + SESSION_DURATION_MS;
       state.user = action.payload.user;
-      state.token = action.payload.token;
-      localStorage.setItem('token', action.payload.token);
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
+      state.sessionExpiresAt = expiresAt;
+      sessionStorage.setItem('sessionExpiresAt', String(expiresAt));
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      state.sessionExpiresAt = null;
+      sessionStorage.removeItem('sessionExpiresAt');
     },
   },
 });

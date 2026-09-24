@@ -3,6 +3,7 @@ import pool from '../db/pool';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_dev_only';
+export const SESSION_COOKIE = 'ff_session';
 
 // Extend Express Request
 declare global {
@@ -11,6 +12,7 @@ declare global {
       user?: {
         id: string;
         organizationId: string;
+        exp?: number;
       };
       project?: {
         id: string;
@@ -48,15 +50,16 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
  */
 export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.header('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = req.cookies?.[SESSION_COOKIE] ??
+    (authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined);
+
+  if (!token) {
     res.status(401).json({ error: 'Missing or invalid Authorization header' });
     return;
   }
 
-  const token = authHeader.split(' ')[1];
-
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { id: string; organizationId: string };
+    const payload = jwt.verify(token, JWT_SECRET) as { id: string; organizationId: string; exp?: number };
     req.user = payload;
     next();
   } catch (error) {

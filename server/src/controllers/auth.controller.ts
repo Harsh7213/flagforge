@@ -3,6 +3,7 @@ import pool from '../db/pool';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { SESSION_COOKIE } from '../middleware/auth';
 
 const registerSchema = z.object({
   name: z.string().min(2),
@@ -17,6 +18,17 @@ const loginSchema = z.object({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_dev_only';
+const SESSION_DURATION_MS = 60 * 60 * 1000;
+
+const setSessionCookie = (res: Response, token: string) => {
+  res.cookie(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: SESSION_DURATION_MS,
+    path: '/',
+  });
+};
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   const client = await pool.connect();
@@ -67,11 +79,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await client.query('COMMIT');
 
     // Generate JWT token
-    const token = jwt.sign({ id: userId, organizationId }, JWT_SECRET, { expiresIn: '7d' });
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    const token = jwt.sign({ id: userId, organizationId }, JWT_SECRET, { expiresIn: '1h' });
+    setSessionCookie(res, token);
 
     res.status(201).json({
       data: {
-        token,
+        expiresAt,
         user: { id: userId, name, email, organizationId, organizationName: actualOrgName },
       },
     });
@@ -107,11 +121,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const token = jwt.sign({ id: user.id, organizationId: user.organization_id }, JWT_SECRET, { expiresIn: '7d' });
+    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    const token = jwt.sign({ id: user.id, organizationId: user.organization_id }, JWT_SECRET, { expiresIn: '1h' });
+    setSessionCookie(res, token);
 
     res.json({
       data: {
-        token,
+        expiresAt,
         user: {
           id: user.id,
           name: user.name,
@@ -124,4 +140,43 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   } catch (error) {
     next(error);
   }
+};
+
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await pool.query(
+      `SELECT u.id, u.name, u.email, u.organization_id, o.name AS organization_name
+       FROM users u
+       JOIN organizations o ON u.organization_id = o.id
+       WHERE u.id = $1`,
+      [req.user!.id]
+    );
+    const user = result.rows[0];
+    if (!user) {
+      res.status(401).json({ error: 'User not found' });
+      return;
+    }
+
+    res.json({
+      data: {
+        expiresAt: req.user?.exp
+          ? req.user.exp * 1000
+          : Date.now() + SESSION_DURATION_MS,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          organizationId: user.organization_id,
+          organizationName: user.organization_name,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = (_req: Request, res: Response) => {
+  res.clearCookie(SESSION_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+  res.status(204).send();
 };

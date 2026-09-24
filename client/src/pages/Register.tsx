@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       const result = await register({ name, email, password, organizationName }).unwrap();
-      dispatch(setCredentials({ user: result.data.user, token: result.data.token }));
+      dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(addToast({ type: 'success', message: 'Account created successfully' }));
       navigate('/app');
     } catch (err: any) {

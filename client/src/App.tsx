@@ -1,10 +1,13 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import ToastContainer from './components/ToastContainer';
 import AuthGuard from './components/AuthGuard';
-import { useAppSelector } from './store';
+import { useAppDispatch, useAppSelector } from './store';
+import { setSystemTheme } from './store/slices/uiSlice';
+import { setCredentials } from './store/slices/authSlice';
+import { useMeQuery } from './store/api/authApi';
 
 // Lazy loading pages
 const LandingPage  = lazy(() => import('./pages/LandingPage'));
@@ -41,16 +44,53 @@ const DashboardLayout: React.FC = () => {
   );
 };
 
+const PublicOnly: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { data, isLoading } = useMeQuery(undefined);
+
+  useEffect(() => {
+    if (data?.data) {
+      dispatch(setCredentials(data.data));
+    }
+  }, [data, dispatch]);
+
+  if (isLoading) {
+    return <LoadingFallback />;
+  }
+
+  if (data?.data) {
+    return <Navigate to="/app" replace />;
+  }
+
+  return <Outlet />;
+};
+
 const App: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (event: MediaQueryListEvent) => {
+      dispatch(setSystemTheme(event.matches ? 'dark' : 'light'));
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route element={<PublicOnly />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
 
           {/* Protected app routes under /app */}
           <Route element={<AuthGuard />}>

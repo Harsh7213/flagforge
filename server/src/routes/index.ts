@@ -4,13 +4,15 @@ import { getProjects, createProject, updateProject, deleteProject } from '../con
 import { listFlags, getFlag, createFlag, updateFlag, deleteFlag, toggleEnvironment, getFlagAuditLogs, getStats, addRule, deleteRule } from '../controllers/flags.controller';
 import { evaluate, batchEvaluate } from '../controllers/evaluation.controller';
 import { getAuditLogs } from '../controllers/audit.controller';
-import { login, register } from '../controllers/auth.controller';
+import { getCurrentUser, login, logout, register } from '../controllers/auth.controller';
 
 const router = Router();
 
 // Auth Routes (Public)
 router.post('/auth/register', register);
 router.post('/auth/login', login);
+router.post('/auth/logout', logout);
+router.get('/auth/me', requireAuth, getCurrentUser);
 
 // Dashboard API Routes (Protected by JWT)
 router.get('/projects', requireAuth, getProjects);
