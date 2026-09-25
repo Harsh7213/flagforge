@@ -27,6 +27,7 @@ interface AcceptInvitationResponse {
 
 export const organizationApi = createApi({
   reducerPath: 'organizationApi',
+  tagTypes: ['Member'],
   baseQuery: fetchBaseQuery({
     baseUrl: '/api/v1',
     credentials: 'include',
@@ -39,6 +40,7 @@ export const organizationApi = createApi({
   endpoints: (builder) => ({
     listMembers: builder.query<{ data: Member[] }, void>({
       query: () => '/organizations/members',
+      providesTags: [{ type: 'Member', id: 'LIST' }],
     }),
     createInvitation: builder.mutation<InvitationResponse, { email: string; role: 'admin' | 'member' }>({
       query: (invitation) => ({
@@ -56,6 +58,7 @@ export const organizationApi = createApi({
     }),
     removeMember: builder.mutation<void, string>({
       query: (userId) => ({ url: `/organizations/members/${userId}`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Member', id: 'LIST' }],
     }),
   }),
 });

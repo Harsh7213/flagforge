@@ -135,7 +135,7 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
     const passwordHash = await bcrypt.hash(password, 12);
     const userResult = await client.query(
       `INSERT INTO users (organization_id, name, email, password_hash, role)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+       VALUES ($1, $2, $3, $4, $5) RETURNING id, session_version`,
       [invitation.organization_id, name, invitation.email, passwordHash, invitation.role]
     );
     await client.query('UPDATE organization_invitations SET accepted_at = NOW() WHERE id = $1', [invitation.id]);
@@ -144,7 +144,11 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
     const userId = userResult.rows[0].id;
     const expiresAt = Date.now() + SESSION_DURATION_MS;
     const sessionToken = jwt.sign(
-      { id: userId, organizationId: invitation.organization_id },
+      {
+        id: userId,
+        organizationId: invitation.organization_id,
+        sessionVersion: userResult.rows[0].session_version,
+      },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
