@@ -1,12 +1,11 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
+import './config';
 import router from './routes';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import migrate from './db/migrate';
-
-dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '4000', 10);
@@ -16,8 +15,10 @@ app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
+  credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json({ limit: '1mb' }));
 
 // ── Health check ────────────────────────────────────────────────────

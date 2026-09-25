@@ -9,6 +9,7 @@ const pageTitles: Record<string, string> = {
   '/app/flags': 'Feature Flags',
   '/app/audit': 'Audit Log',
   '/app/projects': 'Projects',
+  '/app/team': 'Team',
 };
 
 const Header: React.FC = () => {

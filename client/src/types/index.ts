@@ -5,9 +5,11 @@ export type AuditAction = 'created' | 'updated' | 'deleted' | 'toggled' | 'rule_
 export interface Project {
   id: string;
   name: string;
-  api_key: string;
+  api_key?: string;
   created_at: string;
 }
+
+export type OrganizationRole = 'owner' | 'admin' | 'member';
 
 export interface TargetingRule {
   id: string;
@@ -44,6 +46,7 @@ export interface AuditLog {
   flag_key: string;
   flag_name: string;
   actor: string;
+  actor_role?: 'owner' | 'admin' | 'member' | 'system';
   action: AuditAction;
   payload: Record<string, unknown> | null;
   created_at: string;

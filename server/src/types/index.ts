@@ -4,6 +4,8 @@ export type RuleType = 'user_ids' | 'groups' | 'percentage';
 
 export type AuditAction = 'created' | 'updated' | 'deleted' | 'toggled' | 'rule_added' | 'rule_deleted';
 
+export type OrganizationRole = 'owner' | 'admin' | 'member';
+
 export interface Organization {
   id: string;
   name: string;
@@ -16,6 +18,7 @@ export interface User {
   name: string;
   email: string;
   password_hash: string;
+  role: OrganizationRole;
   created_at: Date;
 }
 

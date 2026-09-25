@@ -26,6 +26,13 @@ Feature flag management system built with React, Redux Toolkit, Node.js, and Pos
 ### Local Development Setup
 
 1.  **Start the Database**
+  Copy the local environment template before starting the services:
+  ```bash
+  cp .env.example .env
+  cp server/.env.example server/.env
+  ```
+  Use the same database username, password, and database name in both files.
+
     ```bash
     docker-compose up -d
     ```

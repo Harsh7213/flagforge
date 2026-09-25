@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       const result = await register({ name, email, password, organizationName }).unwrap();
-      dispatch(setCredentials({ user: result.data.user, token: result.data.token }));
+      dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(addToast({ type: 'success', message: 'Account created successfully' }));
       navigate('/app');
     } catch (err: any) {
@@ -31,7 +31,7 @@ const Register: React.FC = () => {
     { id: 'orgName', label: 'Organization Name', type: 'text', value: organizationName, onChange: setOrganizationName, placeholder: 'Acme Corp', required: true },
     { id: 'name', label: 'Your Name', type: 'text', value: name, onChange: setName, placeholder: 'John Doe', required: true },
     { id: 'email', label: 'Work Email', type: 'email', value: email, onChange: setEmail, placeholder: 'john@acme.com', required: true },
-    { id: 'password', label: 'Password', type: 'password', value: password, onChange: setPassword, placeholder: '••••••••', required: true, minLength: 6 },
+    { id: 'password', label: 'Password', type: 'password', value: password, onChange: setPassword, placeholder: '••••••', required: true, minLength: 14 },
   ];
 
   return (

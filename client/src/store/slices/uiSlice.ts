@@ -29,10 +29,13 @@ const getInitialTheme = (): Theme => {
 
 const initialState: UiState = {
   theme: getInitialTheme(),
-  activeProjectId: localStorage.getItem('ff-project'),
+  activeProjectId: null,
   sidebarOpen: true,
   toasts: [],
 };
+
+// Remove the legacy persisted project selection from older client versions.
+localStorage.removeItem('ff-project');
 
 const applyTheme = (theme: Theme) => {
   document.documentElement.setAttribute('data-theme', theme);
@@ -62,13 +65,17 @@ const uiSlice = createSlice({
       localStorage.setItem('ff-theme', state.theme);
       applyTheme(state.theme);
     },
+    setSystemTheme(state, action: PayloadAction<Theme>) {
+      if (!localStorage.getItem('ff-theme')) {
+        state.theme = action.payload;
+        applyTheme(state.theme);
+      }
+    },
     setActiveProject(state, action: PayloadAction<string>) {
       state.activeProjectId = action.payload;
-      localStorage.setItem('ff-project', action.payload);
     },
     clearActiveProject(state) {
       state.activeProjectId = null;
-      localStorage.removeItem('ff-project');
     },
     toggleSidebar(state) {
       state.sidebarOpen = !state.sidebarOpen;
@@ -83,7 +90,7 @@ const uiSlice = createSlice({
   },
 });
 
-export const { toggleTheme, setTheme, setActiveProject, clearActiveProject, toggleSidebar, addToast, removeToast } =
+export const { toggleTheme, setTheme, setSystemTheme, setActiveProject, clearActiveProject, toggleSidebar, addToast, removeToast } =
   uiSlice.actions;
 
 export default uiSlice.reducer;

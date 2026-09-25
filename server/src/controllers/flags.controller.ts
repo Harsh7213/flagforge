@@ -35,12 +35,13 @@ async function logAudit(
   client: { query: Function },
   flagId: string,
   actor: string,
+  actorRole: string,
   action: string,
   payload?: object
 ) {
   await client.query(
-    `INSERT INTO audit_logs (id, flag_id, actor, action, payload) VALUES ($1, $2, $3, $4, $5)`,
-    [uuidv4(), flagId, actor, action, payload ? JSON.stringify(payload) : null]
+    `INSERT INTO audit_logs (id, flag_id, actor, actor_role, action, payload) VALUES ($1, $2, $3, $4, $5, $6)`,
+    [uuidv4(), flagId, actor, actorRole, action, payload ? JSON.stringify(payload) : null]
   );
 }
 
@@ -64,6 +65,10 @@ async function verifyFlagAccess(flagId: string, req: Request) {
 
 function getActor(req: Request) {
   return req.user ? req.user.id : 'system';
+}
+
+function getActorRole(req: Request) {
+  return req.user?.role ?? 'system';
 }
 
 // GET /api/v1/flags?projectId=
@@ -179,7 +184,7 @@ export async function createFlag(req: Request, res: Response, next: NextFunction
       );
     }
 
-    await logAudit(client, flagId, actor, 'created', { key, name });
+    await logAudit(client, flagId, actor, getActorRole(req), 'created', { key, name });
     await client.query('COMMIT');
 
     res.status(201).json({ data: flagResult.rows[0] });
@@ -221,7 +226,7 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
       params
     );
 
-    await logAudit(client, id, actor, 'updated', parsed.data);
+    await logAudit(client, id, actor, getActorRole(req), 'updated', parsed.data);
     await client.query('COMMIT');
 
     res.json({ data: result.rows[0] });
@@ -271,7 +276,7 @@ export async function toggleEnvironment(req: Request, res: Response, next: NextF
 
     if (result.rows.length === 0) throw new AppError('Flag environment not found', 404);
 
-    await logAudit(client, id, actor, 'toggled', { environment: env, enabled: parsed.data.enabled });
+    await logAudit(client, id, actor, getActorRole(req), 'toggled', { environment: env, enabled: parsed.data.enabled });
     await client.query('COMMIT');
 
     res.json({ data: result.rows[0] });
@@ -290,9 +295,11 @@ export async function getFlagAuditLogs(req: Request, res: Response, next: NextFu
     await verifyFlagAccess(id, req);
 
     const result = await pool.query(
-      `SELECT al.*, 
-        CASE WHEN u.name IS NOT NULL THEN u.name ELSE al.actor END as actor
+      `SELECT al.*, ff.key AS flag_key,
+        CASE WHEN u.name IS NOT NULL THEN u.name ELSE al.actor END AS actor,
+        COALESCE(al.actor_role, u.role, 'system') AS actor_role
        FROM audit_logs al
+       JOIN feature_flags ff ON ff.id = al.flag_id
        LEFT JOIN users u ON al.actor = u.id::text
       WHERE al.flag_id = $1 ORDER BY al.created_at DESC`,
       [id]
@@ -325,7 +332,7 @@ export async function addRule(req: Request, res: Response, next: NextFunction) {
        VALUES ($1, $2, $3, $4) RETURNING *`,
       [uuidv4(), environment.rows[0].id, parsed.data.type, JSON.stringify(parsed.data.value)]
     );
-    await logAudit(client, id, getActor(req), 'rule_added', { environment: env, ...parsed.data });
+    await logAudit(client, id, getActor(req), getActorRole(req), 'rule_added', { environment: env, ...parsed.data });
     await client.query('COMMIT');
     res.status(201).json({ data: rule.rows[0] });
   } catch (err) {
@@ -350,7 +357,7 @@ export async function deleteRule(req: Request, res: Response, next: NextFunction
       [ruleId, id]
     );
     if (result.rowCount === 0) throw new AppError('Targeting rule not found', 404);
-    await logAudit(client, id, getActor(req), 'rule_deleted', { ruleId });
+    await logAudit(client, id, getActor(req), getActorRole(req), 'rule_deleted', { ruleId });
     await client.query('COMMIT');
     res.status(204).send();
   } catch (err) {

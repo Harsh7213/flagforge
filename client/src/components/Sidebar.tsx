@@ -5,13 +5,14 @@ import { logout } from '../store/slices/authSlice';
 import { clearActiveProject } from '../store/slices/uiSlice';
 import { flagsApi } from '../store/api/flagsApi';
 import { projectsApi } from '../store/api/projectsApi';
-import { authApi } from '../store/api/authApi';
+import { authApi, useLogoutMutation } from '../store/api/authApi';
 
 const navItems = [
   { to: '/app', label: 'Dashboard', icon: '⬡', exact: true },
   { to: '/app/flags', label: 'Feature Flags', icon: '⚑' },
   { to: '/app/audit', label: 'Audit Log', icon: '📋' },
   { to: '/app/projects', label: 'Projects', icon: '📁' },
+  { to: '/app/team', label: 'Team', icon: '♟' },
 ];
 
 const Sidebar: React.FC = () => {
@@ -20,15 +21,20 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const sidebarOpen = useAppSelector((s) => s.ui.sidebarOpen);
   const user = useAppSelector((s) => s.auth.user);
+  const [requestLogout] = useLogoutMutation();
   const initials = user?.name?.trim().slice(0, 1).toUpperCase() || 'U';
 
-  const handleLogout = () => {
-    dispatch(logout());
-    dispatch(clearActiveProject());
-    dispatch(flagsApi.util.resetApiState());
-    dispatch(projectsApi.util.resetApiState());
-    dispatch(authApi.util.resetApiState());
-    navigate('/login', { replace: true });
+  const handleLogout = async () => {
+    try {
+      await requestLogout(undefined).unwrap();
+    } finally {
+      dispatch(logout());
+      dispatch(clearActiveProject());
+      dispatch(flagsApi.util.resetApiState());
+      dispatch(projectsApi.util.resetApiState());
+      dispatch(authApi.util.resetApiState());
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
@@ -56,7 +62,7 @@ const Sidebar: React.FC = () => {
             Navigation
           </span>
         )}
-        {navItems.map((item) => {
+        {navItems.filter((item) => item.to !== '/app/team' || user?.role === 'owner' || user?.role === 'admin').map((item) => {
           const isActive = item.to === '/app'
             ? location.pathname === '/app'
             : location.pathname.startsWith(item.to);

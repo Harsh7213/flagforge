@@ -74,7 +74,7 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
           </div>
 
           <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-1">
-            <span>by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong></span>
+            <span>by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong>{log.actor_role && <span className="ml-1 text-slate-500 dark:text-slate-400">({log.actor_role})</span>}</span>
             {log.payload && (
               <details className="text-right">
                 <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 select-none">

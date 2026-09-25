@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     try {
       const result = await login({ email, password }).unwrap();
       dispatch(
-        setCredentials({ user: result.data.user, token: result.data.token }),
+        setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }),
       );
       dispatch(
         addToast({ type: "success", message: "Logged in successfully" }),
