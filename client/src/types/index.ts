@@ -9,6 +9,8 @@ export interface Project {
   created_at: string;
 }
 
+export type OrganizationRole = 'owner' | 'admin' | 'member';
+
 export interface TargetingRule {
   id: string;
   flag_environment_id: string;
@@ -44,6 +46,7 @@ export interface AuditLog {
   flag_key: string;
   flag_name: string;
   actor: string;
+  actor_role?: 'owner' | 'admin' | 'member' | 'system';
   action: AuditAction;
   payload: Record<string, unknown> | null;
   created_at: string;

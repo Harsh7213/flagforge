@@ -8,6 +8,7 @@ export interface User {
   email: string;
   organizationId: string;
   organizationName: string;
+  role: 'owner' | 'admin' | 'member';
 }
 
 interface AuthState {

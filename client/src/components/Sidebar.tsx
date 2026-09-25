@@ -12,6 +12,7 @@ const navItems = [
   { to: '/app/flags', label: 'Feature Flags', icon: '⚑' },
   { to: '/app/audit', label: 'Audit Log', icon: '📋' },
   { to: '/app/projects', label: 'Projects', icon: '📁' },
+  { to: '/app/team', label: 'Team', icon: '♟' },
 ];
 
 const Sidebar: React.FC = () => {
@@ -23,14 +24,17 @@ const Sidebar: React.FC = () => {
   const [requestLogout] = useLogoutMutation();
   const initials = user?.name?.trim().slice(0, 1).toUpperCase() || 'U';
 
-  const handleLogout = () => {
-    void requestLogout(undefined);
-    dispatch(logout());
-    dispatch(clearActiveProject());
-    dispatch(flagsApi.util.resetApiState());
-    dispatch(projectsApi.util.resetApiState());
-    dispatch(authApi.util.resetApiState());
-    navigate('/login', { replace: true });
+  const handleLogout = async () => {
+    try {
+      await requestLogout(undefined).unwrap();
+    } finally {
+      dispatch(logout());
+      dispatch(clearActiveProject());
+      dispatch(flagsApi.util.resetApiState());
+      dispatch(projectsApi.util.resetApiState());
+      dispatch(authApi.util.resetApiState());
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
@@ -58,7 +62,7 @@ const Sidebar: React.FC = () => {
             Navigation
           </span>
         )}
-        {navItems.map((item) => {
+        {navItems.filter((item) => item.to !== '/app/team' || user?.role === 'owner' || user?.role === 'admin').map((item) => {
           const isActive = item.to === '/app'
             ? location.pathname === '/app'
             : location.pathname.startsWith(item.to);

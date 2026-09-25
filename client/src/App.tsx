@@ -19,6 +19,8 @@ const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const Login        = lazy(() => import('./pages/Login'));
 const Register     = lazy(() => import('./pages/Register'));
 const AboutPage    = lazy(() => import('./pages/AboutPage'));
+const TeamPage     = lazy(() => import('./pages/TeamPage'));
+const AcceptInvitationPage = lazy(() => import('./pages/AcceptInvitationPage'));
 
 const LoadingFallback = () => (
   <div className="min-h-screen bg-surface-base flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400">
@@ -84,6 +86,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
+          <Route path="/invite/:token" element={<AcceptInvitationPage />} />
           {/* Public routes */}
           <Route element={<PublicOnly />}>
             <Route path="/" element={<LandingPage />} />
@@ -100,6 +103,7 @@ const App: React.FC = () => {
               <Route path="/app/flags/:id" element={<FlagDetail />} />
               <Route path="/app/audit" element={<AuditPage />} />
               <Route path="/app/projects" element={<ProjectsPage />} />
+              <Route path="/app/team" element={<TeamPage />} />
               <Route path="/app/*" element={<Navigate to="/app" replace />} />
             </Route>
           </Route>

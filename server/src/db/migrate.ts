@@ -19,6 +19,21 @@ CREATE TABLE IF NOT EXISTS users (
   name            VARCHAR(255) NOT NULL,
   email           VARCHAR(255) NOT NULL UNIQUE,
   password_hash   VARCHAR(255) NOT NULL,
+  role            VARCHAR(20) NOT NULL DEFAULT 'owner' CHECK (role IN ('owner', 'admin', 'member')),
+  session_version INTEGER NOT NULL DEFAULT 0,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Organization invitations
+CREATE TABLE IF NOT EXISTS organization_invitations (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  email           VARCHAR(255) NOT NULL,
+  role            VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  token_hash      TEXT NOT NULL UNIQUE,
+  expires_at      TIMESTAMPTZ NOT NULL,
+  accepted_at     TIMESTAMPTZ,
+  invited_by      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -69,15 +84,18 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   flag_id     UUID NOT NULL REFERENCES feature_flags(id) ON DELETE CASCADE,
   actor       VARCHAR(255) NOT NULL DEFAULT 'system',
+  actor_role  VARCHAR(20),
   action      VARCHAR(50) NOT NULL,
   payload     JSONB,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Indexes
-CREATE UNIQUE INDEX IF NOT EXISTS idx_organizations_name_lower ON organizations(LOWER(name));
+CREATE INDEX IF NOT EXISTS idx_organizations_name_lower ON organizations(LOWER(name));
 CREATE INDEX IF NOT EXISTS idx_users_org_id ON users(organization_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_invitations_org_id ON organization_invitations(organization_id);
+CREATE INDEX IF NOT EXISTS idx_invitations_email ON organization_invitations(email);
 CREATE INDEX IF NOT EXISTS idx_projects_org_id ON projects(organization_id);
 CREATE INDEX IF NOT EXISTS idx_feature_flags_project_id ON feature_flags(project_id);
 CREATE INDEX IF NOT EXISTS idx_feature_flags_key ON feature_flags(key);
@@ -92,6 +110,14 @@ async function migrate() {
   try {
     console.log('🔄 Running database migrations...');
     await client.query(SQL);
+    await client.query('ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS actor_role VARCHAR(20)');
+    await client.query(`
+      UPDATE audit_logs al
+      SET actor_role = u.role
+      FROM users u
+      WHERE al.actor = u.id::text AND al.actor_role IS NULL
+    `);
+    await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INTEGER NOT NULL DEFAULT 0');
 
     const columns = await client.query(
       `SELECT column_name FROM information_schema.columns

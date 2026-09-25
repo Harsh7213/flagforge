@@ -13,6 +13,8 @@ import { setActiveProject, clearActiveProject, addToast } from '../store/slices/
 const ProjectsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProjectId = useAppSelector((s) => s.ui.activeProjectId);
+  const role = useAppSelector((s) => s.auth.user?.role);
+  const canManageProjects = role === 'owner' || role === 'admin';
   const { data, isLoading } = useListProjectsQuery();
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
@@ -119,17 +121,17 @@ const ProjectsPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Projects</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your flag projects and API keys</p>
         </div>
-        <button
+        {canManageProjects && <button
           id="create-project-btn"
           onClick={() => setShowCreate(!showCreate)}
           className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
         >
           + New Project
-        </button>
+        </button>}
       </div>
 
       {/* Create form */}
-      {showCreate && (
+      {canManageProjects && showCreate && (
         <div className="rounded-2xl border border-border-subtle bg-surface-card p-6 shadow-sm">
           <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Create New Project</h3>
           <form onSubmit={handleCreate} className="flex gap-3 flex-wrap">
@@ -223,7 +225,7 @@ const ProjectsPage: React.FC = () => {
                   )}
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-500 dark:text-slate-400">API Key:</span>
-                    {revealedKeys[project.id] ? <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated border border-border-subtle">
+                    {canManageProjects && revealedKeys[project.id] ? <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-elevated border border-border-subtle">
                       <code className="text-xs font-mono text-slate-800 dark:text-slate-300 truncate max-w-xs">{revealedKeys[project.id]}</code>
                       <button
                         id={`copy-api-key-${project.id}`}
@@ -233,12 +235,12 @@ const ProjectsPage: React.FC = () => {
                       >
                         {copiedKey === revealedKeys[project.id] ? '✓' : '📋'}
                       </button>
-                    </div> : <span className="text-xs text-slate-500 dark:text-slate-400">Hidden. Rotate to generate a new key.</span>}
+                    </div> : <span className="text-xs text-slate-500 dark:text-slate-400">Hidden</span>}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Created {new Date(project.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {editingProjectId !== project.id && (
+                  {canManageProjects && editingProjectId !== project.id && (
                     <button
                       id={`edit-project-${project.id}`}
                       onClick={() => startEditing(project.id, project.name)}
@@ -259,30 +261,30 @@ const ProjectsPage: React.FC = () => {
                       Set Active
                     </button>
                   )}
-                  <button
+                  {canManageProjects && <button
                     id={`rotate-api-key-${project.id}`}
                     disabled={isRotatingKey}
                     onClick={() => handleRotateKey(project.id, project.name)}
                     className="px-4 py-2 rounded-xl bg-surface-elevated hover:bg-amber-500/20 border border-border-subtle hover:border-amber-500/30 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                   >
                     {isRotatingKey ? 'Rotating...' : 'Rotate key'}
-                  </button>
-                  <button
+                  </button>}
+                  {canManageProjects && <button
                     id={`revoke-api-key-${project.id}`}
                     disabled={isRevokingKey}
                     onClick={() => handleRevokeKey(project.id, project.name)}
                     className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                   >
                     {isRevokingKey ? 'Revoking...' : 'Revoke key'}
-                  </button>
-                  <button
+                  </button>}
+                  {canManageProjects && <button
                     id={`delete-project-${project.id}`}
                     disabled={isDeleting}
                     onClick={() => handleDelete(project.id, project.name)}
                     className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
-                  </button>
+                  </button>}
                 </div>
               </div>
             </div>

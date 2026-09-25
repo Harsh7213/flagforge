@@ -3,14 +3,14 @@ import pool from '../db/pool';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { SESSION_COOKIE } from '../middleware/auth';
+import { issueCsrfCookie, SESSION_COOKIE } from '../middleware/auth';
 import { JWT_SECRET } from '../config';
 
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(6),
-  organizationName: z.string().min(2),
+  password: z.string().min(14),
+  organizationName: z.string().trim().min(2),
 });
 
 const loginSchema = z.object({
@@ -43,36 +43,33 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 
     await client.query('BEGIN');
-
-    // Check if organization already exists (case-insensitive search)
-    const existingOrg = await client.query(
-      'SELECT id, name FROM organizations WHERE LOWER(name) = LOWER($1)',
-      [organizationName.trim()]
+    await client.query(
+      'SELECT pg_advisory_xact_lock(hashtextextended(lower($1), 0))',
+      [organizationName]
     );
 
-    let organizationId: string;
-    let actualOrgName: string;
-
-    if (existingOrg.rows.length > 0) {
-      // Reuse existing organization
-      organizationId = existingOrg.rows[0].id;
-      actualOrgName = existingOrg.rows[0].name;
-    } else {
-      // Create new organization without a default project, so users can create
-      // their own project structure from scratch.
-      const orgResult = await client.query(
-        'INSERT INTO organizations (name) VALUES ($1) RETURNING id, name',
-        [organizationName.trim()]
-      );
-      organizationId = orgResult.rows[0].id;
-      actualOrgName = orgResult.rows[0].name;
+    const existingOrganization = await client.query(
+      'SELECT id FROM organizations WHERE lower(trim(name)) = lower($1) LIMIT 1',
+      [organizationName]
+    );
+    if (existingOrganization.rows.length > 0) {
+      await client.query('ROLLBACK');
+      res.status(409).json({ error: 'An organization with this name already exists' });
+      return;
     }
+
+    const orgResult = await client.query(
+      'INSERT INTO organizations (name) VALUES ($1) RETURNING id, name',
+      [organizationName]
+    );
+    const organizationId = orgResult.rows[0].id;
+    const actualOrgName = orgResult.rows[0].name;
 
     // Create user under the organization
     const passwordHash = await bcrypt.hash(password, 10);
     const userResult = await client.query(
-      'INSERT INTO users (organization_id, name, email, password_hash) VALUES ($1, $2, $3, $4) RETURNING id',
-      [organizationId, name, email, passwordHash]
+      'INSERT INTO users (organization_id, name, email, password_hash, role) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [organizationId, name, email, passwordHash, 'owner']
     );
     const userId = userResult.rows[0].id;
 
@@ -80,13 +77,14 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // Generate JWT token
     const expiresAt = Date.now() + SESSION_DURATION_MS;
-    const token = jwt.sign({ id: userId, organizationId }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: userId, organizationId, sessionVersion: 0 }, JWT_SECRET, { expiresIn: '1h' });
     setSessionCookie(res, token);
+    issueCsrfCookie(res);
 
     res.status(201).json({
       data: {
         expiresAt,
-        user: { id: userId, name, email, organizationId, organizationName: actualOrgName },
+        user: { id: userId, name, email, organizationId, organizationName: actualOrgName, role: 'owner' },
       },
     });
   } catch (error) {
@@ -102,7 +100,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const { email, password } = loginSchema.parse(req.body);
 
     const result = await pool.query(
-      `SELECT u.id, u.organization_id, u.name, u.email, u.password_hash, o.name as organization_name 
+      `SELECT u.id, u.organization_id, u.name, u.email, u.password_hash, u.role, u.session_version, o.name as organization_name
        FROM users u 
        JOIN organizations o ON u.organization_id = o.id 
        WHERE u.email = $1`,
@@ -122,8 +120,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const expiresAt = Date.now() + SESSION_DURATION_MS;
-    const token = jwt.sign({ id: user.id, organizationId: user.organization_id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, organizationId: user.organization_id, sessionVersion: user.session_version }, JWT_SECRET, { expiresIn: '1h' });
     setSessionCookie(res, token);
+    issueCsrfCookie(res);
 
     res.json({
       data: {
@@ -134,6 +133,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
           email: user.email,
           organizationId: user.organization_id,
           organizationName: user.organization_name,
+          role: user.role,
         },
       },
     });
@@ -145,7 +145,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await pool.query(
-      `SELECT u.id, u.name, u.email, u.organization_id, o.name AS organization_name
+      `SELECT u.id, u.name, u.email, u.organization_id, u.role, o.name AS organization_name
        FROM users u
        JOIN organizations o ON u.organization_id = o.id
        WHERE u.id = $1`,
@@ -168,6 +168,7 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
           email: user.email,
           organizationId: user.organization_id,
           organizationName: user.organization_name,
+          role: user.role,
         },
       },
     });
@@ -176,7 +177,13 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-export const logout = (_req: Request, res: Response) => {
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await pool.query('UPDATE users SET session_version = session_version + 1 WHERE id = $1', [req.user!.id]);
   res.clearCookie(SESSION_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
-  res.status(204).send();
+    res.clearCookie('ff_csrf', { secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
 };
