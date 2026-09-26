@@ -19,6 +19,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(cookieParser());
+app.use('/api/v1/evaluate', express.json({ limit: '64kb' }));
 app.use(express.json({ limit: '1mb' }));
 
 // ── Health check ────────────────────────────────────────────────────

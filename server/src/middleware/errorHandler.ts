@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 
 export function errorHandler(
-  err: Error & { statusCode?: number },
+  err: Error & { statusCode?: number; status?: number },
   _req: Request,
   res: Response,
   _next: NextFunction
 ): void {
   console.error('[Error]', err.message, err.stack);
 
-  const statusCode = err.statusCode ?? 500;
+  const statusCode = err.statusCode ?? err.status ?? 500;
   res.status(statusCode).json({
     error: err.name || 'InternalServerError',
     message: err.message || 'An unexpected error occurred',

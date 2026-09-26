@@ -6,6 +6,7 @@ import { evaluate, batchEvaluate } from '../controllers/evaluation.controller';
 import { getAuditLogs } from '../controllers/audit.controller';
 import { getCurrentUser, login, logout, register } from '../controllers/auth.controller';
 import { acceptInvitation, createInvitation, listMembers, removeMember } from '../controllers/organization.controller';
+import { batchEvaluationLimit, evaluationLimit } from '../middleware/evaluationLimits';
 
 const router = Router();
 
@@ -43,7 +44,7 @@ router.get('/stats', requireAuth, getStats);
 router.get('/audit', requireAuth, getAuditLogs);
 
 // SDK Evaluation Routes (Protected by API Key)
-router.post('/evaluate', apiKeyAuth, evaluate);
-router.post('/evaluate/batch', apiKeyAuth, batchEvaluate);
+router.post('/evaluate', apiKeyAuth, evaluationLimit, evaluate);
+router.post('/evaluate/batch', apiKeyAuth, batchEvaluationLimit, batchEvaluate);
 
 export default router;

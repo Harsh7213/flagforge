@@ -12,7 +12,7 @@ const evaluateSchema = z.object({
 });
 
 const batchEvaluateSchema = z.object({
-  flagKeys: z.array(z.string().min(1)),
+  flagKeys: z.array(z.string().min(1)).max(50, 'A batch can evaluate at most 50 flags'),
   projectId: z.string().uuid().optional(),
   environment: z.enum(['development', 'staging', 'production']),
   userId: z.string().optional(),
