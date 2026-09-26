@@ -40,7 +40,9 @@ async function logAudit(
   payload?: object
 ) {
   await client.query(
-    `INSERT INTO audit_logs (id, flag_id, actor, actor_role, action, payload) VALUES ($1, $2, $3, $4, $5, $6)`,
+    `INSERT INTO audit_logs (id, flag_id, project_id, flag_key, flag_name, actor, actor_role, action, payload)
+     SELECT $1, ff.id, ff.project_id, ff.key, ff.name, $3, $4, $5, $6
+     FROM feature_flags ff WHERE ff.id = $2`,
     [uuidv4(), flagId, actor, actorRole, action, payload ? JSON.stringify(payload) : null]
   );
 }
@@ -240,14 +242,24 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
 
 // DELETE /api/v1/flags/:id
 export async function deleteFlag(req: Request, res: Response, next: NextFunction) {
+  const client = await pool.connect();
   try {
     const id = req.params.id as string;
     await verifyFlagAccess(id, req);
 
-    await pool.query('DELETE FROM feature_flags WHERE id = $1', [id]);
+    await client.query('BEGIN');
+    const flag = await client.query('SELECT key, name FROM feature_flags WHERE id = $1 FOR UPDATE', [id]);
+    if (flag.rows.length === 0) throw new AppError('Flag not found', 404);
+
+    await logAudit(client, id, getActor(req), getActorRole(req), 'deleted', flag.rows[0]);
+    await client.query('DELETE FROM feature_flags WHERE id = $1', [id]);
+    await client.query('COMMIT');
     res.json({ message: 'Flag deleted' });
   } catch (err) {
+    await client.query('ROLLBACK');
     next(err);
+  } finally {
+    client.release();
   }
 }
 

@@ -7,12 +7,11 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
     const limit = parseInt(req.query.limit as string) || 50;
 
     let query = `
-      SELECT al.*, ff.key as flag_key,
+      SELECT al.*,
         CASE WHEN u.name IS NOT NULL THEN u.name ELSE al.actor END as actor,
         COALESCE(al.actor_role, u.role, 'system') AS actor_role
       FROM audit_logs al
-      JOIN feature_flags ff ON al.flag_id = ff.id
-      JOIN projects p ON ff.project_id = p.id
+      JOIN projects p ON al.project_id = p.id
       LEFT JOIN users u ON al.actor = u.id::text
     `;
     const params: (string | number)[] = [];
@@ -23,7 +22,7 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
       params.push(req.user.organizationId);
 
       if (projectId) {
-        query += ` AND ff.project_id = $2`;
+        query += ` AND al.project_id = $2`;
         params.push(projectId);
       }
     } else {

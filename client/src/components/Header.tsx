@@ -21,11 +21,8 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const projects = projectsData?.data;
-    if (!projects) return;
-    if (projects.length === 0) {
-      if (activeProjectId !== null) dispatch(clearActiveProject());
-    } else if (!projects.some((p) => p.id === activeProjectId)) {
-      dispatch(setActiveProject(projects[0].id));
+    if (projects && activeProjectId && !projects.some((p) => p.id === activeProjectId)) {
+      dispatch(clearActiveProject());
     }
   }, [activeProjectId, dispatch, projectsData]);
 
@@ -57,6 +54,7 @@ const Header: React.FC = () => {
             onChange={(e) => dispatch(setActiveProject(e.target.value))}
             className="px-3 py-1.5 rounded-lg bg-surface-card border border-border-subtle text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/40 hover:border-brand-500/40 transition-all duration-200 cursor-pointer shadow-sm"
           >
+            <option value="" disabled>Select a project</option>
             {projectsData.data.map((p) => (
               <option key={p.id} value={p.id} className="bg-surface-card text-slate-900 dark:text-slate-100">
                 📁 {p.name}

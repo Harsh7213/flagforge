@@ -82,12 +82,17 @@ CREATE TABLE IF NOT EXISTS targeting_rules (
 -- Audit log
 CREATE TABLE IF NOT EXISTS audit_logs (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  flag_id     UUID NOT NULL REFERENCES feature_flags(id) ON DELETE CASCADE,
+  flag_id     UUID,
+  project_id  UUID NOT NULL,
+  flag_key    VARCHAR(255) NOT NULL,
+  flag_name   VARCHAR(255) NOT NULL,
   actor       VARCHAR(255) NOT NULL DEFAULT 'system',
   actor_role  VARCHAR(20),
   action      VARCHAR(50) NOT NULL,
   payload     JSONB,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT audit_logs_flag_id_fkey FOREIGN KEY (flag_id) REFERENCES feature_flags(id) ON DELETE SET NULL,
+  CONSTRAINT audit_logs_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 );
 
 -- Indexes
@@ -110,15 +115,6 @@ async function migrate() {
   try {
     console.log('🔄 Running database migrations...');
     await client.query(SQL);
-    await client.query('ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS actor_role VARCHAR(20)');
-    await client.query(`
-      UPDATE audit_logs al
-      SET actor_role = u.role
-      FROM users u
-      WHERE al.actor = u.id::text AND al.actor_role IS NULL
-    `);
-    await client.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INTEGER NOT NULL DEFAULT 0');
-
     const columns = await client.query(
       `SELECT column_name FROM information_schema.columns
        WHERE table_schema = 'public' AND table_name = 'projects'

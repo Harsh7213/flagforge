@@ -27,15 +27,14 @@ const getInitialTheme = (): Theme => {
   return 'light';
 };
 
+const getInitialProjectId = (): string | null => localStorage.getItem('ff-project');
+
 const initialState: UiState = {
   theme: getInitialTheme(),
-  activeProjectId: null,
+  activeProjectId: getInitialProjectId(),
   sidebarOpen: true,
   toasts: [],
 };
-
-// Remove the legacy persisted project selection from older client versions.
-localStorage.removeItem('ff-project');
 
 const applyTheme = (theme: Theme) => {
   document.documentElement.setAttribute('data-theme', theme);
@@ -73,9 +72,11 @@ const uiSlice = createSlice({
     },
     setActiveProject(state, action: PayloadAction<string>) {
       state.activeProjectId = action.payload;
+      localStorage.setItem('ff-project', action.payload);
     },
     clearActiveProject(state) {
       state.activeProjectId = null;
+      localStorage.removeItem('ff-project');
     },
     toggleSidebar(state) {
       state.sidebarOpen = !state.sidebarOpen;

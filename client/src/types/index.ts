@@ -42,7 +42,7 @@ export interface FeatureFlag {
 
 export interface AuditLog {
   id: string;
-  flag_id: string;
+  flag_id: string | null;
   flag_key: string;
   flag_name: string;
   actor: string;

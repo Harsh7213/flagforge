@@ -34,7 +34,6 @@ const ProjectsPage: React.FC = () => {
     try {
       const result = await createProject({ name: newName.trim() }).unwrap();
       dispatch(addToast({ type: 'success', message: `Project "${newName}" created!` }));
-      dispatch(setActiveProject(result.data.id));
       if (result.data.api_key) {
         setRevealedKeys((keys) => ({ ...keys, [result.data.id]: result.data.api_key! }));
       }
