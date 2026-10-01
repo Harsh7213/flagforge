@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { requireAuth, requireRole, csrfProtection, apiKeyAuth } from '../middleware/auth';
+import {
+  requireAuth,
+  requireRole,
+  csrfProtection,
+  apiKeyAuth,
+  optionalAuth
+} from '../middleware/auth';
 import {
   getProjects,
   createProject,
@@ -38,7 +44,7 @@ router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.post('/auth/logout', requireAuth, csrfProtection, logout);
 router.post('/auth/invitations/accept', acceptInvitation);
-router.get('/auth/me', requireAuth, getCurrentUser);
+router.get('/auth/me', optionalAuth, getCurrentUser);
 
 router.post(
   '/organizations/invitations',

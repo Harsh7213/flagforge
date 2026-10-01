@@ -160,6 +160,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
 export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user) {
+      res.json({ data: null });
+      return;
+    }
+
     const result = await pool.query(
       `SELECT u.id, u.name, u.email, u.organization_id, u.role, o.name AS organization_name
        FROM users u

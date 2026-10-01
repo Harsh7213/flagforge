@@ -71,55 +71,69 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-/**
- * Validates JWT for Dashboard requests
- */
-export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+const authenticateRequest = async (req: Request): Promise<boolean> => {
   const authHeader = req.header('Authorization');
   const token =
     req.cookies?.[SESSION_COOKIE] ??
     (authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined);
 
-  if (!token) {
-    clearAuthCookies(res);
-    res.status(401).json({ error: 'Missing or invalid Authorization header' });
-    return;
+  if (!token) return false;
+
+  let verified;
+  try {
+    verified = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return false;
+  }
+  if (typeof verified === 'string' || !verified.id) return false;
+
+  const membership = await pool.query(
+    'SELECT organization_id, role, session_version FROM users WHERE id = $1',
+    [verified.id]
+  );
+  if (membership.rowCount === 0 || verified.sessionVersion !== membership.rows[0].session_version) {
+    return false;
   }
 
+  req.user = {
+    id: verified.id,
+    organizationId: membership.rows[0].organization_id,
+    role: membership.rows[0].role,
+    sessionVersion: membership.rows[0].session_version,
+    exp: verified.exp
+  };
+  return true;
+};
+
+const continueWithCsrf = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user && !req.cookies?.[CSRF_COOKIE]) {
+    issueCsrfCookie(res);
+  }
+  next();
+};
+
+/** Validates JWT for Dashboard requests. */
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const verified = jwt.verify(token, JWT_SECRET);
-    if (typeof verified === 'string' || !verified.id) {
+    if (!(await authenticateRequest(req))) {
       rejectAuth(res);
       return;
     }
-
-    const membership = await pool.query(
-      'SELECT organization_id, role, session_version FROM users WHERE id = $1',
-      [verified.id]
-    );
-    if (membership.rowCount === 0) {
-      rejectAuth(res);
-      return;
-    }
-
-    if (verified.sessionVersion !== membership.rows[0].session_version) {
-      rejectAuth(res);
-      return;
-    }
-
-    req.user = {
-      id: verified.id,
-      organizationId: membership.rows[0].organization_id,
-      role: membership.rows[0].role,
-      sessionVersion: membership.rows[0].session_version,
-      exp: verified.exp
-    };
-    if (!req.cookies?.[CSRF_COOKIE]) {
-      issueCsrfCookie(res);
-    }
-    next();
+    continueWithCsrf(req, res, next);
   } catch (error) {
-    rejectAuth(res);
+    next(error);
+  }
+};
+
+/** Allows anonymous access while attaching a valid dashboard session when present. */
+export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!(await authenticateRequest(req))) {
+      clearAuthCookies(res);
+    }
+    continueWithCsrf(req, res, next);
+  } catch (error) {
+    next(error);
   }
 };
 
