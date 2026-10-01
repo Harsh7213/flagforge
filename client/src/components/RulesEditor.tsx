@@ -76,13 +76,20 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
     }
   };
 
-  const formatRuleValue = (rule: TargetingRule) => {
-    if (rule.type === 'percentage') return `${rule.value}%`;
+  const formatRuleValue = (rule: TargetingRule & { values?: string[] }) => {
+    if (rule.type === 'percentage') {
+      const numericValue = Number(rule.value ?? 0);
+      return `${numericValue}%`;
+    }
+
+    const legacyValues = Array.isArray(rule.values) ? rule.values : undefined;
+    if (legacyValues && legacyValues.length > 0) return legacyValues.join(', ');
+
     try {
-      const arr: string[] = JSON.parse(rule.value);
+      const arr: string[] = JSON.parse(rule.value ?? '[]');
       return arr.join(', ');
     } catch {
-      return rule.value;
+      return rule.value || '';
     }
   };
 

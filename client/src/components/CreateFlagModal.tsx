@@ -108,7 +108,11 @@ const CreateFlagModal: React.FC<Props> = ({ projectId, onClose }) => {
               onChange={e => {
                 setForm(prev => ({ ...prev, name: e.target.value }));
                 if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
-                if (!form.key) {
+                const currentSlug = form.name
+                  .toLowerCase()
+                  .replace(/\s+/g, '_')
+                  .replace(/[^a-z0-9_-]/g, '');
+                if (!form.key || form.key === currentSlug) {
                   handleKeyChange(e.target.value);
                 }
               }}

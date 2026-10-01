@@ -33,7 +33,7 @@ export const organizationApi = createApi({
   reducerPath: 'organizationApi',
   tagTypes: ['Member'],
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api/v1',
+    baseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost'}/api/v1`,
     credentials: 'include',
     prepareHeaders: headers => {
       const token = csrfToken();

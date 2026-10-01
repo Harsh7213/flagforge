@@ -9,7 +9,7 @@ const csrfToken = () =>
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api/v1/auth',
+    baseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost'}/api/v1/auth`,
     credentials: 'include',
     prepareHeaders: headers => {
       const token = csrfToken();
