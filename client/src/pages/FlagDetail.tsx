@@ -9,6 +9,7 @@ import {
 } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store';
 import { addToast } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 import type { Environment } from '../types';
 import RulesEditor from '../components/RulesEditor';
 import AuditTimeline from '../components/AuditTimeline';
@@ -64,9 +65,9 @@ const FlagDetail: React.FC = () => {
         type: 'success',
         message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`,
       }));
-    } catch {
+    } catch (error) {
       setOptimisticEnvs((prev) => ({ ...prev, [env]: currentEnabled }));
-      dispatch(addToast({ type: 'error', message: 'Failed to toggle environment' }));
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to toggle environment') }));
     }
   };
 
@@ -83,8 +84,8 @@ const FlagDetail: React.FC = () => {
       await updateFlag({ id: flag.id, name: editName, description: editDesc }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Flag updated successfully' }));
       setIsEditing(false);
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to update flag' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to update flag') }));
     }
   };
 
@@ -97,8 +98,8 @@ const FlagDetail: React.FC = () => {
         message: flag.archived ? 'Flag restored' : 'Flag archived',
       }));
       navigate('/app/flags');
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to archive flag' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to archive flag') }));
     }
   };
 
@@ -108,8 +109,8 @@ const FlagDetail: React.FC = () => {
       await deleteFlag(flag.id).unwrap();
       dispatch(addToast({ type: 'success', message: `Flag "${flag.name}" deleted` }));
       navigate('/app/flags');
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to delete flag' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to delete flag') }));
     }
   };
 

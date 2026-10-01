@@ -8,6 +8,8 @@ interface Props {
 const ACTION_ICONS: Record<string, string> = {
   created: '✨',
   updated: '✏️',
+  archived: '📦',
+  restored: '📤',
   deleted: '🗑',
   toggled: '🔀',
   rule_added: '➕',
@@ -17,6 +19,8 @@ const ACTION_ICONS: Record<string, string> = {
 const ACTION_COLORS: Record<string, string> = {
   created: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border-emerald-500/30',
   updated: 'bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30',
+  archived: 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/30',
+  restored: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-400 border-emerald-500/30',
   deleted: 'bg-red-500/15 text-red-800 dark:text-red-400 border-red-500/30',
   toggled: 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-400 border-cyan-500/30',
   rule_added: 'bg-purple-500/15 text-purple-800 dark:text-purple-400 border-purple-500/30',
@@ -49,45 +53,53 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
 
   return (
     <div className="space-y-3">
-      {logs.map((log) => (
-        <article
-          key={log.id}
-          className="p-4 rounded-xl bg-surface-card border border-border-subtle hover:border-brand-500/30 transition-all duration-200 space-y-2 shadow-sm"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-base">{ACTION_ICONS[log.action] || '📌'}</span>
-              <span
-                className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wide border ${
-                  ACTION_COLORS[log.action] || 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/30'
-                }`}
-              >
-                {log.action}
-              </span>
-              <span className="px-2 py-0.5 rounded-md bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono text-xs border border-brand-500/20">
-                {log.flag_key}
+      {logs.map((log) => {
+        const action = log.action === 'updated' && log.payload?.archived === true
+          ? 'archived'
+          : log.action === 'updated' && log.payload?.archived === false
+            ? 'restored'
+            : log.action;
+
+        return (
+          <article
+            key={log.id}
+            className="p-4 rounded-xl bg-surface-card border border-border-subtle hover:border-brand-500/30 transition-all duration-200 space-y-2 shadow-sm"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base">{ACTION_ICONS[action] || '📌'}</span>
+                <span
+                  className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wide border ${
+                    ACTION_COLORS[action] || 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/30'
+                  }`}
+                >
+                  {action}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-brand-500/10 text-brand-700 dark:text-brand-300 font-mono text-xs border border-brand-500/20">
+                  {log.flag_key}
+                </span>
+              </div>
+              <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" title={new Date(log.created_at).toLocaleString()}>
+                {timeAgo(log.created_at)}
               </span>
             </div>
-            <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" title={new Date(log.created_at).toLocaleString()}>
-              {timeAgo(log.created_at)}
-            </span>
-          </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-1">
-            <span>by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong>{log.actor_role && <span className="ml-1 text-slate-500 dark:text-slate-400">({log.actor_role})</span>}</span>
-            {log.payload && (
-              <details className="text-right">
-                <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 select-none">
-                  View payload
-                </summary>
-                <pre className="mt-2 p-3 rounded-lg bg-surface-elevated border border-border-subtle text-[11px] font-mono text-slate-800 dark:text-slate-300 text-left overflow-x-auto max-h-32">
-                  {JSON.stringify(log.payload, null, 2)}
-                </pre>
-              </details>
-            )}
-          </div>
-        </article>
-      ))}
+            <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-1">
+              <span>by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong>{log.actor_role && <span className="ml-1 text-slate-500 dark:text-slate-400">({log.actor_role})</span>}</span>
+              {log.payload && (
+                <details className="text-right">
+                  <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 select-none">
+                    View payload
+                  </summary>
+                  <pre className="mt-2 p-3 rounded-lg bg-surface-elevated border border-border-subtle text-[11px] font-mono text-slate-800 dark:text-slate-300 text-left overflow-x-auto max-h-32">
+                    {JSON.stringify(log.payload, null, 2)}
+                  </pre>
+                </details>
+              )}
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 };

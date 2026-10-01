@@ -27,7 +27,7 @@ const getInitialTheme = (): Theme => {
   return 'light';
 };
 
-const getInitialProjectId = (): string | null => localStorage.getItem('ff-project');
+const getInitialProjectId = (): string | null => sessionStorage.getItem('ff-project');
 
 const initialState: UiState = {
   theme: getInitialTheme(),
@@ -59,11 +59,6 @@ const uiSlice = createSlice({
       localStorage.setItem('ff-theme', state.theme);
       applyTheme(state.theme);
     },
-    setTheme(state, action: PayloadAction<Theme>) {
-      state.theme = action.payload;
-      localStorage.setItem('ff-theme', state.theme);
-      applyTheme(state.theme);
-    },
     setSystemTheme(state, action: PayloadAction<Theme>) {
       if (!localStorage.getItem('ff-theme')) {
         state.theme = action.payload;
@@ -72,11 +67,11 @@ const uiSlice = createSlice({
     },
     setActiveProject(state, action: PayloadAction<string>) {
       state.activeProjectId = action.payload;
-      localStorage.setItem('ff-project', action.payload);
+      sessionStorage.setItem('ff-project', action.payload);
     },
     clearActiveProject(state) {
       state.activeProjectId = null;
-      localStorage.removeItem('ff-project');
+      sessionStorage.removeItem('ff-project');
     },
     toggleSidebar(state) {
       state.sidebarOpen = !state.sidebarOpen;
@@ -91,7 +86,7 @@ const uiSlice = createSlice({
   },
 });
 
-export const { toggleTheme, setTheme, setSystemTheme, setActiveProject, clearActiveProject, toggleSidebar, addToast, removeToast } =
+export const { toggleTheme, setSystemTheme, setActiveProject, clearActiveProject, toggleSidebar, addToast, removeToast } =
   uiSlice.actions;
 
 export default uiSlice.reducer;

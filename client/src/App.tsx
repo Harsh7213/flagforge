@@ -49,18 +49,19 @@ const DashboardLayout: React.FC = () => {
 const PublicOnly: React.FC = () => {
   const dispatch = useAppDispatch();
   const { data, isLoading } = useMeQuery(undefined);
+  const hasValidServerSession = Boolean(data?.data && data.data.expiresAt > Date.now());
 
   useEffect(() => {
-    if (data?.data) {
+    if (hasValidServerSession) {
       dispatch(setCredentials(data.data));
     }
-  }, [data, dispatch]);
+  }, [data, dispatch, hasValidServerSession]);
 
   if (isLoading) {
     return <LoadingFallback />;
   }
 
-  if (data?.data) {
+  if (hasValidServerSession) {
     return <Navigate to="/app" replace />;
   }
 

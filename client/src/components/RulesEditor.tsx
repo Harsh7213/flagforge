@@ -3,6 +3,7 @@ import type { FlagEnvironment, Environment, RuleType, TargetingRule } from '../t
 import { useAddRuleMutation, useDeleteRuleMutation } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store';
 import { addToast } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 interface Props {
   flagId: string;
@@ -48,8 +49,8 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
       dispatch(addToast({ type: 'success', message: 'Targeting rule added' }));
       setRuleValue('');
       setShowForm(false);
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to add rule' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to add rule') }));
     }
   };
 
@@ -57,8 +58,8 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
     try {
       await deleteRule({ flagId, ruleId: rule.id }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Rule removed' }));
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to remove rule' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to remove rule') }));
     }
   };
 

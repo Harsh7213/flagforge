@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCreateFlagMutation } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store';
 import { addToast } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 interface Props {
   projectId: string;
@@ -38,8 +39,8 @@ const CreateFlagModal: React.FC<Props> = ({ projectId, onClose }) => {
       }).unwrap();
       dispatch(addToast({ type: 'success', message: `Flag "${form.name}" created!` }));
       onClose();
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to create flag' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to create flag') }));
     }
   };
 

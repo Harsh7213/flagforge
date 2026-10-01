@@ -9,6 +9,7 @@ import {
 } from '../store/api/projectsApi';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 const ProjectsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -39,8 +40,8 @@ const ProjectsPage: React.FC = () => {
       }
       setNewName('');
       setShowCreate(false);
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to create project' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to create project') }));
     }
   };
 
@@ -52,8 +53,8 @@ const ProjectsPage: React.FC = () => {
         setRevealedKeys((keys) => ({ ...keys, [id]: result.data.api_key! }));
       }
       dispatch(addToast({ type: 'success', message: 'New API key generated. Copy it now; it will not be shown again.' }));
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to rotate API key' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to rotate API key') }));
     }
   };
 
@@ -63,8 +64,8 @@ const ProjectsPage: React.FC = () => {
       await revokeApiKey(id).unwrap();
       setRevealedKeys(({ [id]: _removed, ...keys }) => keys);
       dispatch(addToast({ type: 'success', message: 'API key revoked' }));
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to revoke API key' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to revoke API key') }));
     }
   };
 
@@ -92,8 +93,8 @@ const ProjectsPage: React.FC = () => {
       await updateProject({ id, name }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Project renamed successfully' }));
       cancelEditing();
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to rename project' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to rename project') }));
     }
   };
 
@@ -107,8 +108,8 @@ const ProjectsPage: React.FC = () => {
       if (activeProjectId === id) {
         dispatch(clearActiveProject());
       }
-    } catch {
-      dispatch(addToast({ type: 'error', message: 'Failed to delete project' }));
+    } catch (error) {
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to delete project') }));
     }
   };
 

@@ -8,6 +8,17 @@ export const SESSION_COOKIE = 'ff_session';
 export const CSRF_COOKIE = 'ff_csrf';
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
+export const clearAuthCookies = (res: Response) => {
+  const options = { secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/' };
+  res.clearCookie(SESSION_COOKIE, { ...options, httpOnly: true });
+  res.clearCookie(CSRF_COOKIE, options);
+};
+
+const rejectAuth = (res: Response) => {
+  clearAuthCookies(res);
+  res.status(401).json({ error: 'Invalid or expired token' });
+};
+
 // Extend Express Request
 declare global {
   namespace Express {
@@ -65,6 +76,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     (authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined);
 
   if (!token) {
+    clearAuthCookies(res);
     res.status(401).json({ error: 'Missing or invalid Authorization header' });
     return;
   }
@@ -72,7 +84,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   try {
     const verified = jwt.verify(token, JWT_SECRET);
     if (typeof verified === 'string' || !verified.id) {
-      res.status(401).json({ error: 'Invalid or expired token' });
+      rejectAuth(res);
       return;
     }
 
@@ -81,12 +93,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       [verified.id]
     );
     if (membership.rowCount === 0) {
-      res.status(401).json({ error: 'Invalid or expired token' });
+      rejectAuth(res);
       return;
     }
 
     if (verified.sessionVersion !== membership.rows[0].session_version) {
-      res.status(401).json({ error: 'Invalid or expired token' });
+      rejectAuth(res);
       return;
     }
 
@@ -102,7 +114,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid or expired token' });
+    rejectAuth(res);
   }
 };
 

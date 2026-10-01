@@ -4,6 +4,7 @@ import type { FeatureFlag, Environment } from '../types';
 import { useToggleEnvironmentMutation } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store';
 import { addToast } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 interface Props {
   flag: FeatureFlag;
@@ -48,10 +49,10 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
         type: 'success',
         message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`,
       }));
-    } catch {
+    } catch (error) {
       // Revert optimistic update on failure
       setOptimisticEnvs((prev) => ({ ...prev, [env]: currentEnabled }));
-      dispatch(addToast({ type: 'error', message: 'Failed to toggle flag' }));
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to toggle flag') }));
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store';
 import { addToast } from '../store/slices/uiSlice';
 import { useCreateInvitationMutation, useListMembersQuery, useRemoveMemberMutation } from '../store/api/organizationApi';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 const TeamPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +25,7 @@ const TeamPage: React.FC = () => {
       setEmail('');
       dispatch(addToast({ type: 'success', message: 'Invitation created' }));
     } catch (error: any) {
-      dispatch(addToast({ type: 'error', message: error?.data?.error || 'Failed to create invitation' }));
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, error?.data?.error || 'Failed to create invitation') }));
     }
   };
 
@@ -44,7 +45,7 @@ const TeamPage: React.FC = () => {
       await removeMember(memberId).unwrap();
       dispatch(addToast({ type: 'success', message: `${memberName} was removed` }));
     } catch (error: any) {
-      dispatch(addToast({ type: 'error', message: error?.data?.error || 'Failed to remove member' }));
+      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, error?.data?.error || 'Failed to remove member') }));
     }
   };
 

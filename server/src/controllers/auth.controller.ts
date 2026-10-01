@@ -3,7 +3,7 @@ import pool from '../db/pool';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { issueCsrfCookie, SESSION_COOKIE } from '../middleware/auth';
+import { clearAuthCookies, issueCsrfCookie, SESSION_COOKIE } from '../middleware/auth';
 import { JWT_SECRET } from '../config';
 
 const registerSchema = z.object({
@@ -180,8 +180,7 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await pool.query('UPDATE users SET session_version = session_version + 1 WHERE id = $1', [req.user!.id]);
-  res.clearCookie(SESSION_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
-    res.clearCookie('ff_csrf', { secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+    clearAuthCookies(res);
     res.status(204).send();
   } catch (error) {
     next(error);
