@@ -5,7 +5,7 @@ import { toggleTheme } from '../store/slices/uiSlice';
 
 const AboutPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((s) => s.ui.theme);
+  const theme = useAppSelector(s => s.ui.theme);
 
   return (
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-200">
@@ -20,11 +20,20 @@ const AboutPage: React.FC = () => {
               FlagForge
             </span>
           </Link>
-          
+
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-400">
-            <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-            <Link to="/about" className="text-brand-600 dark:text-brand-400 font-semibold">About</Link>
-            <Link to="/login" className="hover:text-slate-900 dark:hover:text-white transition-colors">Sign In</Link>
+            <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+              Home
+            </Link>
+            <Link to="/about" className="text-brand-600 dark:text-brand-400 font-semibold">
+              About
+            </Link>
+            <Link
+              to="/login"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Sign In
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -54,13 +63,16 @@ const AboutPage: React.FC = () => {
             <span>✨</span> Mission & Vision
           </div>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-            Decouple deployments from releases.<br />
+            Decouple deployments from releases.
+            <br />
             <span className="bg-gradient-to-r from-brand-500 via-cyan-500 to-teal-400 bg-clip-text text-transparent">
               Empower engineering teams.
             </span>
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            FlagForge is an enterprise-grade multi-tenant feature flag management system designed to eliminate high-risk deployments. Control features dynamically across Development, Staging, and Production environments without redeploying code.
+            FlagForge is an enterprise-grade multi-tenant feature flag management system designed to
+            eliminate high-risk deployments. Control features dynamically across Development,
+            Staging, and Production environments without redeploying code.
           </p>
         </div>
 
@@ -70,9 +82,12 @@ const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-500 flex items-center justify-center text-2xl mb-4">
               🏢
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Multi-Tenant Architecture</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+              Multi-Tenant Architecture
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Complete data isolation per organization at the database layer. Secure multi-user team collaboration with case-insensitive organization boundaries.
+              Complete data isolation per organization at the database layer. Secure multi-user team
+              collaboration with case-insensitive organization boundaries.
             </p>
           </div>
 
@@ -80,9 +95,12 @@ const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center text-2xl mb-4">
               🎯
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Targeted Rollouts</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+              Targeted Rollouts
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Target individual user IDs, custom attributes, or percentage-based traffic splits across Development, Staging, and Production environments.
+              Target individual user IDs, custom attributes, or percentage-based traffic splits
+              across Development, Staging, and Production environments.
             </p>
           </div>
 
@@ -90,9 +108,12 @@ const AboutPage: React.FC = () => {
             <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-2xl mb-4">
               🛡️
             </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Comprehensive Audit Log</h3>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+              Comprehensive Audit Log
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Full transparency with timestamped audit events logging every toggle, targeting rule edit, and environment change for regulatory compliance.
+              Full transparency with timestamped audit events logging every toggle, targeting rule
+              edit, and environment change for regulatory compliance.
             </p>
           </div>
         </div>
@@ -102,9 +123,12 @@ const AboutPage: React.FC = () => {
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-brand-500 to-cyan-400 flex items-center justify-center text-3xl shadow-lg text-white">
             👨‍💻
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Created with ❤️ by Harsh</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Created with ❤️ by Harsh
+          </h2>
           <p className="text-slate-600 dark:text-slate-300 max-w-xl mx-auto text-sm leading-relaxed">
-            FlagForge was crafted with precision to deliver a seamless, high-performance feature flag platform for developers and product teams worldwide.
+            FlagForge was crafted with precision to deliver a seamless, high-performance feature
+            flag platform for developers and product teams worldwide.
           </p>
           <div className="pt-2 flex justify-center gap-4">
             <Link
@@ -130,18 +154,39 @@ const AboutPage: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
               🚩
             </div>
-            <span className="font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">FlagForge</span>
+            <span className="font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+              FlagForge
+            </span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-            <Link to="/about" className="hover:text-slate-900 dark:hover:text-white transition-colors">About</Link>
-            <Link to="/login" className="hover:text-slate-900 dark:hover:text-white transition-colors">Sign In</Link>
-            <Link to="/register" className="hover:text-slate-900 dark:hover:text-white transition-colors">Register</Link>
+            <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              to="/login"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/register"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Register
+            </Link>
           </div>
 
           <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span className="font-medium text-slate-700 dark:text-slate-300">Created with ❤️ by Harsh</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              Created with ❤️ by Harsh
+            </span>
           </p>
         </div>
       </footer>

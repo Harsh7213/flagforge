@@ -120,7 +120,7 @@ async function migrate() {
        WHERE table_schema = 'public' AND table_name = 'projects'
       AND column_name IN ('api_key', 'api_key_id', 'api_key_hash')`
     );
-    const columnNames = new Set(columns.rows.map((row) => row.column_name));
+    const columnNames = new Set(columns.rows.map(row => row.column_name));
 
     if (!columnNames.has('api_key_hash')) {
       await client.query('ALTER TABLE projects ADD COLUMN api_key_hash TEXT');
@@ -135,7 +135,11 @@ async function migrate() {
       );
       for (const project of legacyKeys.rows) {
         const apiKeyHash = await bcrypt.hash(String(project.api_key), 12);
-        await client.query('UPDATE projects SET api_key_id = $1, api_key_hash = $2 WHERE id = $3', [project.api_key, apiKeyHash, project.id]);
+        await client.query('UPDATE projects SET api_key_id = $1, api_key_hash = $2 WHERE id = $3', [
+          project.api_key,
+          apiKeyHash,
+          project.id
+        ]);
       }
       await client.query('ALTER TABLE projects DROP COLUMN api_key');
     }

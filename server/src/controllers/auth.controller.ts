@@ -10,12 +10,12 @@ const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(14),
-  organizationName: z.string().trim().min(2),
+  organizationName: z.string().trim().min(2)
 });
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string()
 });
 
 const SESSION_DURATION_MS = 60 * 60 * 1000;
@@ -26,7 +26,7 @@ const setSessionCookie = (res: Response, token: string) => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: SESSION_DURATION_MS,
-    path: '/',
+    path: '/'
   });
 };
 
@@ -43,10 +43,9 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 
     await client.query('BEGIN');
-    await client.query(
-      'SELECT pg_advisory_xact_lock(hashtextextended(lower($1), 0))',
-      [organizationName]
-    );
+    await client.query('SELECT pg_advisory_xact_lock(hashtextextended(lower($1), 0))', [
+      organizationName
+    ]);
 
     const existingOrganization = await client.query(
       'SELECT id FROM organizations WHERE lower(trim(name)) = lower($1) LIMIT 1',
@@ -77,15 +76,24 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     // Generate JWT token
     const expiresAt = Date.now() + SESSION_DURATION_MS;
-    const token = jwt.sign({ id: userId, organizationId, sessionVersion: 0 }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: userId, organizationId, sessionVersion: 0 }, JWT_SECRET, {
+      expiresIn: '1h'
+    });
     setSessionCookie(res, token);
     issueCsrfCookie(res);
 
     res.status(201).json({
       data: {
         expiresAt,
-        user: { id: userId, name, email, organizationId, organizationName: actualOrgName, role: 'owner' },
-      },
+        user: {
+          id: userId,
+          name,
+          email,
+          organizationId,
+          organizationName: actualOrgName,
+          role: 'owner'
+        }
+      }
     });
   } catch (error) {
     await client.query('ROLLBACK');
@@ -120,7 +128,15 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const expiresAt = Date.now() + SESSION_DURATION_MS;
-    const token = jwt.sign({ id: user.id, organizationId: user.organization_id, sessionVersion: user.session_version }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      {
+        id: user.id,
+        organizationId: user.organization_id,
+        sessionVersion: user.session_version
+      },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
     setSessionCookie(res, token);
     issueCsrfCookie(res);
 
@@ -133,9 +149,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
           email: user.email,
           organizationId: user.organization_id,
           organizationName: user.organization_name,
-          role: user.role,
-        },
-      },
+          role: user.role
+        }
+      }
     });
   } catch (error) {
     next(error);
@@ -159,18 +175,16 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
 
     res.json({
       data: {
-        expiresAt: req.user?.exp
-          ? req.user.exp * 1000
-          : Date.now() + SESSION_DURATION_MS,
+        expiresAt: req.user?.exp ? req.user.exp * 1000 : Date.now() + SESSION_DURATION_MS,
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
           organizationId: user.organization_id,
           organizationName: user.organization_name,
-          role: user.role,
-        },
-      },
+          role: user.role
+        }
+      }
     });
   } catch (error) {
     next(error);
@@ -179,7 +193,9 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
 
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await pool.query('UPDATE users SET session_version = session_version + 1 WHERE id = $1', [req.user!.id]);
+    await pool.query('UPDATE users SET session_version = session_version + 1 WHERE id = $1', [
+      req.user!.id
+    ]);
     clearAuthCookies(res);
     res.status(204).send();
   } catch (error) {

@@ -8,7 +8,10 @@
 @tailwind utilities;
 
 /* ── Light Mode CSS Variables ─────────────────────────────────────── */
-:root, html, html.light, [data-theme="light"] {
+:root,
+html,
+html.light,
+[data-theme='light'] {
   --bg-base: #f4f6fa;
   --bg-card: #ffffff;
   --bg-elevated: #eef2f7;
@@ -26,7 +29,8 @@
 }
 
 /* ── Dark Mode Overrides ──────────────────────────────────────────── */
-html.dark, [data-theme="dark"] {
+html.dark,
+[data-theme='dark'] {
   --bg-base: #0b0d14;
   --bg-card: #121520;
   --bg-elevated: #181c2b;
@@ -45,7 +49,9 @@ html.dark, [data-theme="dark"] {
 
 /* ── Base resets ─────────────────────────────────────────────────── */
 @layer base {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     @apply box-border;
   }
 
@@ -64,8 +70,13 @@ html.dark, [data-theme="dark"] {
   }
 
   /* Custom scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
   ::-webkit-scrollbar-thumb {
     background-color: var(--border-main);
     border-radius: 9999px;

@@ -18,28 +18,25 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  sessionExpiresAt: Number(sessionStorage.getItem('sessionExpiresAt')) || null,
+  sessionExpiresAt: Number(sessionStorage.getItem('sessionExpiresAt')) || null
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (
-      state,
-      action: PayloadAction<{ user: User; expiresAt?: number }>
-    ) => {
+    setCredentials: (state, action: PayloadAction<{ user: User; expiresAt?: number }>) => {
       const expiresAt = action.payload.expiresAt ?? Date.now() + SESSION_DURATION_MS;
       state.user = action.payload.user;
       state.sessionExpiresAt = expiresAt;
       sessionStorage.setItem('sessionExpiresAt', String(expiresAt));
     },
-    logout: (state) => {
+    logout: state => {
       state.user = null;
       state.sessionExpiresAt = null;
       sessionStorage.removeItem('sessionExpiresAt');
-    },
-  },
+    }
+  }
 });
 
 export const { setCredentials, logout } = authSlice.actions;

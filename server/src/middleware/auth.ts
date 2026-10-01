@@ -9,7 +9,11 @@ export const CSRF_COOKIE = 'ff_csrf';
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 export const clearAuthCookies = (res: Response) => {
-  const options = { secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/' };
+  const options = {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/'
+  };
   res.clearCookie(SESSION_COOKIE, { ...options, httpOnly: true });
   res.clearCookie(CSRF_COOKIE, options);
 };
@@ -72,7 +76,8 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
  */
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.header('Authorization');
-  const token = req.cookies?.[SESSION_COOKIE] ??
+  const token =
+    req.cookies?.[SESSION_COOKIE] ??
     (authHeader?.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : undefined);
 
   if (!token) {
@@ -107,7 +112,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       organizationId: membership.rows[0].organization_id,
       role: membership.rows[0].role,
       sessionVersion: membership.rows[0].session_version,
-      exp: verified.exp,
+      exp: verified.exp
     };
     if (!req.cookies?.[CSRF_COOKIE]) {
       issueCsrfCookie(res);
@@ -118,7 +123,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export const requireRole = (...allowedRoles: Array<'owner' | 'admin' | 'member'>) =>
+export const requireRole =
+  (...allowedRoles: Array<'owner' | 'admin' | 'member'>) =>
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
       res.status(403).json({ error: 'Insufficient permissions' });
@@ -133,7 +139,7 @@ export const issueCsrfCookie = (res: Response) => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 60 * 1000,
-    path: '/',
+    path: '/'
   });
 };
 

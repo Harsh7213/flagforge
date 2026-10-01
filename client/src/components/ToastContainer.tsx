@@ -6,21 +6,21 @@ const iconMap: Record<string, string> = {
   success: '✓',
   error: '✕',
   info: 'ℹ',
-  warning: '⚠',
+  warning: '⚠'
 };
 
 const colorMap: Record<string, string> = {
   success: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-900 dark:text-emerald-300',
-  error:   'bg-red-500/15 border-red-500/30 text-red-900 dark:text-red-300',
-  info:    'bg-brand-500/15 border-brand-500/30 text-brand-900 dark:text-brand-300',
-  warning: 'bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-300',
+  error: 'bg-red-500/15 border-red-500/30 text-red-900 dark:text-red-300',
+  info: 'bg-brand-500/15 border-brand-500/30 text-brand-900 dark:text-brand-300',
+  warning: 'bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-300'
 };
 
 const iconColorMap: Record<string, string> = {
   success: 'bg-emerald-500/30 text-emerald-600 dark:text-emerald-400',
-  error:   'bg-red-500/30 text-red-600 dark:text-red-400',
-  info:    'bg-brand-500/30 text-brand-600 dark:text-brand-400',
-  warning: 'bg-amber-500/30 text-amber-600 dark:text-amber-400',
+  error: 'bg-red-500/30 text-red-600 dark:text-red-400',
+  info: 'bg-brand-500/30 text-brand-600 dark:text-brand-400',
+  warning: 'bg-amber-500/30 text-amber-600 dark:text-amber-400'
 };
 
 const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
@@ -61,13 +61,13 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
 };
 
 const ToastContainer: React.FC = () => {
-  const toasts = useAppSelector((s) => s.ui.toasts);
+  const toasts = useAppSelector(s => s.ui.toasts);
 
   if (!toasts.length) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-auto">
-      {toasts.map((toast) => (
+      {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} />
       ))}
     </div>

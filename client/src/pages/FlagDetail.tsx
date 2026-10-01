@@ -5,7 +5,7 @@ import {
   useUpdateFlagMutation,
   useDeleteFlagMutation,
   useToggleEnvironmentMutation,
-  useGetFlagAuditLogsQuery,
+  useGetFlagAuditLogsQuery
 } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store';
 import { addToast } from '../store/slices/uiSlice';
@@ -15,9 +15,24 @@ import RulesEditor from '../components/RulesEditor';
 import AuditTimeline from '../components/AuditTimeline';
 
 const ENV_CONFIG = [
-  { env: 'development' as Environment, label: 'Development', icon: '🧪', badgeClass: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400' },
-  { env: 'staging' as Environment, label: 'Staging', icon: '🔶', badgeClass: 'bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400' },
-  { env: 'production' as Environment, label: 'Production', icon: '🚀', badgeClass: 'bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400' },
+  {
+    env: 'development' as Environment,
+    label: 'Development',
+    icon: '🧪',
+    badgeClass: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400'
+  },
+  {
+    env: 'staging' as Environment,
+    label: 'Staging',
+    icon: '🔶',
+    badgeClass: 'bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400'
+  },
+  {
+    env: 'production' as Environment,
+    label: 'Production',
+    icon: '🚀',
+    badgeClass: 'bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400'
+  }
 ];
 
 type ActiveTab = 'overview' | 'audit';
@@ -46,7 +61,7 @@ const FlagDetail: React.FC = () => {
 
   const getEnvEnabled = (env: Environment) => {
     if (optimisticEnvs[env] !== undefined) return optimisticEnvs[env];
-    const envData = flag?.environments?.find((e) => e.environment === env);
+    const envData = flag?.environments?.find(e => e.environment === env);
     return envData?.enabled ?? false;
   };
 
@@ -56,18 +71,25 @@ const FlagDetail: React.FC = () => {
     const nextEnabled = !currentEnabled;
 
     // 1. Instant local optimistic update for zero delay
-    setOptimisticEnvs((prev) => ({ ...prev, [env]: nextEnabled }));
+    setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
 
     // 2. Fire mutation
     try {
       await toggleEnv({ flagId: flag.id, env, enabled: nextEnabled }).unwrap();
-      dispatch(addToast({
-        type: 'success',
-        message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`,
-      }));
+      dispatch(
+        addToast({
+          type: 'success',
+          message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`
+        })
+      );
     } catch (error) {
-      setOptimisticEnvs((prev) => ({ ...prev, [env]: currentEnabled }));
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to toggle environment') }));
+      setOptimisticEnvs(prev => ({ ...prev, [env]: currentEnabled }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to toggle environment')
+        })
+      );
     }
   };
 
@@ -85,7 +107,12 @@ const FlagDetail: React.FC = () => {
       dispatch(addToast({ type: 'success', message: 'Flag updated successfully' }));
       setIsEditing(false);
     } catch (error) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to update flag') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to update flag')
+        })
+      );
     }
   };
 
@@ -93,13 +120,20 @@ const FlagDetail: React.FC = () => {
     if (!flag) return;
     try {
       await updateFlag({ id: flag.id, archived: !flag.archived }).unwrap();
-      dispatch(addToast({
-        type: 'success',
-        message: flag.archived ? 'Flag restored' : 'Flag archived',
-      }));
+      dispatch(
+        addToast({
+          type: 'success',
+          message: flag.archived ? 'Flag restored' : 'Flag archived'
+        })
+      );
       navigate('/app/flags');
     } catch (error) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to archive flag') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to archive flag')
+        })
+      );
     }
   };
 
@@ -110,7 +144,12 @@ const FlagDetail: React.FC = () => {
       dispatch(addToast({ type: 'success', message: `Flag "${flag.name}" deleted` }));
       navigate('/app/flags');
     } catch (error) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to delete flag') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to delete flag')
+        })
+      );
     }
   };
 
@@ -126,7 +165,9 @@ const FlagDetail: React.FC = () => {
     return (
       <div className="text-center py-16 px-4 rounded-2xl bg-surface-card border border-border-subtle shadow-sm">
         <div className="text-4xl mb-3">⚠️</div>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-3">Flag not found</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-3">
+          Flag not found
+        </h3>
         <button
           className="px-4 py-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300 border border-brand-500/20 text-sm font-medium hover:bg-brand-500/20 transition-all"
           onClick={() => navigate('/app/flags')}
@@ -158,7 +199,7 @@ const FlagDetail: React.FC = () => {
             <input
               className="w-full max-w-md px-3 py-1.5 text-xl font-bold rounded-xl bg-surface-elevated border border-border-subtle text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
               value={editName}
-              onChange={(e) => setEditName(e.target.value)}
+              onChange={e => setEditName(e.target.value)}
               id="edit-flag-name"
               autoFocus
             />
@@ -233,14 +274,17 @@ const FlagDetail: React.FC = () => {
       {/* Description */}
       {isEditing ? (
         <div className="space-y-2">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" htmlFor="edit-flag-desc">
+          <label
+            className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+            htmlFor="edit-flag-desc"
+          >
             Description
           </label>
           <textarea
             id="edit-flag-desc"
             rows={2}
             value={editDesc}
-            onChange={(e) => setEditDesc(e.target.value)}
+            onChange={e => setEditDesc(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-subtle text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-y"
           />
         </div>
@@ -250,7 +294,7 @@ const FlagDetail: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex border-b border-border-subtle">
-        {(['overview', 'audit'] as ActiveTab[]).map((tab) => (
+        {(['overview', 'audit'] as ActiveTab[]).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -270,7 +314,7 @@ const FlagDetail: React.FC = () => {
       {activeTab === 'overview' && (
         <div className="grid lg:grid-cols-3 gap-6">
           {ENV_CONFIG.map(({ env, label, icon, badgeClass }) => {
-            const envData = flag.environments?.find((e) => e.environment === env);
+            const envData = flag.environments?.find(e => e.environment === env);
             const enabled = getEnvEnabled(env);
 
             return (
@@ -284,7 +328,9 @@ const FlagDetail: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{icon}</span>
-                    <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${badgeClass}`}>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-md text-xs font-semibold border ${badgeClass}`}
+                    >
                       {label}
                     </span>
                   </div>
@@ -313,7 +359,9 @@ const FlagDetail: React.FC = () => {
                       enabled ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400 dark:bg-slate-600'
                     }`}
                   />
-                  <span className={`text-xs font-semibold ${enabled ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'}`}>
+                  <span
+                    className={`text-xs font-semibold ${enabled ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'}`}
+                  >
                     {enabled ? 'Active / Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -331,9 +379,7 @@ const FlagDetail: React.FC = () => {
       )}
 
       {/* Audit Tab */}
-      {activeTab === 'audit' && (
-        <AuditTimeline logs={auditData?.data ?? []} />
-      )}
+      {activeTab === 'audit' && <AuditTimeline logs={auditData?.data ?? []} />}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
@@ -342,7 +388,8 @@ const FlagDetail: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Delete Flag</h2>
             <p className="text-sm text-slate-600 dark:text-slate-300">
               Are you sure you want to permanently delete{' '}
-              <strong className="text-slate-900 dark:text-white">{flag.name}</strong>? This action cannot be undone.
+              <strong className="text-slate-900 dark:text-white">{flag.name}</strong>? This action
+              cannot be undone.
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button

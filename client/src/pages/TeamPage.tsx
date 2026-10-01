@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store';
 import { addToast } from '../store/slices/uiSlice';
-import { useCreateInvitationMutation, useListMembersQuery, useRemoveMemberMutation } from '../store/api/organizationApi';
+import {
+  useCreateInvitationMutation,
+  useListMembersQuery,
+  useRemoveMemberMutation
+} from '../store/api/organizationApi';
 import { getApiErrorMessage } from '../utils/errorMessage';
 
 const TeamPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   const canManageMembers = user?.role === 'owner' || user?.role === 'admin';
   const [createInvitation, { isLoading }] = useCreateInvitationMutation();
-  const { data: membersData, isLoading: isLoadingMembers } = useListMembersQuery(undefined, { skip: !canManageMembers });
+  const { data: membersData, isLoading: isLoadingMembers } = useListMembersQuery(undefined, {
+    skip: !canManageMembers
+  });
   const [removeMember] = useRemoveMemberMutation();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'admin' | 'member'>('member');
@@ -25,7 +31,12 @@ const TeamPage: React.FC = () => {
       setEmail('');
       dispatch(addToast({ type: 'success', message: 'Invitation created' }));
     } catch (error: any) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, error?.data?.error || 'Failed to create invitation') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, error?.data?.error || 'Failed to create invitation')
+        })
+      );
     }
   };
 
@@ -36,7 +47,11 @@ const TeamPage: React.FC = () => {
   };
 
   if (!canManageMembers) {
-    return <div className="p-8 text-center text-slate-500 dark:text-slate-400">You do not have permission to manage organization members.</div>;
+    return (
+      <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+        You do not have permission to manage organization members.
+      </div>
+    );
   }
 
   const handleRemoveMember = async (memberId: string, memberName: string) => {
@@ -45,14 +60,21 @@ const TeamPage: React.FC = () => {
       await removeMember(memberId).unwrap();
       dispatch(addToast({ type: 'success', message: `${memberName} was removed` }));
     } catch (error: any) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, error?.data?.error || 'Failed to remove member') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, error?.data?.error || 'Failed to remove member')
+        })
+      );
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">Organization</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+          Organization
+        </p>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-2">Invite your team</h1>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
           Invite a new {user?.organizationName || 'organization'} member with a single-use link.
@@ -61,26 +83,38 @@ const TeamPage: React.FC = () => {
 
       <section className="bg-surface-card border border-border-subtle rounded-2xl p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Create invitation</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">The link expires in 24 hours.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          The link expires in 24 hours.
+        </p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div>
-            <label htmlFor="invite-email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Work email</label>
+            <label
+              htmlFor="invite-email"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+            >
+              Work email
+            </label>
             <input
               id="invite-email"
               type="email"
               required
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={event => setEmail(event.target.value)}
               placeholder="teammate@company.com"
               className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
             />
           </div>
           <div>
-            <label htmlFor="invite-role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Role</label>
+            <label
+              htmlFor="invite-role"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+            >
+              Role
+            </label>
             <select
               id="invite-role"
               value={role}
-              onChange={(event) => setRole(event.target.value as 'admin' | 'member')}
+              onChange={event => setRole(event.target.value as 'admin' | 'member')}
               className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50"
             >
               <option value="member">Member</option>
@@ -103,17 +137,26 @@ const TeamPage: React.FC = () => {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">Loading members...</p>
         ) : (
           <div className="mt-4 space-y-3">
-            {membersData?.data.map((member) => {
-              const canRemove = member.id !== user?.id && member.role !== 'owner' &&
+            {membersData?.data.map(member => {
+              const canRemove =
+                member.id !== user?.id &&
+                member.role !== 'owner' &&
                 (user?.role === 'owner' || (user?.role === 'admin' && member.role === 'member'));
               return (
-                <div key={member.id} className="flex items-center justify-between gap-4 p-3 rounded-xl bg-surface-elevated border border-border-subtle">
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between gap-4 p-3 rounded-xl bg-surface-elevated border border-border-subtle"
+                >
                   <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{member.name}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      {member.name}
+                    </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{member.email}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold uppercase text-brand-600 dark:text-brand-300">{member.role}</span>
+                    <span className="text-xs font-semibold uppercase text-brand-600 dark:text-brand-300">
+                      {member.role}
+                    </span>
                     {canRemove && (
                       <button
                         type="button"
@@ -133,9 +176,18 @@ const TeamPage: React.FC = () => {
 
       {invitationLink && (
         <section className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
-          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Invitation ready for testing</p>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Open this link in a private window or another browser session.</p>
-          <a href={invitationLink} className="block mt-4 break-all text-sm text-brand-600 dark:text-brand-300 underline">{invitationLink}</a>
+          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            Invitation ready for testing
+          </p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
+            Open this link in a private window or another browser session.
+          </p>
+          <a
+            href={invitationLink}
+            className="block mt-4 break-all text-sm text-brand-600 dark:text-brand-300 underline"
+          >
+            {invitationLink}
+          </a>
           <button
             type="button"
             onClick={copyInvitationLink}

@@ -1,35 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useLoginMutation } from "../store/api/authApi";
-import { useAppDispatch, useAppSelector } from "../store";
-import { setCredentials } from "../store/slices/authSlice";
-import { addToast, toggleTheme } from "../store/slices/uiSlice";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useLoginMutation } from '../store/api/authApi';
+import { useAppDispatch, useAppSelector } from '../store';
+import { setCredentials } from '../store/slices/authSlice';
+import { addToast, toggleTheme } from '../store/slices/uiSlice';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((state) => state.ui.theme);
+  const theme = useAppSelector(state => state.ui.theme);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const result = await login({ email, password }).unwrap();
-      dispatch(
-        setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }),
-      );
-      dispatch(
-        addToast({ type: "success", message: "Logged in successfully" }),
-      );
-      navigate("/app");
+      dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
+      dispatch(addToast({ type: 'success', message: 'Logged in successfully' }));
+      navigate('/app');
     } catch (err: any) {
       dispatch(
         addToast({
-          type: "error",
-          message: err?.data?.error || "Failed to login",
-        }),
+          type: 'error',
+          message: err?.data?.error || 'Failed to login'
+        })
       );
     }
   };
@@ -41,10 +37,10 @@ const Login: React.FC = () => {
         <button
           onClick={() => dispatch(toggleTheme())}
           className="p-2.5 rounded-xl bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-amber-400 hover:bg-slate-300 dark:hover:bg-white/20 transition-all shadow-sm"
-          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           aria-label="Toggle theme"
         >
-          {theme === "dark" ? "☀️" : "🌙"}
+          {theme === 'dark' ? '☀️' : '🌙'}
         </button>
       </div>
 
@@ -58,8 +54,8 @@ const Login: React.FC = () => {
           className="absolute inset-0 opacity-[0.05] dark:opacity-[0.04] pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
+              'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
+            backgroundSize: '60px 60px'
           }}
         />
 
@@ -81,16 +77,15 @@ const Login: React.FC = () => {
             </span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-md">
-            Toggle feature flags across Dev, Staging, and Production without
-            touching your codebase.
+            Toggle feature flags across Dev, Staging, and Production without touching your codebase.
           </p>
           <div className="flex flex-col gap-3">
             {[
-              "Multi-tenant isolation",
-              "Targeting rules & rollouts",
-              "Full audit trail",
-              "3-environment support",
-            ].map((item) => (
+              'Multi-tenant isolation',
+              'Targeting rules & rollouts',
+              'Full audit trail',
+              '3-environment support'
+            ].map(item => (
               <div
                 key={item}
                 className="flex items-center gap-3 text-slate-700 dark:text-slate-300"
@@ -105,17 +100,13 @@ const Login: React.FC = () => {
             ))}
           </div>
         </div>
-
       </div>
 
       {/* Right — Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-8">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <Link
-            to="/"
-            className="lg:hidden flex items-center gap-2 mb-10 justify-center"
-          >
+          <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 justify-center">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand">
               🚩
             </div>
@@ -125,12 +116,8 @@ const Login: React.FC = () => {
           </Link>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Welcome back
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              Sign in to your FlagForge account
-            </p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Welcome back</h1>
+            <p className="text-slate-600 dark:text-slate-400">Sign in to your FlagForge account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -146,7 +133,7 @@ const Login: React.FC = () => {
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all duration-200"
               />
@@ -163,7 +150,7 @@ const Login: React.FC = () => {
                 type="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all duration-200"
               />
@@ -179,13 +166,13 @@ const Login: React.FC = () => {
                   <span className="spinner" /> Signing in...
                 </span>
               ) : (
-                "Sign In"
+                'Sign In'
               )}
             </button>
           </form>
 
           <p className="text-center mt-6 text-sm text-slate-600 dark:text-slate-400">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Link
               to="/register"
               className="text-brand-600 dark:text-brand-400 hover:underline font-medium transition-colors"

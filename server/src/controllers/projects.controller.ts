@@ -5,11 +5,11 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
 const createProjectSchema = z.object({
-  name: z.string().min(1).max(255),
+  name: z.string().min(1).max(255)
 });
 
 const updateProjectSchema = z.object({
-  name: z.string().min(1).max(255),
+  name: z.string().min(1).max(255)
 });
 
 export const getProjects = async (req: Request, res: Response, next: NextFunction) => {

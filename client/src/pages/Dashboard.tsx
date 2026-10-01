@@ -22,21 +22,41 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, icon, gradient, glow,
     <div className="text-2xl mb-3">{icon}</div>
     <div className="text-4xl font-extrabold text-white mb-1">{value}</div>
     <div className="text-sm text-slate-200 font-medium">{label}</div>
-    <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full opacity-20" style={{ background: gradient }} />
+    <div
+      className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full opacity-20"
+      style={{ background: gradient }}
+    />
   </div>
 );
 
 const ENV_CONFIG = [
-  { env: 'development', label: 'Development', barColor: 'bg-cyan-500', shadow: 'shadow-[0_0_8px_hsl(187,92%,58%,0.5)]' },
-  { env: 'staging',     label: 'Staging',     barColor: 'bg-amber-500', shadow: 'shadow-[0_0_8px_hsl(38,96%,60%,0.5)]' },
-  { env: 'production',  label: 'Production',  barColor: 'bg-red-500',   shadow: 'shadow-[0_0_8px_hsl(4,85%,62%,0.5)]' },
+  {
+    env: 'development',
+    label: 'Development',
+    barColor: 'bg-cyan-500',
+    shadow: 'shadow-[0_0_8px_hsl(187,92%,58%,0.5)]'
+  },
+  {
+    env: 'staging',
+    label: 'Staging',
+    barColor: 'bg-amber-500',
+    shadow: 'shadow-[0_0_8px_hsl(38,96%,60%,0.5)]'
+  },
+  {
+    env: 'production',
+    label: 'Production',
+    barColor: 'bg-red-500',
+    shadow: 'shadow-[0_0_8px_hsl(4,85%,62%,0.5)]'
+  }
 ] as const;
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const activeProjectId = useAppSelector((s) => s.ui.activeProjectId);
+  const activeProjectId = useAppSelector(s => s.ui.activeProjectId);
 
-  const { data: statsData, isLoading: statsLoading } = useGetStatsQuery(activeProjectId ?? skipToken);
+  const { data: statsData, isLoading: statsLoading } = useGetStatsQuery(
+    activeProjectId ?? skipToken
+  );
   const { data: auditData, isLoading: auditLoading } = useGetAuditLogsQuery(
     activeProjectId ? { projectId: activeProjectId, limit: 10 } : skipToken
   );
@@ -48,10 +68,38 @@ const Dashboard: React.FC = () => {
   const recentFlags = flagsData?.data?.slice(0, 5) ?? [];
 
   const statCards: StatCardProps[] = [
-    { label: 'Total Flags',   value: stats?.total ?? 0,                       icon: '🚩', gradient: 'linear-gradient(135deg,hsl(258,78%,52%),hsl(258,78%,35%))', glow: 'hover:shadow-brand', delay: 0 },
-    { label: 'Active Flags',  value: stats?.active ?? 0,                      icon: '✅', gradient: 'linear-gradient(135deg,hsl(143,65%,42%),hsl(143,65%,28%))', glow: 'hover:shadow-green', delay: 0.05 },
-    { label: 'Archived',      value: stats?.archived ?? 0,                    icon: '📦', gradient: 'linear-gradient(135deg,hsl(38,80%,45%),hsl(38,80%,30%))',  glow: '',                 delay: 0.1 },
-    { label: 'Prod Enabled',  value: stats?.byEnvironment?.production ?? 0,   icon: '🚀', gradient: 'linear-gradient(135deg,hsl(187,75%,42%),hsl(187,75%,28%))',glow: '',                 delay: 0.15 },
+    {
+      label: 'Total Flags',
+      value: stats?.total ?? 0,
+      icon: '🚩',
+      gradient: 'linear-gradient(135deg,hsl(258,78%,52%),hsl(258,78%,35%))',
+      glow: 'hover:shadow-brand',
+      delay: 0
+    },
+    {
+      label: 'Active Flags',
+      value: stats?.active ?? 0,
+      icon: '✅',
+      gradient: 'linear-gradient(135deg,hsl(143,65%,42%),hsl(143,65%,28%))',
+      glow: 'hover:shadow-green',
+      delay: 0.05
+    },
+    {
+      label: 'Archived',
+      value: stats?.archived ?? 0,
+      icon: '📦',
+      gradient: 'linear-gradient(135deg,hsl(38,80%,45%),hsl(38,80%,30%))',
+      glow: '',
+      delay: 0.1
+    },
+    {
+      label: 'Prod Enabled',
+      value: stats?.byEnvironment?.production ?? 0,
+      icon: '🚀',
+      gradient: 'linear-gradient(135deg,hsl(187,75%,42%),hsl(187,75%,28%))',
+      glow: '',
+      delay: 0.15
+    }
   ];
 
   return (
@@ -60,7 +108,9 @@ const Dashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Overview of your feature flag system</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            Overview of your feature flag system
+          </p>
         </div>
         <button
           id="dashboard-manage-flags-btn"
@@ -75,22 +125,28 @@ const Dashboard: React.FC = () => {
       {!activeProjectId ? (
         <div className="rounded-2xl border border-border-subtle bg-surface-card p-12 text-center shadow-sm">
           <div className="text-4xl mb-4">📁</div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-2">No project selected</h3>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Select or create a project to view your dashboard.</p>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-2">
+            No project selected
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Select or create a project to view your dashboard.
+          </p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {statsLoading
               ? [...Array(4)].map((_, i) => (
-                  <div key={i} className="rounded-2xl border border-border-subtle p-6 space-y-3 bg-surface-card shadow-sm">
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-border-subtle p-6 space-y-3 bg-surface-card shadow-sm"
+                  >
                     <div className="skeleton h-7 w-10" />
                     <div className="skeleton h-10 w-16" />
                     <div className="skeleton h-4 w-24" />
                   </div>
                 ))
-              : statCards.map((card) => <StatCard key={card.label} {...card} />)
-            }
+              : statCards.map(card => <StatCard key={card.label} {...card} />)}
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
@@ -109,12 +165,14 @@ const Dashboard: React.FC = () => {
               {recentFlags.length === 0 ? (
                 <div className="text-center py-10">
                   <div className="text-3xl mb-3">🚩</div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">No flags yet. Create your first one!</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    No flags yet. Create your first one!
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {recentFlags.map((flag) => {
-                    const activeEnvs = flag.environments?.filter((e) => e.enabled) ?? [];
+                  {recentFlags.map(flag => {
+                    const activeEnvs = flag.environments?.filter(e => e.enabled) ?? [];
                     return (
                       <div
                         key={flag.id}
@@ -124,17 +182,28 @@ const Dashboard: React.FC = () => {
                         className="flex items-center justify-between p-3 rounded-xl bg-surface-elevated hover:border-brand-500/30 border border-transparent cursor-pointer transition-all duration-200"
                       >
                         <div>
-                          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">{flag.name}</div>
-                          <code className="text-xs text-brand-600 dark:text-brand-300 font-mono">{flag.key}</code>
+                          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                            {flag.name}
+                          </div>
+                          <code className="text-xs text-brand-600 dark:text-brand-300 font-mono">
+                            {flag.key}
+                          </code>
                         </div>
                         <div className="flex gap-1 flex-wrap justify-end">
                           {activeEnvs.length === 0 ? (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 font-mono">OFF</span>
-                          ) : activeEnvs.map((e) => (
-                            <span key={e.environment} className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono">
-                              {e.environment.slice(0, 3).toUpperCase()}
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 font-mono">
+                              OFF
                             </span>
-                          ))}
+                          ) : (
+                            activeEnvs.map(e => (
+                              <span
+                                key={e.environment}
+                                className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-mono"
+                              >
+                                {e.environment.slice(0, 3).toUpperCase()}
+                              </span>
+                            ))
+                          )}
                         </div>
                       </div>
                     );
@@ -145,7 +214,9 @@ const Dashboard: React.FC = () => {
 
             {/* Environment Breakdown */}
             <div className="rounded-2xl border border-border-subtle bg-surface-card p-6 shadow-sm">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-5">Environment Breakdown</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-5">
+                Environment Breakdown
+              </h3>
               {!stats ? (
                 <div className="space-y-4">
                   {[...Array(3)].map((_, i) => (
@@ -163,8 +234,12 @@ const Dashboard: React.FC = () => {
                     return (
                       <div key={env}>
                         <div className="flex justify-between text-sm mb-2">
-                          <span className="font-medium text-slate-800 dark:text-slate-200">{label}</span>
-                          <span className="text-slate-500 dark:text-slate-400">{count} / {stats.total}</span>
+                          <span className="font-medium text-slate-800 dark:text-slate-200">
+                            {label}
+                          </span>
+                          <span className="text-slate-500 dark:text-slate-400">
+                            {count} / {stats.total}
+                          </span>
                         </div>
                         <div className="h-2.5 rounded-full bg-surface-elevated overflow-hidden border border-border-subtle">
                           <div

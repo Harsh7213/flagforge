@@ -2,7 +2,8 @@ export type Environment = 'development' | 'staging' | 'production';
 
 export type RuleType = 'user_ids' | 'groups' | 'percentage';
 
-export type AuditAction = 'created' | 'updated' | 'deleted' | 'toggled' | 'rule_added' | 'rule_deleted';
+export type AuditAction =
+  'created' | 'updated' | 'deleted' | 'toggled' | 'rule_added' | 'rule_deleted';
 
 export type OrganizationRole = 'owner' | 'admin' | 'member';
 

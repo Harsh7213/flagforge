@@ -8,7 +8,7 @@ const evaluateSchema = z.object({
   projectId: z.string().uuid().optional(),
   environment: z.enum(['development', 'staging', 'production']),
   userId: z.string().optional(),
-  groups: z.array(z.string()).optional(),
+  groups: z.array(z.string()).optional()
 });
 
 const batchEvaluateSchema = z.object({
@@ -16,7 +16,7 @@ const batchEvaluateSchema = z.object({
   projectId: z.string().uuid().optional(),
   environment: z.enum(['development', 'staging', 'production']),
   userId: z.string().optional(),
-  groups: z.array(z.string()).optional(),
+  groups: z.array(z.string()).optional()
 });
 
 // POST /api/v1/evaluate
@@ -48,9 +48,7 @@ export async function batchEvaluate(req: Request, res: Response, next: NextFunct
     const projectId = req.project!.id;
 
     const results = await Promise.all(
-      flagKeys.map((flagKey) =>
-        evaluateFlag({ flagKey, projectId, environment, userId, groups })
-      )
+      flagKeys.map(flagKey => evaluateFlag({ flagKey, projectId, environment, userId, groups }))
     );
 
     res.json({ data: results });

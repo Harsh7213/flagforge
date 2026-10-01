@@ -14,15 +14,15 @@ export const store = configureStore({
     [flagsApi.reducerPath]: flagsApi.reducer,
     [projectsApi.reducerPath]: projectsApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
-    [organizationApi.reducerPath]: organizationApi.reducer,
+    [organizationApi.reducerPath]: organizationApi.reducer
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(
       flagsApi.middleware,
       projectsApi.middleware,
       authApi.middleware,
       organizationApi.middleware
-    ),
+    )
 });
 
 export type RootState = ReturnType<typeof store.getState>;

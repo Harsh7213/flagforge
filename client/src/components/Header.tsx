@@ -1,7 +1,12 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store';
-import { clearActiveProject, setActiveProject, toggleSidebar, toggleTheme } from '../store/slices/uiSlice';
+import {
+  clearActiveProject,
+  setActiveProject,
+  toggleSidebar,
+  toggleTheme
+} from '../store/slices/uiSlice';
 import { useListProjectsQuery } from '../store/api/projectsApi';
 
 const pageTitles: Record<string, string> = {
@@ -9,26 +14,27 @@ const pageTitles: Record<string, string> = {
   '/app/flags': 'Feature Flags',
   '/app/audit': 'Audit Log',
   '/app/projects': 'Projects',
-  '/app/team': 'Team',
+  '/app/team': 'Team'
 };
 
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const theme = useAppSelector((s) => s.ui.theme);
-  const activeProjectId = useAppSelector((s) => s.ui.activeProjectId);
+  const theme = useAppSelector(s => s.ui.theme);
+  const activeProjectId = useAppSelector(s => s.ui.activeProjectId);
   const { data: projectsData } = useListProjectsQuery();
 
   useEffect(() => {
     const projects = projectsData?.data;
-    if (projects && activeProjectId && !projects.some((p) => p.id === activeProjectId)) {
+    if (projects && activeProjectId && !projects.some(p => p.id === activeProjectId)) {
       dispatch(clearActiveProject());
     }
   }, [activeProjectId, dispatch, projectsData]);
 
-  const title = Object.entries(pageTitles).find(([path]) =>
-    path === '/app' ? location.pathname === '/app' : location.pathname.startsWith(path)
-  )?.[1] ?? 'FlagForge';
+  const title =
+    Object.entries(pageTitles).find(([path]) =>
+      path === '/app' ? location.pathname === '/app' : location.pathname.startsWith(path)
+    )?.[1] ?? 'FlagForge';
 
   return (
     <header className="fixed top-0 right-0 left-0 h-16 z-30 flex items-center justify-between px-6 bg-surface-elevated border-b border-border-subtle shadow-sm transition-colors duration-200">
@@ -51,12 +57,18 @@ const Header: React.FC = () => {
             id="project-selector"
             aria-label="Select active project"
             value={activeProjectId ?? ''}
-            onChange={(e) => dispatch(setActiveProject(e.target.value))}
+            onChange={e => dispatch(setActiveProject(e.target.value))}
             className="px-3 py-1.5 rounded-lg bg-surface-card border border-border-subtle text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/40 hover:border-brand-500/40 transition-all duration-200 cursor-pointer shadow-sm"
           >
-            <option value="" disabled>Select a project</option>
-            {projectsData.data.map((p) => (
-              <option key={p.id} value={p.id} className="bg-surface-card text-slate-900 dark:text-slate-100">
+            <option value="" disabled>
+              Select a project
+            </option>
+            {projectsData.data.map(p => (
+              <option
+                key={p.id}
+                value={p.id}
+                className="bg-surface-card text-slate-900 dark:text-slate-100"
+              >
                 📁 {p.name}
               </option>
             ))}

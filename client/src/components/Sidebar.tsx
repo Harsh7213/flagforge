@@ -12,15 +12,15 @@ const navItems = [
   { to: '/app/flags', label: 'Feature Flags', icon: '⚑' },
   { to: '/app/audit', label: 'Audit Log', icon: '📋' },
   { to: '/app/projects', label: 'Projects', icon: '📁' },
-  { to: '/app/team', label: 'Team', icon: '♟' },
+  { to: '/app/team', label: 'Team', icon: '♟' }
 ];
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const sidebarOpen = useAppSelector((s) => s.ui.sidebarOpen);
-  const user = useAppSelector((s) => s.auth.user);
+  const sidebarOpen = useAppSelector(s => s.ui.sidebarOpen);
+  const user = useAppSelector(s => s.auth.user);
   const [requestLogout] = useLogoutMutation();
   const initials = user?.name?.trim().slice(0, 1).toUpperCase() || 'U';
 
@@ -44,7 +44,9 @@ const Sidebar: React.FC = () => {
         bg-surface-elevated border-r border-border-subtle`}
     >
       {/* Logo */}
-      <div className={`flex items-center gap-3 px-4 h-16 border-b border-border-subtle ${!sidebarOpen && 'justify-center'}`}>
+      <div
+        className={`flex items-center gap-3 px-4 h-16 border-b border-border-subtle ${!sidebarOpen && 'justify-center'}`}
+      >
         <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-base shadow-brand">
           🚩
         </div>
@@ -62,33 +64,41 @@ const Sidebar: React.FC = () => {
             Navigation
           </span>
         )}
-        {navItems.filter((item) => item.to !== '/app/team' || user?.role === 'owner' || user?.role === 'admin').map((item) => {
-          const isActive = item.to === '/app'
-            ? location.pathname === '/app'
-            : location.pathname.startsWith(item.to);
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/app'}
-              title={!sidebarOpen ? item.label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group
-                ${isActive
-                  ? 'bg-brand-500/15 text-brand-600 dark:text-brand-300 border border-brand-500/30 font-semibold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-black/5 dark:hover:bg-white/5'
+        {navItems
+          .filter(
+            item => item.to !== '/app/team' || user?.role === 'owner' || user?.role === 'admin'
+          )
+          .map(item => {
+            const isActive =
+              item.to === '/app'
+                ? location.pathname === '/app'
+                : location.pathname.startsWith(item.to);
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/app'}
+                title={!sidebarOpen ? item.label : undefined}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group
+                ${
+                  isActive
+                    ? 'bg-brand-500/15 text-brand-600 dark:text-brand-300 border border-brand-500/30 font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-black/5 dark:hover:bg-white/5'
                 }
                 ${!sidebarOpen && 'justify-center'}`}
-            >
-              <span className={`text-base flex-shrink-0 ${isActive ? 'text-brand-500 dark:text-brand-400' : 'text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`}>
-                {item.icon}
-              </span>
-              {sidebarOpen && <span>{item.label}</span>}
-              {sidebarOpen && isActive && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400" />
-              )}
-            </NavLink>
-          );
-        })}
+              >
+                <span
+                  className={`text-base flex-shrink-0 ${isActive ? 'text-brand-500 dark:text-brand-400' : 'text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`}
+                >
+                  {item.icon}
+                </span>
+                {sidebarOpen && <span>{item.label}</span>}
+                {sidebarOpen && isActive && (
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400" />
+                )}
+              </NavLink>
+            );
+          })}
       </nav>
 
       {/* User footer */}
@@ -99,8 +109,12 @@ const Sidebar: React.FC = () => {
               {initials}
             </div>
             <div className="flex-1 overflow-hidden">
-              <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.name || 'User'}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.organizationName || 'Organization'}</div>
+              <div className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                {user?.name || 'User'}
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                {user?.organizationName || 'Organization'}
+              </div>
             </div>
             <button
               onClick={handleLogout}

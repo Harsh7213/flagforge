@@ -12,7 +12,7 @@ export function errorHandler(
   res.status(statusCode).json({
     error: err.name || 'InternalServerError',
     message: err.message || 'An unexpected error occurred',
-    statusCode,
+    statusCode
   });
 }
 
@@ -20,7 +20,7 @@ export function notFound(_req: Request, res: Response): void {
   res.status(404).json({
     error: 'NotFound',
     message: 'The requested route does not exist',
-    statusCode: 404,
+    statusCode: 404
   });
 }
 

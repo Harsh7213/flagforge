@@ -13,7 +13,7 @@ interface Props {
 const RULE_TYPE_OPTIONS: { value: RuleType; label: string; placeholder: string }[] = [
   { value: 'user_ids', label: 'Specific Users', placeholder: 'user-123, user-456' },
   { value: 'groups', label: 'User Groups', placeholder: 'beta-testers, admins' },
-  { value: 'percentage', label: 'Percentage Rollout', placeholder: '50' },
+  { value: 'percentage', label: 'Percentage Rollout', placeholder: '50' }
 ];
 
 const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
@@ -41,7 +41,10 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
       }
       value = pct;
     } else {
-      value = ruleValue.split(',').map((v) => v.trim()).filter(Boolean);
+      value = ruleValue
+        .split(',')
+        .map(v => v.trim())
+        .filter(Boolean);
     }
 
     try {
@@ -50,7 +53,12 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
       setRuleValue('');
       setShowForm(false);
     } catch (error) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to add rule') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to add rule')
+        })
+      );
     }
   };
 
@@ -59,7 +67,12 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
       await deleteRule({ flagId, ruleId: rule.id }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Rule removed' }));
     } catch (error) {
-      dispatch(addToast({ type: 'error', message: getApiErrorMessage(error, 'Failed to remove rule') }));
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to remove rule')
+        })
+      );
     }
   };
 
@@ -73,7 +86,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
     }
   };
 
-  const selectedTypeOption = RULE_TYPE_OPTIONS.find((o) => o.value === ruleType)!;
+  const selectedTypeOption = RULE_TYPE_OPTIONS.find(o => o.value === ruleType)!;
 
   return (
     <div className="space-y-3">
@@ -98,22 +111,30 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
         </p>
       ) : (
         <div className="space-y-2">
-          {environment.rules.map((rule) => (
+          {environment.rules.map(rule => (
             <div
               key={rule.id}
               className="flex items-center justify-between p-2.5 rounded-xl bg-surface-elevated border border-border-subtle text-xs"
             >
               <div className="flex items-center gap-2 overflow-hidden">
-                <span className={`px-2 py-0.5 rounded-md font-mono text-[10px] uppercase tracking-wide font-semibold ${
-                  rule.type === 'user_ids'
-                    ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30'
+                <span
+                  className={`px-2 py-0.5 rounded-md font-mono text-[10px] uppercase tracking-wide font-semibold ${
+                    rule.type === 'user_ids'
+                      ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30'
+                      : rule.type === 'groups'
+                        ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30'
+                        : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
+                  }`}
+                >
+                  {rule.type === 'user_ids'
+                    ? '👤 Users'
                     : rule.type === 'groups'
-                    ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30'
-                    : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
-                }`}>
-                  {rule.type === 'user_ids' ? '👤 Users' : rule.type === 'groups' ? '👥 Groups' : '🎯 %'}
+                      ? '👥 Groups'
+                      : '🎯 %'}
                 </span>
-                <span className="text-slate-800 dark:text-slate-300 font-mono truncate">{formatRuleValue(rule)}</span>
+                <span className="text-slate-800 dark:text-slate-300 font-mono truncate">
+                  {formatRuleValue(rule)}
+                </span>
               </div>
               <button
                 className="text-slate-400 hover:text-red-500 p-1 transition-colors"
@@ -131,25 +152,39 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
       )}
 
       {showForm && (
-        <form className="p-3.5 rounded-xl bg-surface-elevated border border-border-subtle space-y-3" onSubmit={handleAdd}>
+        <form
+          className="p-3.5 rounded-xl bg-surface-elevated border border-border-subtle space-y-3"
+          onSubmit={handleAdd}
+        >
           <div>
-            <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1" htmlFor={`rule-type-${envLabel}`}>
+            <label
+              className="block text-xs text-slate-600 dark:text-slate-400 mb-1"
+              htmlFor={`rule-type-${envLabel}`}
+            >
               Rule Type
             </label>
             <select
               id={`rule-type-${envLabel}`}
               className="w-full px-3 py-1.5 rounded-lg bg-surface-card border border-border-subtle text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
               value={ruleType}
-              onChange={(e) => { setRuleType(e.target.value as RuleType); setRuleValue(''); }}
+              onChange={e => {
+                setRuleType(e.target.value as RuleType);
+                setRuleValue('');
+              }}
             >
-              {RULE_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              {RULE_TYPE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1" htmlFor={`rule-value-${envLabel}`}>
+            <label
+              className="block text-xs text-slate-600 dark:text-slate-400 mb-1"
+              htmlFor={`rule-value-${envLabel}`}
+            >
               {ruleType === 'percentage' ? 'Percentage (0–100)' : 'Values (comma-separated)'}
             </label>
             <input
@@ -160,7 +195,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
               step={1}
               placeholder={selectedTypeOption.placeholder}
               value={ruleValue}
-              onChange={(e) => setRuleValue(e.target.value)}
+              onChange={e => setRuleValue(e.target.value)}
               autoFocus
               className="w-full px-3 py-1.5 rounded-lg bg-surface-card border border-border-subtle text-xs text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
             />
@@ -178,7 +213,10 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
             <button
               type="button"
               className="px-3 py-1.5 rounded-lg bg-surface-card hover:bg-surface-elevated border border-border-subtle text-slate-600 dark:text-slate-400 text-xs font-medium transition-all"
-              onClick={() => { setShowForm(false); setRuleValue(''); }}
+              onClick={() => {
+                setShowForm(false);
+                setRuleValue('');
+              }}
               id={`cancel-rule-${envLabel}`}
             >
               Cancel

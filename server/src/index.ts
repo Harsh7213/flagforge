@@ -12,12 +12,14 @@ const PORT = parseInt(process.env.PORT || '4000', 10);
 
 // ── Security & Parsing ──────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
+    credentials: true
+  })
+);
 app.use(cookieParser());
 app.use('/api/v1/evaluate', express.json({ limit: '64kb' }));
 app.use(express.json({ limit: '1mb' }));

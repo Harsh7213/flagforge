@@ -13,7 +13,7 @@ const ACTION_ICONS: Record<string, string> = {
   deleted: '🗑',
   toggled: '🔀',
   rule_added: '➕',
-  rule_deleted: '➖',
+  rule_deleted: '➖'
 };
 
 const ACTION_COLORS: Record<string, string> = {
@@ -24,7 +24,7 @@ const ACTION_COLORS: Record<string, string> = {
   deleted: 'bg-red-500/15 text-red-800 dark:text-red-400 border-red-500/30',
   toggled: 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-400 border-cyan-500/30',
   rule_added: 'bg-purple-500/15 text-purple-800 dark:text-purple-400 border-purple-500/30',
-  rule_deleted: 'bg-rose-500/15 text-rose-800 dark:text-rose-400 border-rose-500/30',
+  rule_deleted: 'bg-rose-500/15 text-rose-800 dark:text-rose-400 border-rose-500/30'
 };
 
 function timeAgo(dateStr: string): string {
@@ -43,7 +43,9 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
     return (
       <div className="text-center py-16 px-4 rounded-2xl bg-surface-card border border-border-subtle shadow-sm">
         <div className="text-4xl mb-3">📋</div>
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-1">No audit events yet</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-1">
+          No audit events yet
+        </h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
           Changes to feature flags and targeting rules will appear here in real-time.
         </p>
@@ -53,12 +55,13 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
 
   return (
     <div className="space-y-3">
-      {logs.map((log) => {
-        const action = log.action === 'updated' && log.payload?.archived === true
-          ? 'archived'
-          : log.action === 'updated' && log.payload?.archived === false
-            ? 'restored'
-            : log.action;
+      {logs.map(log => {
+        const action =
+          log.action === 'updated' && log.payload?.archived === true
+            ? 'archived'
+            : log.action === 'updated' && log.payload?.archived === false
+              ? 'restored'
+              : log.action;
 
         return (
           <article
@@ -70,7 +73,8 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
                 <span className="text-base">{ACTION_ICONS[action] || '📌'}</span>
                 <span
                   className={`px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wide border ${
-                    ACTION_COLORS[action] || 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/30'
+                    ACTION_COLORS[action] ||
+                    'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/30'
                   }`}
                 >
                   {action}
@@ -79,13 +83,23 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
                   {log.flag_key}
                 </span>
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap" title={new Date(log.created_at).toLocaleString()}>
+              <span
+                className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap"
+                title={new Date(log.created_at).toLocaleString()}
+              >
                 {timeAgo(log.created_at)}
               </span>
             </div>
 
             <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 pt-1">
-              <span>by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong>{log.actor_role && <span className="ml-1 text-slate-500 dark:text-slate-400">({log.actor_role})</span>}</span>
+              <span>
+                by <strong className="text-slate-900 dark:text-slate-200">{log.actor}</strong>
+                {log.actor_role && (
+                  <span className="ml-1 text-slate-500 dark:text-slate-400">
+                    ({log.actor_role})
+                  </span>
+                )}
+              </span>
               {log.payload && (
                 <details className="text-right">
                   <summary className="cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 select-none">

@@ -6,7 +6,7 @@ import { setCredentials } from '../store/slices/authSlice';
 import { useLogoutMutation, useMeQuery } from '../store/api/authApi';
 
 const AuthGuard: React.FC = () => {
-  const { user, sessionExpiresAt } = useAppSelector((state) => state.auth);
+  const { user, sessionExpiresAt } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   const location = useLocation();
   const [logoutSession] = useLogoutMutation();
@@ -25,13 +25,17 @@ const AuthGuard: React.FC = () => {
 
     const remainingTime = expiresAt - Date.now();
     if (remainingTime <= 0) {
-      void logoutSession(undefined).unwrap().catch(() => undefined);
+      void logoutSession(undefined)
+        .unwrap()
+        .catch(() => undefined);
       dispatch(logout());
       return;
     }
 
     const timeoutId = window.setTimeout(() => {
-      void logoutSession(undefined).unwrap().catch(() => undefined);
+      void logoutSession(undefined)
+        .unwrap()
+        .catch(() => undefined);
       dispatch(logout());
     }, remainingTime);
     return () => window.clearTimeout(timeoutId);

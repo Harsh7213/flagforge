@@ -60,7 +60,7 @@ export async function evaluateFlag(req: EvaluationRequest): Promise<EvaluationRe
 
     if (rule.type === 'groups' && groups.length > 0) {
       const allowedGroups: string[] = JSON.parse(rule.value);
-      const matched = groups.some((g) => allowedGroups.includes(g));
+      const matched = groups.some(g => allowedGroups.includes(g));
       if (matched) {
         return { flagKey, enabled: true, reason: 'MATCHED_GROUP', environment };
       }

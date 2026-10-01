@@ -21,7 +21,11 @@ const getInitialTheme = (): Theme => {
     return saved;
   }
   // Auto-detect device system preference
-  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
     return 'dark';
   }
   return 'light';
@@ -33,7 +37,7 @@ const initialState: UiState = {
   theme: getInitialTheme(),
   activeProjectId: getInitialProjectId(),
   sidebarOpen: true,
-  toasts: [],
+  toasts: []
 };
 
 const applyTheme = (theme: Theme) => {
@@ -81,12 +85,19 @@ const uiSlice = createSlice({
       state.toasts.push({ ...action.payload, id });
     },
     removeToast(state, action: PayloadAction<string>) {
-      state.toasts = state.toasts.filter((t) => t.id !== action.payload);
-    },
-  },
+      state.toasts = state.toasts.filter(t => t.id !== action.payload);
+    }
+  }
 });
 
-export const { toggleTheme, setSystemTheme, setActiveProject, clearActiveProject, toggleSidebar, addToast, removeToast } =
-  uiSlice.actions;
+export const {
+  toggleTheme,
+  setSystemTheme,
+  setActiveProject,
+  clearActiveProject,
+  toggleSidebar,
+  addToast,
+  removeToast
+} = uiSlice.actions;
 
 export default uiSlice.reducer;

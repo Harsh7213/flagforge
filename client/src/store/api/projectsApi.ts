@@ -6,38 +6,44 @@ export const projectsApi = createApi({
   reducerPath: 'projectsApi',
   baseQuery: baseQuery,
   tagTypes: ['Project'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     listProjects: builder.query<ApiResponse<Project[]>, void>({
       query: () => '/projects',
-      providesTags: [{ type: 'Project', id: 'LIST' }],
+      providesTags: [{ type: 'Project', id: 'LIST' }]
     }),
 
     createProject: builder.mutation<ApiResponse<Project>, { name: string }>({
-      query: (body) => ({ url: '/projects', method: 'POST', body }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      query: body => ({ url: '/projects', method: 'POST', body }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }]
     }),
 
     updateProject: builder.mutation<ApiResponse<Project>, { id: string; name: string }>({
       query: ({ id, name }) => ({ url: `/projects/${id}`, method: 'PATCH', body: { name } }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }]
     }),
 
     rotateApiKey: builder.mutation<ApiResponse<Project>, string>({
-      query: (id) => ({ url: `/projects/${id}/api-key/rotate`, method: 'POST' }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      query: id => ({ url: `/projects/${id}/api-key/rotate`, method: 'POST' }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }]
     }),
 
     revokeApiKey: builder.mutation<void, string>({
-      query: (id) => ({ url: `/projects/${id}/api-key`, method: 'DELETE' }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
+      query: id => ({ url: `/projects/${id}/api-key`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }]
     }),
 
     deleteProject: builder.mutation<void, string>({
-      query: (id) => ({ url: `/projects/${id}`, method: 'DELETE' }),
-      invalidatesTags: [{ type: 'Project', id: 'LIST' }],
-    }),
-  }),
+      query: id => ({ url: `/projects/${id}`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Project', id: 'LIST' }]
+    })
+  })
 });
 
-export const { useListProjectsQuery, useCreateProjectMutation, useUpdateProjectMutation, useDeleteProjectMutation, useRotateApiKeyMutation, useRevokeApiKeyMutation } =
-  projectsApi;
+export const {
+  useListProjectsQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+  useRotateApiKeyMutation,
+  useRevokeApiKeyMutation
+} = projectsApi;

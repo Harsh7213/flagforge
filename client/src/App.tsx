@@ -10,16 +10,16 @@ import { setCredentials } from './store/slices/authSlice';
 import { useMeQuery } from './store/api/authApi';
 
 // Lazy loading pages
-const LandingPage  = lazy(() => import('./pages/LandingPage'));
-const Dashboard    = lazy(() => import('./pages/Dashboard'));
-const FlagsPage    = lazy(() => import('./pages/FlagsPage'));
-const FlagDetail   = lazy(() => import('./pages/FlagDetail'));
-const AuditPage    = lazy(() => import('./pages/AuditPage'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const FlagsPage = lazy(() => import('./pages/FlagsPage'));
+const FlagDetail = lazy(() => import('./pages/FlagDetail'));
+const AuditPage = lazy(() => import('./pages/AuditPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
-const Login        = lazy(() => import('./pages/Login'));
-const Register     = lazy(() => import('./pages/Register'));
-const AboutPage    = lazy(() => import('./pages/AboutPage'));
-const TeamPage     = lazy(() => import('./pages/TeamPage'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const TeamPage = lazy(() => import('./pages/TeamPage'));
 const AcceptInvitationPage = lazy(() => import('./pages/AcceptInvitationPage'));
 
 const LoadingFallback = () => (
@@ -30,11 +30,13 @@ const LoadingFallback = () => (
 
 // App shell layout (Sidebar + Header + main content)
 const DashboardLayout: React.FC = () => {
-  const sidebarOpen = useAppSelector((s) => s.ui.sidebarOpen);
+  const sidebarOpen = useAppSelector(s => s.ui.sidebarOpen);
   return (
     <div className="flex min-h-screen bg-surface-base text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <Sidebar />
-      <div className={`flex flex-col flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+      <div
+        className={`flex flex-col flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}
+      >
         <Header />
         <main className="flex-1 p-6 overflow-y-auto mt-16">
           <Suspense fallback={<LoadingFallback />}>

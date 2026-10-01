@@ -7,14 +7,14 @@ import type {
   ApiResponse,
   PaginatedResponse,
   Environment,
-  RuleType,
+  RuleType
 } from '../../types';
 
 export const flagsApi = createApi({
   reducerPath: 'flagsApi',
   baseQuery: baseQuery,
   tagTypes: ['Flag', 'Stats', 'AuditLog'],
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     // ── List flags ─────────────────────────────────────────────────
     listFlags: builder.query<
       ApiResponse<FeatureFlag[]>,
@@ -26,19 +26,19 @@ export const flagsApi = createApi({
         if (archived !== undefined) params.set('archived', String(archived));
         return `/flags?${params}`;
       },
-      providesTags: (result) =>
+      providesTags: result =>
         result
           ? [
               ...result.data.map(({ id }) => ({ type: 'Flag' as const, id })),
-              { type: 'Flag', id: 'LIST' },
+              { type: 'Flag', id: 'LIST' }
             ]
-          : [{ type: 'Flag', id: 'LIST' }],
+          : [{ type: 'Flag', id: 'LIST' }]
     }),
 
     // ── Get single flag ─────────────────────────────────────────────
     getFlag: builder.query<ApiResponse<FeatureFlag>, string>({
-      query: (id) => `/flags/${id}`,
-      providesTags: (_result, _err, id) => [{ type: 'Flag', id }],
+      query: id => `/flags/${id}`,
+      providesTags: (_result, _err, id) => [{ type: 'Flag', id }]
     }),
 
     // ── Create flag ─────────────────────────────────────────────────
@@ -46,8 +46,8 @@ export const flagsApi = createApi({
       ApiResponse<FeatureFlag>,
       { key: string; name: string; description?: string; projectId: string }
     >({
-      query: (body) => ({ url: '/flags', method: 'POST', body }),
-      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats'],
+      query: body => ({ url: '/flags', method: 'POST', body }),
+      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats']
     }),
 
     // ── Update flag ─────────────────────────────────────────────────
@@ -56,13 +56,17 @@ export const flagsApi = createApi({
       { id: string; name?: string; description?: string; archived?: boolean }
     >({
       query: ({ id, ...body }) => ({ url: `/flags/${id}`, method: 'PATCH', body }),
-      invalidatesTags: (_result, _err, { id }) => [{ type: 'Flag', id }, { type: 'Flag', id: 'LIST' }, 'Stats'],
+      invalidatesTags: (_result, _err, { id }) => [
+        { type: 'Flag', id },
+        { type: 'Flag', id: 'LIST' },
+        'Stats'
+      ]
     }),
 
     // ── Delete flag ─────────────────────────────────────────────────
     deleteFlag: builder.mutation<void, string>({
-      query: (id) => ({ url: `/flags/${id}`, method: 'DELETE' }),
-      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats'],
+      query: id => ({ url: `/flags/${id}`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats']
     }),
 
     // ── Toggle environment ──────────────────────────────────────────
@@ -73,14 +77,14 @@ export const flagsApi = createApi({
       query: ({ flagId, env, enabled }) => ({
         url: `/flags/${flagId}/environments/${env}/toggle`,
         method: 'POST',
-        body: { enabled },
+        body: { enabled }
       }),
       invalidatesTags: (_result, _err, { flagId }) => [
         { type: 'Flag', id: flagId },
         { type: 'Flag', id: 'LIST' },
         'Stats',
-        'AuditLog',
-      ],
+        'AuditLog'
+      ]
     }),
 
     // ── Add rule ────────────────────────────────────────────────────
@@ -91,24 +95,24 @@ export const flagsApi = createApi({
       query: ({ flagId, env, type, value }) => ({
         url: `/flags/${flagId}/rules?env=${env}`,
         method: 'POST',
-        body: { type, value },
+        body: { type, value }
       }),
-      invalidatesTags: (_result, _err, { flagId }) => [{ type: 'Flag', id: flagId }, 'AuditLog'],
+      invalidatesTags: (_result, _err, { flagId }) => [{ type: 'Flag', id: flagId }, 'AuditLog']
     }),
 
     // ── Delete rule ─────────────────────────────────────────────────
     deleteRule: builder.mutation<void, { flagId: string; ruleId: string }>({
       query: ({ flagId, ruleId }) => ({
         url: `/flags/${flagId}/rules/${ruleId}`,
-        method: 'DELETE',
+        method: 'DELETE'
       }),
-      invalidatesTags: (_result, _err, { flagId }) => [{ type: 'Flag', id: flagId }, 'AuditLog'],
+      invalidatesTags: (_result, _err, { flagId }) => [{ type: 'Flag', id: flagId }, 'AuditLog']
     }),
 
     // ── Stats ───────────────────────────────────────────────────────
     getStats: builder.query<ApiResponse<FlagStats>, string>({
-      query: (projectId) => `/stats?projectId=${projectId}`,
-      providesTags: ['Stats'],
+      query: projectId => `/stats?projectId=${projectId}`,
+      providesTags: ['Stats']
     }),
 
     // ── Audit logs (project-wide) ───────────────────────────────────
@@ -118,15 +122,15 @@ export const flagsApi = createApi({
     >({
       query: ({ projectId, limit = 100, offset = 0 }) =>
         `/audit?projectId=${projectId}&limit=${limit}&offset=${offset}`,
-      providesTags: ['AuditLog'],
+      providesTags: ['AuditLog']
     }),
 
     // ── Audit logs (flag-level) ─────────────────────────────────────
     getFlagAuditLogs: builder.query<PaginatedResponse<AuditLog>, string>({
-      query: (flagId) => `/flags/${flagId}/audit`,
-      providesTags: ['AuditLog'],
-    }),
-  }),
+      query: flagId => `/flags/${flagId}/audit`,
+      providesTags: ['AuditLog']
+    })
+  })
 });
 
 export const {
@@ -140,5 +144,5 @@ export const {
   useDeleteRuleMutation,
   useGetStatsQuery,
   useGetAuditLogsQuery,
-  useGetFlagAuditLogsQuery,
+  useGetFlagAuditLogsQuery
 } = flagsApi;

@@ -27,7 +27,7 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
       }
     } else {
       // Should not be reached since requireAuth is on this route, but fallback
-      query += ` WHERE 1=0`; 
+      query += ` WHERE 1=0`;
     }
 
     query += ` ORDER BY al.created_at DESC LIMIT $${params.length + 1}`;
@@ -37,7 +37,7 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
 
     res.json({
       data: result.rows,
-      total: result.rowCount, // Not exactly total, but enough for UI
+      total: result.rowCount // Not exactly total, but enough for UI
     });
   } catch (error) {
     next(error);

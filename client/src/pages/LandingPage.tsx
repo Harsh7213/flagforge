@@ -9,49 +9,61 @@ const features = [
     title: 'Multi-Tenant Isolation',
     desc: 'Every organization gets a completely isolated view. Your flags are never visible to other companies — enforced at the database layer.',
     color: 'from-violet-500/15 to-purple-500/15 border-violet-500/30',
-    iconBg: 'bg-violet-500/20 text-violet-600 dark:text-violet-300',
+    iconBg: 'bg-violet-500/20 text-violet-600 dark:text-violet-300'
   },
   {
     icon: '🎯',
     title: 'Targeting Rules',
     desc: 'Roll out to specific user IDs, groups, or a percentage of traffic. Fine-grained control over who sees what.',
     color: 'from-cyan-500/15 to-teal-500/15 border-cyan-500/30',
-    iconBg: 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300',
+    iconBg: 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300'
   },
   {
     icon: '🌍',
     title: '3 Environments',
     desc: 'Development, Staging, and Production environments per flag. Promote changes safely through your pipeline.',
     color: 'from-emerald-500/15 to-green-500/15 border-emerald-500/30',
-    iconBg: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300',
+    iconBg: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
   },
   {
     icon: '📋',
     title: 'Full Audit Trail',
     desc: 'Every toggle, rule change, and flag creation is logged with actor and timestamp. Compliance-ready out of the box.',
     color: 'from-amber-500/15 to-orange-500/15 border-amber-500/30',
-    iconBg: 'bg-amber-500/20 text-amber-600 dark:text-amber-300',
+    iconBg: 'bg-amber-500/20 text-amber-600 dark:text-amber-300'
   },
   {
     icon: '⚡',
     title: 'Instant Toggles',
     desc: 'Enable or disable features with a single click. No deployments needed. Changes reflect immediately via the SDK.',
     color: 'from-yellow-500/15 to-amber-500/15 border-yellow-500/30',
-    iconBg: 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300',
+    iconBg: 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300'
   },
   {
     icon: '🔒',
     title: 'SQL Injection Safe',
     desc: 'All queries use parameterized statements. Zod validation on every input. JWT-secured endpoints with organization-scoped access.',
     color: 'from-red-500/15 to-rose-500/15 border-red-500/30',
-    iconBg: 'bg-red-500/20 text-red-600 dark:text-red-300',
-  },
+    iconBg: 'bg-red-500/20 text-red-600 dark:text-red-300'
+  }
 ];
 
 const steps = [
-  { num: '01', title: 'Create Your Organization', desc: 'Register your company account in seconds. Each organization is fully isolated with its own projects and users.' },
-  { num: '02', title: 'Create a Project & Flags', desc: 'Organize flags by product or team. Each flag gets Development, Staging, and Production environments automatically.' },
-  { num: '03', title: 'Toggle & Target in Real Time', desc: 'Use the dashboard to enable flags, add targeting rules, and watch your rollout happen without redeploying.' },
+  {
+    num: '01',
+    title: 'Create Your Organization',
+    desc: 'Register your company account in seconds. Each organization is fully isolated with its own projects and users.'
+  },
+  {
+    num: '02',
+    title: 'Create a Project & Flags',
+    desc: 'Organize flags by product or team. Each flag gets Development, Staging, and Production environments automatically.'
+  },
+  {
+    num: '03',
+    title: 'Toggle & Target in Real Time',
+    desc: 'Use the dashboard to enable flags, add targeting rules, and watch your rollout happen without redeploying.'
+  }
 ];
 
 const CodeSnippet = () => (
@@ -65,30 +77,36 @@ const CodeSnippet = () => (
         <span className="ml-2 text-slate-500 dark:text-slate-400 text-xs">feature-flags.ts</span>
       </div>
       <pre className="text-left leading-relaxed">
-        <span className="text-slate-500 dark:text-slate-400">// Evaluate a flag for a user</span>{'\n'}
-        <span className="text-brand-600 dark:text-brand-300 font-semibold">const</span>{' '}
-        <span className="text-cyan-600 dark:text-cyan-300">result</span>{' = '}
-        <span className="text-slate-700 dark:text-slate-300">await</span>{' client.'}{'\n'}
-        {'  '}
-        <span className="text-amber-600 dark:text-amber-300 font-semibold">evaluate</span>
-        {'({\n'}
-        {'    '}
-        <span className="text-emerald-600 dark:text-emerald-300">flagKey</span>
-        {': '}
-        <span className="text-orange-600 dark:text-orange-300">'dark_mode'</span>
-        {',\n'}
-        {'    '}
-        <span className="text-emerald-600 dark:text-emerald-300">userId</span>
-        {': '}
-        <span className="text-orange-600 dark:text-orange-300">'user_123'</span>
-        {',\n'}
-        {'    '}
-        <span className="text-emerald-600 dark:text-emerald-300">env</span>
-        {': '}
-        <span className="text-orange-600 dark:text-orange-300">'production'</span>
-        {',\n'}
-        {'  });\n\n'}
-        <span className="text-slate-500 dark:text-slate-400">// result.enabled → true ✓</span>
+        <code>
+          <span className="text-slate-500 dark:text-slate-400">// Evaluate a flag for a user</span>
+          {'\n'}
+          <span className="text-brand-600 dark:text-brand-300 font-semibold">const</span>{' '}
+          <span className="text-cyan-600 dark:text-cyan-300">result</span>
+          {' = '}
+          <span className="text-slate-700 dark:text-slate-300">await</span>
+          {' client.'}
+          {'\n'}
+          {'  '}
+          <span className="text-amber-600 dark:text-amber-300 font-semibold">evaluate</span>
+          {'({\n'}
+          {'    '}
+          <span className="text-emerald-600 dark:text-emerald-300">flagKey</span>
+          {': '}
+          <span className="text-orange-600 dark:text-orange-300">'dark_mode'</span>
+          {',\n'}
+          {'    '}
+          <span className="text-emerald-600 dark:text-emerald-300">userId</span>
+          {': '}
+          <span className="text-orange-600 dark:text-orange-300">'user_123'</span>
+          {',\n'}
+          {'    '}
+          <span className="text-emerald-600 dark:text-emerald-300">env</span>
+          {': '}
+          <span className="text-orange-600 dark:text-orange-300">'production'</span>
+          {',\n'}
+          {'  });\n\n'}
+          <span className="text-slate-500 dark:text-slate-400">// result.enabled → true ✓</span>
+        </code>
       </pre>
     </div>
   </div>
@@ -96,7 +114,7 @@ const CodeSnippet = () => (
 
 const LandingPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const theme = useAppSelector((s) => s.ui.theme);
+  const theme = useAppSelector(s => s.ui.theme);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -107,9 +125,10 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-slate-100 overflow-x-hidden transition-colors duration-200">
-
       {/* ── Navbar ───────────────────────────────────────────────── */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-surface-elevated/90 backdrop-blur-xl border-b border-border-subtle shadow-sm' : 'bg-transparent'}`}>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-surface-elevated/90 backdrop-blur-xl border-b border-border-subtle shadow-sm' : 'bg-transparent'}`}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand text-white">
@@ -120,9 +139,24 @@ const LandingPage: React.FC = () => {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">Features</a>
-            <a href="#how-it-works" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">How It Works</a>
-            <Link to="/about" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium">About</Link>
+            <a
+              href="#features"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+            >
+              How It Works
+            </a>
+            <Link
+              to="/about"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+            >
+              About
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             {/* Theme Toggle Button */}
@@ -135,7 +169,10 @@ const LandingPage: React.FC = () => {
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
-            <Link to="/login" className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors px-4 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">
+            <Link
+              to="/login"
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors px-4 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
+            >
               Sign In
             </Link>
             <Link
@@ -171,8 +208,9 @@ const LandingPage: React.FC = () => {
               </span>
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-10 max-w-lg">
-              Control every feature release across Development, Staging, and Production.
-              Target specific users, roll out by percentage, and never touch your codebase to toggle a flag.
+              Control every feature release across Development, Staging, and Production. Target
+              specific users, roll out by percentage, and never touch your codebase to toggle a
+              flag.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -197,11 +235,18 @@ const LandingPage: React.FC = () => {
               {[
                 { label: 'Environments', value: '3' },
                 { label: 'Targeting Rules', value: '∞' },
-                { label: 'Audit Logs', value: '100%' },
-              ].map((stat) => (
-                <div key={stat.label} className="px-4 py-2 rounded-xl bg-surface-card border border-border-subtle flex items-center gap-2 shadow-sm">
-                  <span className="text-xl font-bold text-brand-600 dark:text-brand-300">{stat.value}</span>
-                  <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">{stat.label}</span>
+                { label: 'Audit Logs', value: '100%' }
+              ].map(stat => (
+                <div
+                  key={stat.label}
+                  className="px-4 py-2 rounded-xl bg-surface-card border border-border-subtle flex items-center gap-2 shadow-sm"
+                >
+                  <span className="text-xl font-bold text-brand-600 dark:text-brand-300">
+                    {stat.value}
+                  </span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                    {stat.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -220,10 +265,14 @@ const LandingPage: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Everything you need to
-              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent"> ship safely</span>
+              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                {' '}
+                ship safely
+              </span>
             </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Built for engineering teams that demand reliability, security, and full observability over their feature rollouts.
+              Built for engineering teams that demand reliability, security, and full observability
+              over their feature rollouts.
             </p>
           </div>
 
@@ -234,11 +283,17 @@ const LandingPage: React.FC = () => {
                 className={`group relative p-6 rounded-2xl bg-surface-card border border-border-subtle hover:-translate-y-1 hover:border-brand-500/30 hover:shadow-md transition-all duration-300`}
                 style={{ animationDelay: `${i * 0.08}s` }}
               >
-                <div className={`w-12 h-12 rounded-xl ${feat.iconBg} flex items-center justify-center text-2xl mb-4`}>
+                <div
+                  className={`w-12 h-12 rounded-xl ${feat.iconBg} flex items-center justify-center text-2xl mb-4`}
+                >
                   {feat.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{feat.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">{feat.desc}</p>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                  {feat.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                  {feat.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -251,7 +306,10 @@ const LandingPage: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Up and running in
-              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent"> 3 steps</span>
+              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                {' '}
+                3 steps
+              </span>
             </h2>
           </div>
 
@@ -260,14 +318,18 @@ const LandingPage: React.FC = () => {
             <div className="absolute left-8 top-16 bottom-16 w-px bg-gradient-to-b from-brand-500/50 via-cyan-500/30 to-transparent hidden md:block" />
 
             <div className="space-y-10">
-              {steps.map((step) => (
+              {steps.map(step => (
                 <div key={step.num} className="flex gap-8 group">
                   <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-600 dark:text-brand-300 text-lg group-hover:shadow-brand transition-all duration-300">
                     {step.num}
                   </div>
                   <div className="pt-3">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{step.title}</h3>
-                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{step.desc}</p>
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                      {step.title}
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {step.desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -286,7 +348,8 @@ const LandingPage: React.FC = () => {
                 Ready to ship better?
               </h2>
               <p className="text-lg text-brand-100 mb-10 max-w-xl mx-auto">
-                Join teams already using FlagForge to roll out features safely, target users precisely, and keep full audit visibility.
+                Join teams already using FlagForge to roll out features safely, target users
+                precisely, and keep full audit visibility.
               </p>
               <Link
                 to="/register"
@@ -307,15 +370,34 @@ const LandingPage: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
               🚩
             </div>
-            <span className="font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">FlagForge</span>
+            <span className="font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+              FlagForge
+            </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <Link to="/about" className="hover:text-slate-900 dark:hover:text-white transition-colors">About</Link>
-            <Link to="/login" className="hover:text-slate-900 dark:hover:text-white transition-colors">Sign In</Link>
-            <Link to="/register" className="hover:text-slate-900 dark:hover:text-white transition-colors">Register</Link>
+            <Link
+              to="/about"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              to="/login"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/register"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Register
+            </Link>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span className="font-medium text-slate-700 dark:text-slate-300">Created with ❤️ by Harsh</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              Created with ❤️ by Harsh
+            </span>
           </p>
         </div>
       </footer>

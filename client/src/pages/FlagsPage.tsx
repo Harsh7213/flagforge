@@ -9,7 +9,7 @@ import { useDebounce } from '../hooks/useDebounce';
 type FilterTab = 'active' | 'archived' | 'all';
 
 const FlagsPage: React.FC = () => {
-  const activeProjectId = useAppSelector((s) => s.ui.activeProjectId);
+  const activeProjectId = useAppSelector(s => s.ui.activeProjectId);
 
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
@@ -18,11 +18,15 @@ const FlagsPage: React.FC = () => {
 
   const archived = filterTab === 'archived' ? true : filterTab === 'all' ? undefined : false;
 
-  const { data, isLoading, isFetching } = useListFlagsQuery(activeProjectId ? {
-    projectId: activeProjectId,
-    search: debouncedSearch || undefined,
-    archived,
-  } : skipToken);
+  const { data, isLoading, isFetching } = useListFlagsQuery(
+    activeProjectId
+      ? {
+          projectId: activeProjectId,
+          search: debouncedSearch || undefined,
+          archived
+        }
+      : skipToken
+  );
 
   const flags = data?.data ?? [];
 
@@ -32,7 +36,9 @@ const FlagsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Feature Flags</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and control your feature releases across environments</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Manage and control your feature releases across environments
+          </p>
         </div>
         <button
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
@@ -47,7 +53,7 @@ const FlagsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Tabs */}
         <div className="inline-flex p-1 rounded-xl bg-surface-card border border-border-subtle shadow-sm">
-          {(['active', 'archived', 'all'] as FilterTab[]).map((tab) => (
+          {(['active', 'archived', 'all'] as FilterTab[]).map(tab => (
             <button
               key={tab}
               onClick={() => setFilterTab(tab)}
@@ -65,12 +71,14 @@ const FlagsPage: React.FC = () => {
 
         {/* Search */}
         <div className="relative min-w-[260px]">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
+            🔍
+          </span>
           <input
             type="search"
             placeholder="Search flags..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             id="flags-search-input"
             aria-label="Search feature flags"
             className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-card border border-border-subtle text-sm text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all shadow-sm"
@@ -82,7 +90,10 @@ const FlagsPage: React.FC = () => {
       {isLoading ? (
         <div className="grid md:grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="p-5 rounded-2xl bg-surface-card border border-border-subtle space-y-3 animate-pulse">
+            <div
+              key={i}
+              className="p-5 rounded-2xl bg-surface-card border border-border-subtle space-y-3 animate-pulse"
+            >
               <div className="h-5 bg-surface-elevated rounded w-1/3" />
               <div className="h-4 bg-surface-elevated rounded w-2/3" />
               <div className="flex gap-2 pt-2">
@@ -121,7 +132,7 @@ const FlagsPage: React.FC = () => {
             </div>
           )}
           <div className="grid md:grid-cols-2 gap-4">
-            {flags.map((flag) => (
+            {flags.map(flag => (
               <FlagCard key={flag.id} flag={flag} />
             ))}
           </div>

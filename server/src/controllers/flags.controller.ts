@@ -8,27 +8,31 @@ import { Environment } from '../types';
 const ENVIRONMENTS: Environment[] = ['development', 'staging', 'production'];
 
 const createFlagSchema = z.object({
-  key: z.string().min(1).max(255).regex(/^[a-z0-9_-]+$/, {
-    message: 'Flag key must only contain lowercase letters, numbers, underscores, or hyphens',
-  }),
+  key: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(/^[a-z0-9_-]+$/, {
+      message: 'Flag key must only contain lowercase letters, numbers, underscores, or hyphens'
+    }),
   name: z.string().min(1).max(255),
   description: z.string().optional(),
-  projectId: z.string().uuid(),
+  projectId: z.string().uuid()
 });
 
 const updateFlagSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
-  archived: z.boolean().optional(),
+  archived: z.boolean().optional()
 });
 
 const toggleEnvSchema = z.object({
-  enabled: z.boolean(),
+  enabled: z.boolean()
 });
 
 const addRuleSchema = z.object({
   type: z.enum(['user_ids', 'groups', 'percentage']),
-  value: z.union([z.array(z.string()), z.number().min(0).max(100)]),
+  value: z.union([z.array(z.string()), z.number().min(0).max(100)])
 });
 
 async function logAudit(
@@ -51,7 +55,10 @@ async function logAudit(
 async function verifyProjectAccess(projectId: string, req: Request) {
   if (req.project) return; // SDK call with API key, already verified
   if (!req.user) throw new AppError('Unauthorized', 401);
-  const res = await pool.query('SELECT id FROM projects WHERE id = $1 AND organization_id = $2', [projectId, req.user.organizationId]);
+  const res = await pool.query('SELECT id FROM projects WHERE id = $1 AND organization_id = $2', [
+    projectId,
+    req.user.organizationId
+  ]);
   if (res.rowCount === 0) throw new AppError('Project not found or unauthorized', 403);
 }
 
@@ -76,7 +83,7 @@ function getActorRole(req: Request) {
 // GET /api/v1/flags?projectId=
 export async function listFlags(req: Request, res: Response, next: NextFunction) {
   try {
-    const projectId = req.query.projectId as string || req.project?.id;
+    const projectId = (req.query.projectId as string) || req.project?.id;
     if (!projectId) throw new AppError('projectId is required', 400);
 
     await verifyProjectAccess(projectId, req);
@@ -217,9 +224,18 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
     const params: unknown[] = [];
     let idx = 1;
 
-    if (name !== undefined) { updates.push(`name = $${idx++}`); params.push(name); }
-    if (description !== undefined) { updates.push(`description = $${idx++}`); params.push(description); }
-    if (archived !== undefined) { updates.push(`archived = $${idx++}`); params.push(archived); }
+    if (name !== undefined) {
+      updates.push(`name = $${idx++}`);
+      params.push(name);
+    }
+    if (description !== undefined) {
+      updates.push(`description = $${idx++}`);
+      params.push(description);
+    }
+    if (archived !== undefined) {
+      updates.push(`archived = $${idx++}`);
+      params.push(archived);
+    }
     updates.push(`updated_at = NOW()`);
     params.push(id);
 
@@ -248,7 +264,10 @@ export async function deleteFlag(req: Request, res: Response, next: NextFunction
     await verifyFlagAccess(id, req);
 
     await client.query('BEGIN');
-    const flag = await client.query('SELECT key, name FROM feature_flags WHERE id = $1 FOR UPDATE', [id]);
+    const flag = await client.query(
+      'SELECT key, name FROM feature_flags WHERE id = $1 FOR UPDATE',
+      [id]
+    );
     if (flag.rows.length === 0) throw new AppError('Flag not found', 404);
 
     await logAudit(client, id, getActor(req), getActorRole(req), 'deleted', flag.rows[0]);
@@ -288,7 +307,10 @@ export async function toggleEnvironment(req: Request, res: Response, next: NextF
 
     if (result.rows.length === 0) throw new AppError('Flag environment not found', 404);
 
-    await logAudit(client, id, actor, getActorRole(req), 'toggled', { environment: env, enabled: parsed.data.enabled });
+    await logAudit(client, id, actor, getActorRole(req), 'toggled', {
+      environment: env,
+      enabled: parsed.data.enabled
+    });
     await client.query('COMMIT');
 
     res.json({ data: result.rows[0] });
@@ -344,7 +366,10 @@ export async function addRule(req: Request, res: Response, next: NextFunction) {
        VALUES ($1, $2, $3, $4) RETURNING *`,
       [uuidv4(), environment.rows[0].id, parsed.data.type, JSON.stringify(parsed.data.value)]
     );
-    await logAudit(client, id, getActor(req), getActorRole(req), 'rule_added', { environment: env, ...parsed.data });
+    await logAudit(client, id, getActor(req), getActorRole(req), 'rule_added', {
+      environment: env,
+      ...parsed.data
+    });
     await client.query('COMMIT');
     res.status(201).json({ data: rule.rows[0] });
   } catch (err) {
@@ -385,7 +410,7 @@ export async function deleteRule(req: Request, res: Response, next: NextFunction
 // Let's implement getStats
 export async function getStats(req: Request, res: Response, next: NextFunction) {
   try {
-    const projectId = req.query.projectId as string || req.project?.id;
+    const projectId = (req.query.projectId as string) || req.project?.id;
     if (!projectId) throw new AppError('projectId is required', 400);
 
     await verifyProjectAccess(projectId, req);
@@ -398,10 +423,9 @@ export async function getStats(req: Request, res: Response, next: NextFunction) 
          WHERE ff.project_id = $1 AND fe.enabled = true AND ff.archived = false`,
         [projectId]
       ),
-      pool.query(
-        `SELECT COUNT(*) FROM feature_flags WHERE project_id = $1 AND archived = true`,
-        [projectId]
-      ),
+      pool.query(`SELECT COUNT(*) FROM feature_flags WHERE project_id = $1 AND archived = true`, [
+        projectId
+      ]),
       pool.query(
         `SELECT fe.environment, COUNT(*) as enabled_count
          FROM flag_environments fe
@@ -409,7 +433,7 @@ export async function getStats(req: Request, res: Response, next: NextFunction) 
          WHERE ff.project_id = $1 AND fe.enabled = true AND ff.archived = false
          GROUP BY fe.environment`,
         [projectId]
-      ),
+      )
     ]);
 
     const envStats: Record<string, number> = {};
@@ -422,8 +446,8 @@ export async function getStats(req: Request, res: Response, next: NextFunction) 
         total: parseInt(totalResult.rows[0].count, 10),
         active: parseInt(activeResult.rows[0].count, 10),
         archived: parseInt(archivedResult.rows[0].count, 10),
-        byEnvironment: envStats,
-      },
+        byEnvironment: envStats
+      }
     });
   } catch (err) {
     next(err);

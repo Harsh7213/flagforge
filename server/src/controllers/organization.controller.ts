@@ -12,13 +12,13 @@ const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000;
 
 const invitationSchema = z.object({
   email: z.string().email(),
-  role: z.enum(['admin', 'member']).default('member'),
+  role: z.enum(['admin', 'member']).default('member')
 });
 
 const acceptInvitationSchema = z.object({
   token: z.string().min(32),
   name: z.string().min(2),
-  password: z.string().min(14),
+  password: z.string().min(14)
 });
 
 const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');
@@ -29,7 +29,7 @@ const setSessionCookie = (res: Response, token: string) => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: SESSION_DURATION_MS,
-    path: '/',
+    path: '/'
   });
 };
 
@@ -37,7 +37,9 @@ export const createInvitation = async (req: Request, res: Response, next: NextFu
   try {
     const { email, role } = invitationSchema.parse(req.body);
     const normalizedEmail = email.trim().toLowerCase();
-    const existingUser = await pool.query('SELECT id FROM users WHERE LOWER(email) = $1', [normalizedEmail]);
+    const existingUser = await pool.query('SELECT id FROM users WHERE LOWER(email) = $1', [
+      normalizedEmail
+    ]);
     if (existingUser.rowCount) {
       res.status(409).json({ error: 'A user with this email already exists' });
       return;
@@ -85,19 +87,21 @@ export const removeMember = async (req: Request, res: Response, next: NextFuncti
       res.status(400).json({ error: 'You cannot remove yourself' });
       return;
     }
-    if (member.rows[0].role === 'owner' || (req.user!.role === 'admin' && member.rows[0].role === 'admin')) {
+    if (
+      member.rows[0].role === 'owner' ||
+      (req.user!.role === 'admin' && member.rows[0].role === 'admin')
+    ) {
       res.status(403).json({ error: 'You cannot remove this member' });
       return;
     }
 
-    await pool.query(
-      'UPDATE users SET session_version = session_version + 1 WHERE id = $1',
-      [req.params.userId]
-    );
-    await pool.query(
-      'DELETE FROM users WHERE id = $1 AND organization_id = $2',
-      [req.params.userId, req.user!.organizationId]
-    );
+    await pool.query('UPDATE users SET session_version = session_version + 1 WHERE id = $1', [
+      req.params.userId
+    ]);
+    await pool.query('DELETE FROM users WHERE id = $1 AND organization_id = $2', [
+      req.params.userId,
+      req.user!.organizationId
+    ]);
     res.status(204).send();
   } catch (error) {
     next(error);
@@ -125,7 +129,9 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
       return;
     }
 
-    const existingUser = await client.query('SELECT id FROM users WHERE LOWER(email) = $1', [invitation.email]);
+    const existingUser = await client.query('SELECT id FROM users WHERE LOWER(email) = $1', [
+      invitation.email
+    ]);
     if (existingUser.rowCount) {
       await client.query('ROLLBACK');
       res.status(409).json({ error: 'A user with this email already exists' });
@@ -138,7 +144,9 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
        VALUES ($1, $2, $3, $4, $5) RETURNING id, session_version`,
       [invitation.organization_id, name, invitation.email, passwordHash, invitation.role]
     );
-    await client.query('UPDATE organization_invitations SET accepted_at = NOW() WHERE id = $1', [invitation.id]);
+    await client.query('UPDATE organization_invitations SET accepted_at = NOW() WHERE id = $1', [
+      invitation.id
+    ]);
     await client.query('COMMIT');
 
     const userId = userResult.rows[0].id;
@@ -147,7 +155,7 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
       {
         id: userId,
         organizationId: invitation.organization_id,
-        sessionVersion: userResult.rows[0].session_version,
+        sessionVersion: userResult.rows[0].session_version
       },
       JWT_SECRET,
       { expiresIn: '1h' }
@@ -163,9 +171,9 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
           email: invitation.email,
           organizationId: invitation.organization_id,
           organizationName: invitation.organization_name,
-          role: invitation.role,
-        },
-      },
+          role: invitation.role
+        }
+      }
     });
   } catch (error) {
     await client.query('ROLLBACK');
