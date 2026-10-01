@@ -5,6 +5,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../../test/mocks/server';
 import { renderWithProviders } from '../../test/utils';
 import FlagCard from '../FlagCard';
+import type { Toast } from '../../store/slices/uiSlice';
 import { mockFlag, mockArchivedFlag, mockUser } from '../../test/mocks/data';
 
 const mockNavigate = vi.fn();
@@ -137,7 +138,7 @@ describe('FlagCard', () => {
 
       await waitFor(() => {
         const toasts = store.getState().ui.toasts;
-        expect(toasts.some(t => t.type === 'success')).toBe(true);
+        expect(toasts.some((t: Toast) => t.type === 'success')).toBe(true);
       });
     });
 
@@ -155,7 +156,7 @@ describe('FlagCard', () => {
 
       await waitFor(() => {
         const toasts = store.getState().ui.toasts;
-        expect(toasts.some(t => t.type === 'error')).toBe(true);
+        expect(toasts.some((t: Toast) => t.type === 'error')).toBe(true);
       });
 
       // Should revert to original state (Dev was enabled, so "Disable" title reappears)

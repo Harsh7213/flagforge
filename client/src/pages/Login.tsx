@@ -4,6 +4,7 @@ import { useLoginMutation } from '../store/api/authApi';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,11 +21,11 @@ const Login: React.FC = () => {
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(addToast({ type: 'success', message: 'Logged in successfully' }));
       navigate('/app');
-    } catch (err: any) {
+    } catch (error: unknown) {
       dispatch(
         addToast({
           type: 'error',
-          message: err?.data?.error || 'Failed to login'
+          message: getApiErrorMessage(error, 'Failed to login')
         })
       );
     }

@@ -9,38 +9,53 @@ import { authApi } from '../store/api/authApi';
 import { organizationApi } from '../store/api/organizationApi';
 import uiReducer from '../store/slices/uiSlice';
 import authReducer from '../store/slices/authSlice';
-import type { RootState } from '../store';
 import type { User } from '../store/slices/authSlice';
+
+type TestRootState = {
+  ui: ReturnType<typeof uiReducer>;
+  auth: ReturnType<typeof authReducer>;
+  [flagsApi.reducerPath]: ReturnType<typeof flagsApi.reducer>;
+  [projectsApi.reducerPath]: ReturnType<typeof projectsApi.reducer>;
+  [authApi.reducerPath]: ReturnType<typeof authApi.reducer>;
+  [organizationApi.reducerPath]: ReturnType<typeof organizationApi.reducer>;
+};
 
 // ─── Store Factory ────────────────────────────────────────────────────────────
 /**
  * Creates a fresh Redux store for each test.
  * Pass `preloadedState` to seed initial auth/ui state without dispatching actions.
  */
-export function createTestStore(preloadedState?: Partial<RootState>) {
+export function createTestStore(preloadedState?: Partial<TestRootState>) {
+  const reducer = {
+    ui: uiReducer,
+    auth: authReducer,
+    [flagsApi.reducerPath]: flagsApi.reducer,
+    [projectsApi.reducerPath]: projectsApi.reducer,
+    [authApi.reducerPath]: authApi.reducer,
+    [organizationApi.reducerPath]: organizationApi.reducer
+  } as never;
+
   return configureStore({
-    reducer: {
-      ui: uiReducer,
-      auth: authReducer,
-      [flagsApi.reducerPath]: flagsApi.reducer,
-      [projectsApi.reducerPath]: projectsApi.reducer,
-      [authApi.reducerPath]: authApi.reducer,
-      [organizationApi.reducerPath]: organizationApi.reducer
-    },
-    middleware: getDefaultMiddleware =>
-      getDefaultMiddleware().concat(
+    reducer,
+    middleware: (getDefaultMiddleware: unknown) => {
+      const defaultMiddleware = getDefaultMiddleware as () => {
+        concat: (...args: unknown[]) => unknown;
+      };
+
+      return defaultMiddleware().concat(
         flagsApi.middleware,
         projectsApi.middleware,
         authApi.middleware,
         organizationApi.middleware
-      ),
-    preloadedState: preloadedState as any
-  });
+      ) as never;
+    },
+    preloadedState
+  } as never);
 }
 
 // ─── Render Options ───────────────────────────────────────────────────────────
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  preloadedState?: Partial<RootState>;
+  preloadedState?: Partial<TestRootState>;
   routerProps?: MemoryRouterProps;
   /** Shortcut: seed an authenticated user without building full preloadedState */
   authenticatedAs?: User;
@@ -65,7 +80,7 @@ export function renderWithProviders(
     ...renderOptions
   }: ExtendedRenderOptions = {}
 ) {
-  const mergedState: Partial<RootState> = {
+  const mergedState: Partial<TestRootState> = {
     ...preloadedState,
     auth: {
       user: authenticatedAs !== undefined ? authenticatedAs : (preloadedState?.auth?.user ?? null),

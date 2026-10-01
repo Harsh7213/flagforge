@@ -30,11 +30,11 @@ const TeamPage: React.FC = () => {
       setInvitationLink(link);
       setEmail('');
       dispatch(addToast({ type: 'success', message: 'Invitation created' }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       dispatch(
         addToast({
           type: 'error',
-          message: getApiErrorMessage(error, error?.data?.error || 'Failed to create invitation')
+          message: getApiErrorMessage(error, 'Failed to create invitation')
         })
       );
     }
@@ -59,11 +59,11 @@ const TeamPage: React.FC = () => {
     try {
       await removeMember(memberId).unwrap();
       dispatch(addToast({ type: 'success', message: `${memberName} was removed` }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       dispatch(
         addToast({
           type: 'error',
-          message: getApiErrorMessage(error, error?.data?.error || 'Failed to remove member')
+          message: getApiErrorMessage(error, 'Failed to remove member')
         })
       );
     }

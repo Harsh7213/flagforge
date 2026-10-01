@@ -63,12 +63,9 @@ describe('CreateFlagModal', () => {
 
   it('submits valid form data and closes modal', async () => {
     const user = userEvent.setup();
-    const { store } = renderWithProviders(
-      <CreateFlagModal projectId="proj-1" onClose={onClose} />,
-      {
-        authenticatedAs: mockUser
-      }
-    );
+    renderWithProviders(<CreateFlagModal projectId="proj-1" onClose={onClose} />, {
+      authenticatedAs: mockUser
+    });
 
     await user.type(screen.getByLabelText(/Flag Name \*/i), 'Test Flag');
     await user.type(screen.getByLabelText(/Description/i), 'Optional description');

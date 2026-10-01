@@ -50,11 +50,11 @@ class MockResizeObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-window.ResizeObserver = MockResizeObserver as any;
+window.ResizeObserver = MockResizeObserver as unknown as typeof window.ResizeObserver;
 
 class MockIntersectionObserver {
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-window.IntersectionObserver = MockIntersectionObserver as any;
+window.IntersectionObserver = MockIntersectionObserver as unknown as typeof window.IntersectionObserver;

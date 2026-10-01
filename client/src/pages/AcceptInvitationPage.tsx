@@ -4,6 +4,7 @@ import { useAppDispatch } from '../store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 import { useAcceptInvitationMutation } from '../store/api/organizationApi';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 const AcceptInvitationPage: React.FC = () => {
   const { token = '' } = useParams<{ token: string }>();
@@ -25,11 +26,11 @@ const AcceptInvitationPage: React.FC = () => {
         })
       );
       navigate('/app', { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
       dispatch(
         addToast({
           type: 'error',
-          message: error?.data?.error || 'Failed to accept invitation'
+          message: getApiErrorMessage(error, 'Failed to accept invitation')
         })
       );
     }

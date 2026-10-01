@@ -4,6 +4,7 @@ import { useRegisterMutation } from '../store/api/authApi';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
+import { getApiErrorMessage } from '../utils/errorMessage';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -22,12 +23,28 @@ const Register: React.FC = () => {
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(addToast({ type: 'success', message: 'Account created successfully' }));
       navigate('/app');
-    } catch (err: any) {
-      dispatch(addToast({ type: 'error', message: err?.data?.error || 'Failed to register' }));
+    } catch (error: unknown) {
+      dispatch(
+        addToast({
+          type: 'error',
+          message: getApiErrorMessage(error, 'Failed to register')
+        })
+      );
     }
   };
 
-  const fields = [
+  type FormField = {
+    id: string;
+    label: string;
+    type: string;
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+    required: boolean;
+    minLength?: number;
+  };
+
+  const fields: FormField[] = [
     {
       id: 'orgName',
       label: 'Organization Name',
@@ -155,7 +172,7 @@ const Register: React.FC = () => {
                   placeholder={field.placeholder}
                   value={field.value}
                   onChange={e => field.onChange(e.target.value)}
-                  minLength={(field as any).minLength}
+                  minLength={field.minLength}
                   className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all duration-200"
                 />
               </div>
