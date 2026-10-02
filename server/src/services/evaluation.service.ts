@@ -1,5 +1,5 @@
 import pool from '../db/pool';
-import { Environment, EvaluationRequest, EvaluationResult, TargetingRule } from '../types';
+import { EvaluationRequest, EvaluationResult, TargetingRule } from '../types';
 
 /**
  * Core flag evaluation engine.

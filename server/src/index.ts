@@ -1,44 +1,14 @@
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
-import './config';
-import router from './routes';
-import { errorHandler, notFound } from './middleware/errorHandler';
 import migrate from './db/migrate';
+import { connectRedis } from './db/redis';
+import { createApp } from './app';
 
-const app = express();
+const app = createApp();
 const PORT = parseInt(process.env.PORT || '4000', 10);
-
-// ── Security & Parsing ──────────────────────────────────────────────
-app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-CSRF-Token'],
-    credentials: true
-  })
-);
-app.use(cookieParser());
-app.use('/api/v1/evaluate', express.json({ limit: '64kb' }));
-app.use(express.json({ limit: '1mb' }));
-
-// ── Health check ────────────────────────────────────────────────────
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// ── API Routes ───────────────────────────────────────────────────────
-app.use('/api/v1', router);
-
-// ── 404 + Error Handler ──────────────────────────────────────────────
-app.use(notFound);
-app.use(errorHandler);
 
 // ── Startup ──────────────────────────────────────────────────────────
 async function start() {
   try {
+    await connectRedis();
     await migrate();
     app.listen(PORT, () => {
       console.log(`\n🚀 Feature Flags API running at http://localhost:${PORT}`);

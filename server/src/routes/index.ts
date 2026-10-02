@@ -35,7 +35,11 @@ import {
   listMembers,
   removeMember
 } from '../controllers/organization.controller';
-import { batchEvaluationLimit, evaluationLimit } from '../middleware/evaluationLimits';
+import {
+  batchEvaluationLimit,
+  evaluationLimit,
+  monthlyEvaluationLimit
+} from '../middleware/evaluationLimits';
 
 const router = Router();
 
@@ -127,7 +131,7 @@ router.get('/stats', requireAuth, getStats);
 router.get('/audit', requireAuth, getAuditLogs);
 
 // SDK Evaluation Routes (Protected by API Key)
-router.post('/evaluate', apiKeyAuth, evaluationLimit, evaluate);
-router.post('/evaluate/batch', apiKeyAuth, batchEvaluationLimit, batchEvaluate);
+router.post('/evaluate', apiKeyAuth, evaluationLimit, monthlyEvaluationLimit, evaluate);
+router.post('/evaluate/batch', apiKeyAuth, batchEvaluationLimit, monthlyEvaluationLimit, batchEvaluate);
 
 export default router;

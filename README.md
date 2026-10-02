@@ -1,12 +1,13 @@
 # FlagForge - Feature Flag Management System
 
-FlagForge is a multi-tenant feature flag management system for creating, targeting, evaluating, and auditing feature releases across development, staging, and production environments. It includes a React dashboard, an Express API, PostgreSQL persistence, and an API-key-protected evaluation endpoint for application integrations.
+FlagForge is a multi-tenant feature flag management system for creating, targeting, evaluating, and auditing feature releases across development, staging, and production environments. It includes a React dashboard, an Express API, PostgreSQL persistence, Redis-backed distributed rate limiting, and an API-key-protected evaluation endpoint for application integrations.
 
 ## Features
 
 - **Multi-Environment Support**: Manage flags across Development, Staging, and Production environments independently.
 - **Targeting Rules**: Roll out features based on user IDs, user groups, or percentage-based rollouts.
 - **Evaluation API**: Evaluate individual flags or batches of flags with a project API key, user ID, and optional groups.
+- **Distributed Rate Limiting**: Share project evaluation limits across server instances with an atomic Redis-backed sliding-window counter.
 - **Projects and API Keys**: Organize flags by project; rotate or revoke project keys. Keys are bcrypt-hashed at rest and shown only once when created or rotated.
 - **Organizations and Roles**: Workspaces support owner, admin, and member roles. Owners and admins can invite teammates with a single-use, 24-hour invitation link and manage eligible members.
 - **Authentication and Security**: Use HTTP-only cookie sessions, session expiry, CSRF protection for state-changing dashboard requests, role-based access control, Helmet, and validated environment configuration.
@@ -16,15 +17,15 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
 ## Architecture
 
 - **Frontend**: React 18, TypeScript, Vite, Redux Toolkit, RTK Query, Tailwind CSS
-- **Backend**: Node.js, Express, TypeScript, Zod for validation, bcryptjs, and cookie-parser.
-- **Database**: PostgreSQL 15, `pg` (node-postgres), with migrations run on server startup.
+- **Backend**: Node.js, Express, TypeScript, Zod for validation, bcryptjs, cookie-parser, and Redis.
+- **Data Stores**: PostgreSQL 15 with `pg` (node-postgres), plus Redis 7 for shared rate-limit counters. PostgreSQL migrations run on server startup.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- Docker & Docker Compose (for PostgreSQL)
+- Docker & Docker Compose (for PostgreSQL and Redis)
 
 ### Local Development Setup
 
@@ -42,7 +43,7 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
    docker compose up -d
    ```
 
-   This starts PostgreSQL on `localhost:5433` and pgAdmin on `localhost:5050`. The database will be automatically created. Set the values in `.env` and `server/.env` to matching database credentials; do not commit either file.
+    This starts PostgreSQL on `localhost:5433`, Redis on `localhost:6379`, and pgAdmin on `localhost:5050`. PostgreSQL and Redis data are stored in Docker volumes; Redis uses AOF persistence. Set the values in `.env` and `server/.env` to matching database credentials and set `REDIS_URL=redis://localhost:6379` in `server/.env`; do not commit either file. The local Redis port is bound to loopback; configure authentication and TLS for a remotely accessible production Redis.
 
 2. **Start the Backend**
 
@@ -53,6 +54,12 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
    ```
 
 _Note: The server automatically runs database migrations on startup._
+
+The server connects to Redis before accepting requests. Set `REDIS_URL` to the same shared Redis instance in every server environment; all instances then enforce the same per-project evaluation limits.
+
+Embedded Lua scripts update the Redis counters atomically. The per-minute limits use a weighted sliding window to smooth bursts across minute boundaries.
+
+`/api/v1/evaluate` allows 60 requests per minute, and `/api/v1/evaluate/batch` allows 10 requests per minute. The monthly evaluation quota is 100,000 flag evaluations per project; each flag in a batch counts individually. Rate-limited and over-quota requests receive HTTP `429`.
 
 3.  **Start the Frontend**
     In a new terminal:

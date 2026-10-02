@@ -4,6 +4,7 @@ import pool from '../db/pool';
 import { AppError } from '../middleware/errorHandler';
 import { z } from 'zod';
 import { Environment } from '../types';
+import type { PoolClient } from 'pg';
 
 const ENVIRONMENTS: Environment[] = ['development', 'staging', 'production'];
 
@@ -36,7 +37,7 @@ const addRuleSchema = z.object({
 });
 
 async function logAudit(
-  client: { query: Function },
+  client: PoolClient,
   flagId: string,
   actor: string,
   actorRole: string,
