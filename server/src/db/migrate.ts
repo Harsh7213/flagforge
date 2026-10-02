@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS projects (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   name            VARCHAR(255) NOT NULL,
+  plan            VARCHAR(50) NOT NULL DEFAULT 'standard',
   api_key_id      TEXT UNIQUE,
   api_key_hash    TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()

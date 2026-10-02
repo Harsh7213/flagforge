@@ -37,6 +37,8 @@ declare global {
       project?: {
         id: string;
         name: string;
+        plan?: string;
+        organizationId?: string;
       };
     }
   }
@@ -56,7 +58,7 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
     const parts = apiKey.split('_');
     const apiKeyId = parts.length === 3 && parts[0] === 'ff' ? parts[1] : apiKey;
     const result = await pool.query(
-      'SELECT id, name, api_key_hash FROM projects WHERE api_key_id = $1 AND api_key_hash IS NOT NULL',
+      'SELECT id, name, organization_id, plan, api_key_hash FROM projects WHERE api_key_id = $1 AND api_key_hash IS NOT NULL',
       [apiKeyId]
     );
     const project = result.rows[0];
@@ -64,7 +66,12 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
       res.status(401).json({ error: 'Invalid API key' });
       return;
     }
-    req.project = { id: project.id, name: project.name };
+    req.project = {
+      id: project.id,
+      name: project.name,
+      organizationId: project.organization_id,
+      plan: project.plan
+    };
     next();
   } catch (err) {
     next(err);

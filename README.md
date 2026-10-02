@@ -7,7 +7,7 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
 - **Multi-Environment Support**: Manage flags across Development, Staging, and Production environments independently.
 - **Targeting Rules**: Roll out features based on user IDs, user groups, or percentage-based rollouts.
 - **Evaluation API**: Evaluate individual flags or batches of flags with a project API key, user ID, and optional groups.
-- **Distributed Rate Limiting**: Share project evaluation limits across server instances with an atomic Redis-backed sliding-window counter.
+- **Evaluation Limits**: Apply per-project request limits and monthly usage quotas across projects in each organization.
 - **Projects and API Keys**: Organize flags by project; rotate or revoke project keys. Keys are bcrypt-hashed at rest and shown only once when created or rotated.
 - **Organizations and Roles**: Workspaces support owner, admin, and member roles. Owners and admins can invite teammates with a single-use, 24-hour invitation link and manage eligible members.
 - **Authentication and Security**: Use HTTP-only cookie sessions, session expiry, CSRF protection for state-changing dashboard requests, role-based access control, Helmet, and validated environment configuration.
@@ -55,11 +55,7 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
 
 _Note: The server automatically runs database migrations on startup._
 
-The server connects to Redis before accepting requests. Set `REDIS_URL` to the same shared Redis instance in every server environment; all instances then enforce the same per-project evaluation limits.
-
-Embedded Lua scripts update the Redis counters atomically. The per-minute limits use a weighted sliding window to smooth bursts across minute boundaries.
-
-`/api/v1/evaluate` allows 60 requests per minute, and `/api/v1/evaluate/batch` allows 10 requests per minute. The monthly evaluation quota is 100,000 flag evaluations per project; each flag in a batch counts individually. Rate-limited and over-quota requests receive HTTP `429`.
+The server uses a shared Redis instance to enforce per-project request limits and monthly evaluation quotas at both project and organization levels. Individual and batch evaluations have separate limits, and each flag in a batch counts toward usage. Requests exceeding a limit receive HTTP `429`.
 
 3.  **Start the Frontend**
     In a new terminal:

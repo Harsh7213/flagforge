@@ -1,20 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
 import request from 'supertest';
+import type {} from './auth';
 import { createEvaluationLimit, createMonthlyEvaluationLimit } from './evaluationLimits';
 
 class FakeRedisClient {
   private values = new Map<string, number>();
 
   async eval(_script: string, options: { keys: string[]; arguments: string[] }) {
-    if (options.arguments.length === 3) {
-      const [weight, limit, resetTime] = options.arguments.map(Number);
-      const current = this.values.get(options.keys[0]) ?? 0;
-      if (current + weight > limit) return [current, 0, resetTime];
+    if (options.arguments.length === 4) {
+      const [weight, projectLimit, organizationLimit, resetTime] = options.arguments.map(Number);
+      const organizationCurrent = this.values.get(options.keys[0]) ?? 0;
+      const projectCurrent = this.values.get(options.keys[1]) ?? 0;
+      if (organizationCurrent + weight > organizationLimit) {
+        return [organizationCurrent, projectCurrent, 0, 1, resetTime];
+      }
+      if (projectCurrent + weight > projectLimit) {
+        return [organizationCurrent, projectCurrent, 1, 0, resetTime];
+      }
 
-      const total = current + weight;
-      this.values.set(options.keys[0], total);
-      return [total, 1, resetTime];
+      const organizationTotal = organizationCurrent + weight;
+      const projectTotal = projectCurrent + weight;
+      this.values.set(options.keys[0], organizationTotal);
+      this.values.set(options.keys[1], projectTotal);
+      return [organizationTotal, projectTotal, 1, 1, resetTime];
     }
 
     if (options.arguments.length === 2) {
@@ -58,7 +67,7 @@ const batchEvaluationLimit = createEvaluationLimit(
   new FakeRedisClient() as never
 );
 const monthlyEvaluationLimit = createMonthlyEvaluationLimit(
-  100_000,
+  10000,
   'test:quota:evaluate',
   new FakeRedisClient() as never
 );
@@ -67,7 +76,11 @@ const app = express();
 app.use(express.json());
 app.use((req, _res, next) => {
   Object.assign(req, {
-    project: { id: req.get('X-Project-ID') ?? 'default-project', name: 'Test project' }
+    project: {
+      id: req.get('X-Project-ID') ?? 'default-project',
+      name: 'Test project',
+      organizationId: req.get('X-Organization-ID') ?? req.get('X-Project-ID') ?? 'default-project'
+    }
   });
   next();
 });
@@ -139,15 +152,71 @@ describe('evaluation rate limits', () => {
     expect((await evaluateBatch('batch-project')).status).toBe(429);
   }, 15_000);
 
-  it('counts batch flags toward a monthly per-project quota and resets each month', async () => {
+  it('resolves request limits and monthly quotas from the project plan', async () => {
+    const planEvaluationLimit = createEvaluationLimit(
+      req => (req.project?.plan === 'small' ? 1 : 2),
+      'test:plan-rate-limit',
+      new FakeRedisClient() as never
+    );
+    const planMonthlyLimit = createMonthlyEvaluationLimit(
+      req => (req.project?.plan === 'small' ? 2 : 4),
+      'test:plan-quota',
+      new FakeRedisClient() as never,
+      req => (req.project?.plan === 'small' ? 5 : 8)
+    );
+    const planApp = express();
+    planApp.use(express.json());
+    planApp.use((req, _res, next) => {
+      Object.assign(req, {
+        project: {
+          id: req.get('X-Project-ID') ?? 'default-project',
+          name: 'Test project',
+          organizationId:
+            req.get('X-Organization-ID') ?? req.get('X-Project-ID') ?? 'default-project',
+          plan: req.get('X-Project-Plan') ?? 'standard'
+        }
+      });
+      next();
+    });
+    planApp.post('/evaluate', planEvaluationLimit, planMonthlyLimit, (_req, res) =>
+      res.sendStatus(200)
+    );
+
+    const evaluateOnPlan = (projectId: string, plan: string) =>
+      request(planApp)
+        .post('/evaluate')
+        .set('X-Project-ID', projectId)
+        .set('X-Project-Plan', plan);
+
+    const smallPlanRequest = await evaluateOnPlan('small-project', 'small');
+    expect(smallPlanRequest.status).toBe(200);
+    expect(smallPlanRequest.headers['x-evaluation-quota-limit']).toBe('2');
+    expect((await evaluateOnPlan('small-project', 'small')).status).toBe(429);
+
+    const standardPlanRequest = await evaluateOnPlan('standard-project', 'standard');
+    expect(standardPlanRequest.status).toBe(200);
+    expect(standardPlanRequest.headers['x-evaluation-quota-limit']).toBe('4');
+  });
+
+  it('counts batch flags toward monthly per-project quotas and resets each month', async () => {
     const start = new Date('2026-10-31T23:59:00.000Z').getTime();
     const clock = vi.spyOn(Date, 'now').mockReturnValue(start);
-    const quota = createMonthlyEvaluationLimit(5, 'test:weighted-quota', new FakeRedisClient() as never);
+    const quota = createMonthlyEvaluationLimit(
+      5,
+      'test:weighted-quota',
+      new FakeRedisClient() as never,
+      10
+    );
     const quotaApp = express();
     quotaApp.use(express.json());
     quotaApp.use((req, _res, next) => {
       Object.assign(req, {
-        project: { id: req.get('X-Project-ID') ?? 'default-project', name: 'Test project' }
+        project: {
+          id: req.get('X-Project-ID') ?? 'default-project',
+          name: 'Test project',
+          organizationId:
+            req.get('X-Organization-ID') ?? req.get('X-Project-ID') ?? 'default-project'
+        }
       });
       next();
     });
@@ -167,5 +236,42 @@ describe('evaluation rate limits', () => {
 
     clock.mockReturnValue(new Date('2026-11-01T00:00:00.000Z').getTime());
     expect((await evaluateMany('quota-project', ['d', 'e', 'f'])).status).toBe(200);
+  });
+
+  it('enforces a monthly organization quota across projects', async () => {
+    const quota = createMonthlyEvaluationLimit(
+      100,
+      'test:organization-quota',
+      new FakeRedisClient() as never,
+      5
+    );
+    const quotaApp = express();
+    quotaApp.use(express.json());
+    quotaApp.use((req, _res, next) => {
+      Object.assign(req, {
+        project: {
+          id: req.get('X-Project-ID'),
+          name: 'Test project',
+          organizationId: req.get('X-Organization-ID')
+        }
+      });
+      next();
+    });
+    quotaApp.post('/evaluate', quota, (_req, res) => res.sendStatus(200));
+
+    const evaluateMany = (projectId: string, flagKeys: string[]) =>
+      request(quotaApp)
+        .post('/evaluate')
+        .set('X-Project-ID', projectId)
+        .set('X-Organization-ID', 'shared-organization')
+        .send({ flagKeys });
+
+    const firstBatch = await evaluateMany('project-one', ['a', 'b', 'c']);
+    expect(firstBatch.status).toBe(200);
+    expect(firstBatch.headers['x-organization-evaluation-quota-remaining']).toBe('2');
+
+    const secondBatch = await evaluateMany('project-two', ['d', 'e', 'f']);
+    expect(secondBatch.status).toBe(429);
+    expect(secondBatch.body.error).toMatch(/Organization monthly evaluation quota/);
   });
 });
