@@ -238,4 +238,4 @@ All routes are rooted at `/api/v1`.
 
 ## Deployment Shape
 
-Local development runs PostgreSQL 15 and Redis 7 through Docker Compose; pgAdmin is available for local database inspection. The client and server are started separately. PostgreSQL and Redis ports are bound to loopback in the provided Compose configuration. Production hosting, TLS termination, backups, and multi-region topology are deployment decisions outside the current repository configuration.
+The Docker Compose setup runs four separate containers: PostgreSQL 15, Redis 7, the Express backend, and the React dashboard. PostgreSQL and Redis data are persisted in named Docker volumes, and their ports are bound to loopback for local development access. The dashboard is served by Nginx and proxies API requests to the backend. TLS termination, backups, and multi-region topology are deployment decisions outside the current repository configuration.

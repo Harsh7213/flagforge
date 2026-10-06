@@ -18,58 +18,45 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
 
 - **Frontend**: React 18, TypeScript, Vite, Redux Toolkit, RTK Query, Tailwind CSS
 - **Backend**: Node.js, Express, TypeScript, Zod for validation, bcryptjs, cookie-parser, and Redis.
-- **Data Stores**: PostgreSQL 15 with `pg` (node-postgres), plus Redis 7 for shared rate-limit counters. PostgreSQL migrations run on server startup.
+- **Data Stores**: PostgreSQL with `pg` (node-postgres), plus Redis for shared rate-limit counters. PostgreSQL migrations run on server startup.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- Docker & Docker Compose (for PostgreSQL and Redis)
+- Docker & Docker Compose
 
 ### Local Development Setup
 
-1. **Start the Database**
-   Copy the local environment template before starting the services:
+1. **Configure local environment variables**
+   Copy the environment templates before starting the services:
 
    ```bash
    cp .env.example .env
    cp server/.env.example server/.env
    ```
 
-   Use the same database username, password, and database name in both files.
+   Set `POSTGRES_PASSWORD` and `JWT_SECRET` in the root `.env` before starting the stack. Use a strong, unique JWT secret of at least 32 characters. The containerized setup reads these values from the root `.env`; `server/.env` is only needed when running the backend directly on your host.
+
+2. **Start the full stack**
 
    ```bash
-   docker compose up -d
+   docker compose up --build -d
    ```
 
-    This starts PostgreSQL on `localhost:5433`, Redis on `localhost:6379`, and pgAdmin on `localhost:5050`. PostgreSQL and Redis data are stored in Docker volumes; Redis uses AOF persistence. Set the values in `.env` and `server/.env` to matching database credentials and set `REDIS_URL=redis://localhost:6379` in `server/.env`; do not commit either file. The local Redis port is bound to loopback; configure authentication and TLS for a remotely accessible production Redis.
+   This starts four containers: PostgreSQL, Redis, the backend API, and the frontend dashboard. The API is available at `localhost:4000` and the dashboard at `localhost` (port 80). PostgreSQL and Redis data are persisted in Docker volumes; Redis uses AOF persistence. PostgreSQL and Redis are also available on host ports `5433` and `6379` for local development tools.
 
-2. **Start the Backend**
+   If you want to run the app locally without containers for debugging, run `npm install` and `npm run dev` in the `server` and `client` directories, and configure the server to use the PostgreSQL and Redis services started by Compose. The containerized Compose setup is the default for the repository.
 
-   ```bash
-   cd server
-   npm install
-   npm run dev
-   ```
+3.  **Access the Application**
+    - Dashboard (Docker Compose): [http://localhost](http://localhost)
+    - Dashboard (Vite development server): [http://localhost:5173](http://localhost:5173)
+    - API: [http://localhost:4000/api/v1](http://localhost:4000/api/v1)
 
-_Note: The server automatically runs database migrations on startup._
+_Note: The backend container automatically runs database migrations before starting the API._
 
 The server uses a shared Redis instance to enforce per-project request limits and monthly evaluation quotas at both project and organization levels. Individual and batch evaluations have separate limits, and each flag in a batch counts toward usage. Requests exceeding a limit receive HTTP `429`.
-
-3.  **Start the Frontend**
-    In a new terminal:
-
-    ```bash
-    cd client
-    npm install
-    npm run dev
-    ```
-
-4.  **Access the Application**
-    - Dashboard: [http://localhost:5173](http://localhost:5173)
-    - API: [http://localhost:4000/api/v1](http://localhost:4000/api/v1)
-    - pgAdmin: [http://localhost:5050](http://localhost:5050), using `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` from `.env`
 
 ### Dashboard workflow
 
