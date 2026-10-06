@@ -164,17 +164,48 @@ export const issueCsrfCookie = (res: Response) => {
   });
 };
 
+const getAllowedOrigins = () => {
+  const configuredOrigins = [
+    process.env.CORS_ORIGIN,
+    'http://localhost:5173',
+    'http://localhost',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1'
+  ];
+
+  const origins = new Set<string>();
+  for (const candidate of configuredOrigins) {
+    if (!candidate) continue;
+    try {
+      origins.add(new URL(candidate).origin);
+    } catch {
+      // Ignore malformed origin entries from local env configuration.
+    }
+  }
+
+  return origins;
+};
+
 export const csrfProtection = (req: Request, res: Response, next: NextFunction) => {
   if (SAFE_METHODS.has(req.method) || !req.cookies?.[SESSION_COOKIE]) {
     next();
     return;
   }
 
-  const expectedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+  const allowedOrigins = getAllowedOrigins();
   const origin = req.header('Origin');
+  const normalizedOrigin = origin ? (() => {
+    try {
+      return new URL(origin).origin;
+    } catch {
+      return undefined;
+    }
+  })() : undefined;
   const csrfCookie = req.cookies?.[CSRF_COOKIE];
   const csrfHeader = req.header('X-CSRF-Token');
-  if (origin !== expectedOrigin || !csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
+
+  const hasValidOrigin = !normalizedOrigin || allowedOrigins.has(normalizedOrigin);
+  if (!hasValidOrigin || !csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
     res.status(403).json({ error: 'CSRF validation failed' });
     return;
   }
