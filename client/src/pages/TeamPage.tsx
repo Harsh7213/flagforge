@@ -117,8 +117,18 @@ const TeamPage: React.FC = () => {
               onChange={event => setRole(event.target.value as 'admin' | 'member')}
               className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50"
             >
-              <option value="member">Member</option>
-              <option value="admin">Admin</option>
+              <option
+                value="member"
+                className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white"
+              >
+                Member
+              </option>
+              <option
+                value="admin"
+                className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white"
+              >
+                Admin
+              </option>
             </select>
           </div>
           <button
