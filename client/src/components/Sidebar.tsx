@@ -47,11 +47,11 @@ const Sidebar: React.FC = () => {
       <div
         className={`flex items-center gap-3 px-4 h-16 border-b border-border-subtle ${!sidebarOpen && 'justify-center'}`}
       >
-        <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-base shadow-brand">
+        <div className="w-8 h-8 shrink-0 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-base shadow-brand">
           🚩
         </div>
         {sidebarOpen && (
-          <span className="font-bold text-lg bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent whitespace-nowrap">
+          <span className="font-bold text-lg bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent whitespace-nowrap">
             FlagForge
           </span>
         )}
@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
                 ${!sidebarOpen && 'justify-center'}`}
               >
                 <span
-                  className={`text-base flex-shrink-0 ${isActive ? 'text-brand-500 dark:text-brand-400' : 'text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`}
+                  className={`text-base shrink-0 ${isActive ? 'text-brand-500 dark:text-brand-400' : 'text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`}
                 >
                   {item.icon}
                 </span>
@@ -105,7 +105,7 @@ const Sidebar: React.FC = () => {
       <div className={`p-3 border-t border-border-subtle ${!sidebarOpen && 'flex justify-center'}`}>
         {sidebarOpen ? (
           <div className="flex items-center gap-3 px-2 py-2">
-            <div className="w-8 h-8 rounded-full flex-shrink-0 bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand">
+            <div className="w-8 h-8 rounded-full shrink-0 bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand">
               {initials}
             </div>
             <div className="flex-1 overflow-hidden">
@@ -119,14 +119,14 @@ const Sidebar: React.FC = () => {
             <button
               onClick={handleLogout}
               title="Log out"
-              className="text-slate-500 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-500/10 flex-shrink-0"
+              className="text-slate-500 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-red-500/10 shrink-0"
             >
               ⏻
             </button>
           </div>
         ) : (
           <div
-            className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand cursor-pointer"
+            className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand cursor-pointer"
             title={user?.name || 'User'}
           >
             {initials}

@@ -42,7 +42,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
       }`}
     >
       <div
-        className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold ${
+        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-sm font-bold ${
           iconColorMap[toast.type] || iconColorMap.info
         }`}
       >
@@ -51,7 +51,7 @@ const ToastItem: React.FC<{ toast: Toast }> = ({ toast }) => {
       <p className="flex-1 text-sm font-medium leading-relaxed pt-0.5">{toast.message}</p>
       <button
         onClick={() => dispatch(removeToast(toast.id))}
-        className="text-current opacity-50 hover:opacity-100 transition-opacity flex-shrink-0 text-lg leading-none p-0.5"
+        className="text-current opacity-50 hover:opacity-100 transition-opacity shrink-0 text-lg leading-none p-0.5"
         aria-label="Close notification"
       >
         ×
@@ -66,7 +66,7 @@ const ToastContainer: React.FC = () => {
   if (!toasts.length) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-auto">
+    <div className="fixed bottom-6 right-6 z-9999 flex flex-col gap-3 max-w-sm w-full pointer-events-auto">
       {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} />
       ))}

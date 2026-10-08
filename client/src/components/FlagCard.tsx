@@ -97,7 +97,7 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
           {flag.name}
         </h3>
         {flag.archived && (
-          <span className="flex-shrink-0 px-2 py-0.5 rounded-full text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+          <span className="shrink-0 px-2 py-0.5 rounded-full text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
             Archived
           </span>
         )}
@@ -128,7 +128,7 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
             >
               {/* Smooth Hardware-Accelerated Toggle Track */}
               <div
-                className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                   isEnabled ? 'bg-emerald-500 shadow-green' : 'bg-slate-300 dark:bg-slate-700'
                 } ${flag.archived ? 'opacity-40 cursor-not-allowed' : ''}`}
               >

@@ -192,7 +192,7 @@ const CreateFlagModal: React.FC<Props> = ({ projectId, onClose }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand transition-all disabled:opacity-60"
+              className="px-5 py-2 rounded-xl bg-linear-to from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand transition-all disabled:opacity-60"
               id="submit-create-flag"
             >
               {isLoading ? (

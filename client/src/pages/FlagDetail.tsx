@@ -340,7 +340,7 @@ const FlagDetail: React.FC = () => {
                     id={`env-toggle-${env}`}
                     disabled={flag.archived}
                     onClick={() => handleToggle(env)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                       enabled ? 'bg-emerald-500 shadow-green' : 'bg-slate-300 dark:bg-slate-700'
                     } ${flag.archived ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >

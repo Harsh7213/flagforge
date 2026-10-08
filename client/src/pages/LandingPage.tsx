@@ -68,7 +68,7 @@ const steps = [
 
 const CodeSnippet = () => (
   <div className="relative group animate-float">
-    <div className="absolute -inset-1 bg-gradient-to-r from-brand-500 to-cyan-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
+    <div className="absolute -inset-1 bg-linear-to-r from-brand-500 to-cyan-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500" />
     <div className="relative bg-surface-elevated border border-border-subtle rounded-2xl p-6 font-mono text-sm shadow-glass">
       <div className="flex items-center gap-2 mb-4">
         <div className="w-3 h-3 rounded-full bg-red-500" />
@@ -131,10 +131,10 @@ const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand text-white">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand text-white">
               🚩
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge
             </span>
           </div>
@@ -177,7 +177,7 @@ const LandingPage: React.FC = () => {
             </Link>
             <Link
               to="/register"
-              className="text-sm font-semibold px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-brand transition-all duration-200 hover:shadow-brand-lg hover:-translate-y-px"
+              className="text-sm font-semibold px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-brand transition-all duration-200 hover:shadow-brand-lg hover:-translate-y-px"
             >
               Get Started →
             </Link>
@@ -191,7 +191,7 @@ const LandingPage: React.FC = () => {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-brand-500/10 dark:bg-brand-500/15 blur-3xl" />
           <div className="absolute top-1/3 -right-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl" />
-          <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[600px] h-64 rounded-full bg-brand-600/10 blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-150 h-64 rounded-full bg-brand-600/10 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-2 gap-16 items-center">
@@ -203,7 +203,7 @@ const LandingPage: React.FC = () => {
             </div>
             <h1 className="text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.1] mb-6 text-slate-900 dark:text-white">
               Ship Features
-              <span className="block bg-gradient-to-r from-brand-600 via-violet-600 to-cyan-600 dark:from-brand-400 dark:via-violet-400 dark:to-cyan-400 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-brand-600 via-violet-600 to-cyan-600 dark:from-brand-400 dark:via-violet-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 With Confidence
               </span>
             </h1>
@@ -216,7 +216,7 @@ const LandingPage: React.FC = () => {
               <Link
                 to="/register"
                 id="hero-get-started-btn"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-bold text-lg shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-1"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-bold text-lg shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-1"
               >
                 Get Started Free
                 <span>→</span>
@@ -265,7 +265,7 @@ const LandingPage: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Everything you need to
-              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 {' '}
                 ship safely
               </span>
@@ -306,7 +306,7 @@ const LandingPage: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Up and running in
-              <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 {' '}
                 3 steps
               </span>
@@ -315,12 +315,12 @@ const LandingPage: React.FC = () => {
 
           <div className="relative">
             {/* Connecting line */}
-            <div className="absolute left-8 top-16 bottom-16 w-px bg-gradient-to-b from-brand-500/50 via-cyan-500/30 to-transparent hidden md:block" />
+            <div className="absolute left-8 top-16 bottom-16 w-px bg-linear-to-b from-brand-500/50 via-cyan-500/30 to-transparent hidden md:block" />
 
             <div className="space-y-10">
               {steps.map(step => (
                 <div key={step.num} className="flex gap-8 group">
-                  <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-600 dark:text-brand-300 text-lg group-hover:shadow-brand transition-all duration-300">
+                  <div className="shrink-0 w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono font-bold text-brand-600 dark:text-brand-300 text-lg group-hover:shadow-brand transition-all duration-300">
                     {step.num}
                   </div>
                   <div className="pt-3">
@@ -342,7 +342,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="relative overflow-hidden rounded-3xl p-12 text-center shadow-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-brand-700 to-violet-900 text-white rounded-3xl" />
+            <div className="absolute inset-0 bg-linear-to-br from-brand-600 via-brand-700 to-violet-900 text-white rounded-3xl" />
             <div className="relative">
               <h2 className="text-4xl lg:text-5xl font-extrabold mb-4 text-white">
                 Ready to ship better?
@@ -367,10 +367,10 @@ const LandingPage: React.FC = () => {
       <footer className="border-t border-border-subtle py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
               🚩
             </div>
-            <span className="font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+            <span className="font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge
             </span>
           </div>

@@ -40,10 +40,10 @@ const AcceptInvitationPage: React.FC = () => {
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center gap-3 mb-10 justify-center">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand">
             🚩
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
             FlagForge
           </span>
         </Link>
@@ -96,7 +96,7 @@ const AcceptInvitationPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || !token}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold shadow-brand disabled:opacity-60"
+              className="w-full py-3.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 text-white font-bold shadow-brand disabled:opacity-60"
             >
               {isLoading ? 'Joining organization...' : 'Accept invitation'}
             </button>

@@ -41,7 +41,7 @@ const FlagsPage: React.FC = () => {
           </p>
         </div>
         <button
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
           onClick={() => setShowCreate(true)}
           id="create-flag-btn"
         >
@@ -70,7 +70,7 @@ const FlagsPage: React.FC = () => {
         </div>
 
         {/* Search */}
-        <div className="relative min-w-[260px]">
+        <div className="relative min-w-65">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
             🔍
           </span>
@@ -116,7 +116,7 @@ const FlagsPage: React.FC = () => {
           </p>
           {!search && (
             <button
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-medium text-sm shadow-brand transition-all"
               onClick={() => setShowCreate(true)}
               id="empty-create-flag-btn"
             >

@@ -46,7 +46,7 @@ const Login: React.FC = () => {
       </div>
 
       {/* Left decorative panel */}
-      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-gradient-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-950/80 border-r border-border-subtle transition-colors duration-200">
+      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-linear-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-950/80 border-r border-border-subtle transition-colors duration-200">
         {/* Glow blobs */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-brand-500/15 dark:bg-brand-500/20 blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-cyan-500/15 dark:bg-cyan-500/15 blur-3xl pointer-events-none" />
@@ -61,10 +61,10 @@ const Login: React.FC = () => {
         />
 
         <Link to="/" className="relative flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand text-white">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand text-white">
             🚩
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
             FlagForge
           </span>
         </Link>
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
           <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
             Control your features.
             <br />
-            <span className="bg-gradient-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
               Ship with confidence.
             </span>
           </h2>
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
                 key={item}
                 className="flex items-center gap-3 text-slate-700 dark:text-slate-300"
               >
-                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center flex-shrink-0">
+                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
                   <span className="text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                     ✓
                   </span>
@@ -108,10 +108,10 @@ const Login: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 justify-center">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand">
               🚩
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent">
               FlagForge
             </span>
           </Link>
@@ -160,7 +160,7 @@ const Login: React.FC = () => {
               type="submit"
               id="login-submit-btn"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-bold text-base shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="w-full py-3.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-bold text-base shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">

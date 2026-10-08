@@ -134,7 +134,7 @@ const TeamPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-5 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold shadow-brand disabled:opacity-60"
+            className="px-5 py-3 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 text-white font-semibold shadow-brand disabled:opacity-60"
           >
             {isLoading ? 'Creating invitation...' : 'Create invitation'}
           </button>

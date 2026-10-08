@@ -115,7 +115,7 @@ const Dashboard: React.FC = () => {
         <button
           id="dashboard-manage-flags-btn"
           onClick={() => navigate('/app/flags')}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
+          className="px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold text-sm shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-px"
         >
           Manage Flags →
         </button>
