@@ -1,5 +1,9 @@
 <div align="center">
-  <img src="docs/flagforge-logo.svg" alt="FlagForge logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/flagforge-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/flagforge-logo.svg">
+    <img src="docs/flagforge-logo.svg" alt="FlagForge logo">
+  </picture>
   <h3>Forge your flag now</h3>
   <p>Ship new features with confidence. FlagForge gives your team one place to control rollouts, target the right users, and see how every release is performing—without waiting for a full deployment to change course.</p>
   <p>Self-host FlagForge on your own infrastructure and keep control of your data.</p>
