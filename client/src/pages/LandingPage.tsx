@@ -131,8 +131,13 @@ const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand text-white">
-              🚩
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+              <img
+                src="/flag-icon.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 brightness-0 invert"
+              />
             </div>
             <span className="text-xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge
@@ -367,8 +372,13 @@ const LandingPage: React.FC = () => {
       <footer className="border-t border-border-subtle py-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
-              🚩
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+              <img
+                src="/flag-icon.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 brightness-0 invert"
+              />
             </div>
             <span className="font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge

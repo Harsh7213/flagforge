@@ -105,7 +105,12 @@ const FlagsPage: React.FC = () => {
         </div>
       ) : flags.length === 0 ? (
         <div className="text-center py-16 px-4 rounded-2xl bg-surface-card border border-border-subtle shadow-sm">
-          <div className="text-4xl mb-3">🚩</div>
+          <img
+            src="/flag-icon.svg"
+            alt=""
+            aria-hidden="true"
+            className="w-8 h-8 mx-auto mb-3"
+          />
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-1">
             {search ? 'No flags match your search' : 'No flags yet'}
           </h3>

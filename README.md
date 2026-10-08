@@ -1,6 +1,9 @@
-# FlagForge - Feature Flag Management System
-
-FlagForge is a multi-tenant feature flag management system for creating, targeting, evaluating, and auditing feature releases across development, staging, and production environments. It includes a React dashboard, an Express API, PostgreSQL persistence, Redis-backed distributed rate limiting, and an API-key-protected evaluation endpoint for application integrations.
+<div align="center">
+  <img src="docs/flagforge-logo.svg" alt="FlagForge logo">
+  <h3>Forge your flag now</h3>
+  <p>Ship new features with confidence. FlagForge gives your team one place to control rollouts, target the right users, and see how every release is performing—without waiting for a full deployment to change course.</p>
+  <p>Self-host FlagForge on your own infrastructure and keep control of your data.</p>
+</div>
 
 ## Features
 
@@ -47,7 +50,16 @@ FlagForge is a multi-tenant feature flag management system for creating, targeti
 
    This starts four containers: PostgreSQL, Redis, the backend API, and the frontend dashboard. The API is available at `localhost:4000` and the dashboard at `localhost` (port 80). PostgreSQL and Redis data are persisted in Docker volumes; Redis uses AOF persistence. PostgreSQL and Redis are also available on host ports `5433` and `6379` for local development tools.
 
-   If you want to run the app locally without containers for debugging, run `npm install` and `npm run dev` in the `server` and `client` directories, and configure the server to use the PostgreSQL and Redis services started by Compose. The containerized Compose setup is the default for the repository.
+   If you want to run the app locally without containers for debugging, run `npm install` and `npm run dev` in the `server` and `client` directories, and configure the server to use the PostgreSQL and Redis services started by Compose.
+
+   To run the backend on your host, start its required data stores from the repository root first:
+
+   ```bash
+   docker compose up -d postgres redis
+   docker compose ps
+   ```
+
+   Wait until both services report `healthy`, then run `npm run dev` from the `server` directory. The server's `REDIS_URL` must point to the host-mapped Redis port (by default, `redis://localhost:6379`). If Redis is stopped or the URL/port does not match, startup fails with `ECONNREFUSED` on port `6379`.
 
 3.  **Access the Application**
     - Dashboard (Docker Compose): [http://localhost](http://localhost)

@@ -40,8 +40,13 @@ const AcceptInvitationPage: React.FC = () => {
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center gap-3 mb-10 justify-center">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand">
-            🚩
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+            <img
+              src="/flag-icon.svg"
+              alt=""
+              aria-hidden="true"
+              className="w-7 h-7 brightness-0 invert"
+            />
           </div>
           <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
             FlagForge

@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 interface StatCardProps {
   label: string;
   value: number | string;
-  icon: string;
+  icon: React.ReactNode;
   gradient: string;
   glow: string;
   delay?: number;
@@ -71,7 +71,14 @@ const Dashboard: React.FC = () => {
     {
       label: 'Total Flags',
       value: stats?.total ?? 0,
-      icon: '🚩',
+      icon: (
+        <img
+          src="/flag-icon.svg"
+          alt=""
+          aria-hidden="true"
+          className="w-7 h-7 brightness-0 invert"
+        />
+      ),
       gradient: 'linear-gradient(135deg,hsl(258,78%,52%),hsl(258,78%,35%))',
       glow: 'hover:shadow-brand',
       delay: 0
@@ -164,7 +171,12 @@ const Dashboard: React.FC = () => {
               </div>
               {recentFlags.length === 0 ? (
                 <div className="text-center py-10">
-                  <div className="text-3xl mb-3">🚩</div>
+                  <img
+                    src="/flag-icon.svg"
+                    alt=""
+                    aria-hidden="true"
+                    className="w-7 h-7 mx-auto mb-3"
+                  />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
                     No flags yet. Create your first one!
                   </p>

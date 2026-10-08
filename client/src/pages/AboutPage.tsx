@@ -13,8 +13,13 @@ const AboutPage: React.FC = () => {
       <nav className="border-b border-border-subtle bg-surface-elevated/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand text-white">
-              🚩
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+              <img
+                src="/flag-icon.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 brightness-0 invert"
+              />
             </div>
             <span className="text-xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge
@@ -71,8 +76,8 @@ const AboutPage: React.FC = () => {
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
             FlagForge is an enterprise-grade multi-tenant feature flag management system designed to
-            eliminate high-risk deployments. Control features dynamically across Development,
-            Staging, and Production environments without redeploying code.
+            eliminate high-risk deployments. Control features dynamically across different
+            environments without redeploying code.
           </p>
         </div>
 
@@ -151,8 +156,13 @@ const AboutPage: React.FC = () => {
       <footer className="border-t border-border-subtle py-10 bg-surface-elevated/50">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm shadow-brand text-white">
-              🚩
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+              <img
+                src="/flag-icon.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 brightness-0 invert"
+              />
             </div>
             <span className="font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
               FlagForge

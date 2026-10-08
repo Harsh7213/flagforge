@@ -61,8 +61,13 @@ const Login: React.FC = () => {
         />
 
         <Link to="/" className="relative flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-xl shadow-brand text-white">
-            🚩
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+            <img
+              src="/flag-icon.svg"
+              alt=""
+              aria-hidden="true"
+              className="w-7 h-7 brightness-0 invert"
+            />
           </div>
           <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
             FlagForge
@@ -108,8 +113,13 @@ const Login: React.FC = () => {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 justify-center">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-lg shadow-brand">
-              🚩
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+              <img
+                src="/flag-icon.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-6 h-6 brightness-0 invert"
+              />
             </div>
             <span className="text-xl font-bold bg-linear-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent">
               FlagForge

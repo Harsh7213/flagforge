@@ -9,7 +9,11 @@ import { authApi, useLogoutMutation } from '../store/api/authApi';
 
 const navItems = [
   { to: '/app', label: 'Dashboard', icon: '⬡', exact: true },
-  { to: '/app/flags', label: 'Feature Flags', icon: '⚑' },
+  {
+    to: '/app/flags',
+    label: 'Feature Flags',
+    icon: <img src="/flag-icon.svg" alt="" aria-hidden="true" className="w-5 h-5 object-contain" />
+  },
   { to: '/app/audit', label: 'Audit Log', icon: '📋' },
   { to: '/app/projects', label: 'Projects', icon: '📁' },
   { to: '/app/team', label: 'Team', icon: '♟' }
@@ -47,8 +51,13 @@ const Sidebar: React.FC = () => {
       <div
         className={`flex items-center gap-3 px-4 h-16 border-b border-border-subtle ${!sidebarOpen && 'justify-center'}`}
       >
-        <div className="w-8 h-8 shrink-0 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-base shadow-brand">
-          🚩
+        <div className="w-8 h-8 shrink-0 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+          <img
+            src="/flag-icon.svg"
+            alt=""
+            aria-hidden="true"
+            className="w-6 h-6 brightness-0 invert"
+          />
         </div>
         {sidebarOpen && (
           <span className="font-bold text-lg bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent whitespace-nowrap">

@@ -12,13 +12,12 @@ const AuthGuard: React.FC = () => {
   const [logoutSession] = useLogoutMutation();
   const { data, isLoading, isError } = useMeQuery(undefined);
   const expiresAt = sessionExpiresAt ?? data?.data?.expiresAt ?? 0;
-  const hasValidServerSession = Boolean(data?.data && data.data.expiresAt > Date.now());
 
   useEffect(() => {
-    if (hasValidServerSession) {
+    if (data?.data) {
       dispatch(setCredentials(data.data));
     }
-  }, [data, dispatch, hasValidServerSession]);
+  }, [data, dispatch]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -45,7 +44,7 @@ const AuthGuard: React.FC = () => {
     return <div className="min-h-screen bg-surface-base" />;
   }
 
-  if (isError || !user || expiresAt <= Date.now()) {
+  if (isError || !user || !expiresAt) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return <Outlet />;

@@ -79,7 +79,13 @@ const CreateFlagModal: React.FC<Props> = ({ projectId, onClose }) => {
             className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2"
             id="create-flag-title"
           >
-            <span>🚩</span> Create Feature Flag
+            <img
+              src="/flag-icon.svg"
+              alt=""
+              aria-hidden="true"
+              className="w-5 h-5"
+            />
+            Create Feature Flag
           </h2>
           <button
             className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-lg p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5"
