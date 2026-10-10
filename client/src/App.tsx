@@ -50,8 +50,10 @@ const DashboardLayout: React.FC = () => {
 
 const PublicOnly: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { data, isLoading } = useMeQuery(undefined);
-  const hasServerSession = Boolean(data?.data);
+  const { data, isLoading, isFetching, isError } = useMeQuery(undefined, {
+    refetchOnMountOrArgChange: true
+  });
+  const hasServerSession = !isError && !isFetching && Boolean(data?.data);
 
   useEffect(() => {
     if (hasServerSession) {
@@ -59,7 +61,7 @@ const PublicOnly: React.FC = () => {
     }
   }, [data, dispatch, hasServerSession]);
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <LoadingFallback />;
   }
 

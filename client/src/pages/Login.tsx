@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const features = [
   'Multi-tenant isolation',
@@ -145,6 +146,7 @@ const Login: React.FC = () => {
                 id="email"
                 type="email"
                 required
+                maxLength={INPUT_LIMITS.email}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@company.com"

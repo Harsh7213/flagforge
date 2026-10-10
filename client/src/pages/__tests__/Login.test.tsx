@@ -6,13 +6,16 @@ import Login from '../Login';
 
 import { http, HttpResponse } from 'msw';
 import { server } from '../../test/mocks/server';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('Login Page', () => {
   it('renders login form elements', () => {
     renderWithProviders(<Login />);
 
     expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Email address/i)).toBeInTheDocument();
+    expect((screen.getByLabelText(/Email address/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.email
+    );
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sign in/i })).toBeInTheDocument();
   });

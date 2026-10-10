@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { Routes, Route } from 'react-router-dom';
 import { renderWithProviders } from '../../test/utils';
 import AcceptInvitationPage from '../AcceptInvitationPage';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('AcceptInvitationPage', () => {
   it('renders invitation form fields when token is present', () => {
@@ -17,7 +18,12 @@ describe('AcceptInvitationPage', () => {
     );
 
     expect(screen.getByRole('heading', { name: /Join your organization/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Your name/i)).toBeInTheDocument();
+    expect((screen.getByLabelText(/Your name/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.userName
+    );
+    expect((screen.getByLabelText(/Password/i) as HTMLInputElement).minLength).toBe(
+      INPUT_LIMITS.passwordMinimum
+    );
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
   });
 

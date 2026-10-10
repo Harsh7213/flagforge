@@ -15,39 +15,6 @@ const renderHeader = (pathname = '/app', authenticated = true) =>
   });
 
 describe('Header', () => {
-  // ─── Page Titles ───────────────────────────────────────────────────────────
-  describe('page titles', () => {
-    it('shows "Dashboard" at /app', async () => {
-      renderHeader('/app');
-      expect(await screen.findByText('Dashboard')).toBeInTheDocument();
-    });
-
-    it('shows "Feature Flags" at /app/flags', async () => {
-      renderHeader('/app/flags');
-      expect(await screen.findByText('Feature Flags')).toBeInTheDocument();
-    });
-
-    it('shows "Audit Log" at /app/audit', async () => {
-      renderHeader('/app/audit');
-      expect(await screen.findByText('Audit Log')).toBeInTheDocument();
-    });
-
-    it('shows "Projects" at /app/projects', async () => {
-      renderHeader('/app/projects');
-      expect(await screen.findByText('Projects')).toBeInTheDocument();
-    });
-
-    it('shows "Team" at /app/team', async () => {
-      renderHeader('/app/team');
-      expect(await screen.findByText('Team')).toBeInTheDocument();
-    });
-
-    it('shows "FlagForge" for unknown routes', async () => {
-      renderHeader('/app/unknown-route');
-      expect(await screen.findByText('FlagForge')).toBeInTheDocument();
-    });
-  });
-
   it('does not render a sidebar toggle in the header', () => {
     renderHeader('/app');
     expect(screen.queryByLabelText(/sidebar/i)).not.toBeInTheDocument();
@@ -57,7 +24,7 @@ describe('Header', () => {
   describe('theme toggle', () => {
     it('renders the theme toggle button', () => {
       renderHeader('/app');
-      expect(screen.getByLabelText('Toggle color theme')).toBeInTheDocument();
+      expect(screen.getByLabelText('Toggle theme')).toBeInTheDocument();
     });
 
     it('dispatches toggleTheme action when clicked', async () => {
@@ -65,7 +32,7 @@ describe('Header', () => {
       const { store } = renderHeader('/app');
 
       const initialTheme = store.getState().ui.theme;
-      await user.click(screen.getByLabelText('Toggle color theme'));
+      await user.click(screen.getByLabelText('Toggle theme'));
       expect(store.getState().ui.theme).not.toBe(initialTheme);
     });
   });

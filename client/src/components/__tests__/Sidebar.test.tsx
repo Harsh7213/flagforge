@@ -54,20 +54,20 @@ describe('Sidebar', () => {
     it('shows expanded content when sidebar is open', () => {
       renderSidebar(mockUser, true);
       expect(screen.getByText('FlagForge')).toBeInTheDocument();
-      expect(screen.getByText('Navigation')).toBeInTheDocument();
+      expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
 
     it('hides expanded content when sidebar is collapsed', () => {
       renderSidebar(mockUser, false);
       expect(screen.queryByText('FlagForge')).not.toBeInTheDocument();
-      expect(screen.queryByText('Navigation')).not.toBeInTheDocument();
+      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
     });
 
-    it('toggles between expanded and collapsed from the user footer', async () => {
+    it('toggles between expanded and collapsed using the sidebar controls', async () => {
       const user = userEvent.setup();
       const { store } = renderSidebar(mockUser, true);
 
-      await user.click(screen.getByRole('button', { name: 'Collapse sidebar from user footer' }));
+      await user.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
       expect(store.getState().ui.sidebarOpen).toBe(false);
       expect(
         screen.getByRole('button', { name: 'Expand sidebar from user footer' })
@@ -75,9 +75,7 @@ describe('Sidebar', () => {
 
       await user.click(screen.getByRole('button', { name: 'Expand sidebar from user footer' }));
       expect(store.getState().ui.sidebarOpen).toBe(true);
-      expect(
-        screen.getByRole('button', { name: 'Collapse sidebar from user footer' })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toBeInTheDocument();
     });
   });
 

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test/utils';
 import ProjectsPage from '../ProjectsPage';
 import { mockUser, mockProjects } from '../../test/mocks/data';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('ProjectsPage', () => {
   it('renders projects header and lists project names', async () => {
@@ -30,6 +31,7 @@ describe('ProjectsPage', () => {
     await user.click(screen.getByRole('button', { name: /\+ New Project/i }));
 
     const input = screen.getByPlaceholderText(/Project name/i);
+    expect((input as HTMLInputElement).maxLength).toBe(INPUT_LIMITS.projectName);
     await user.type(input, 'New Analytics App');
 
     await user.click(screen.getByRole('button', { name: /^Create$/i }));
@@ -37,6 +39,22 @@ describe('ProjectsPage', () => {
     await waitFor(() => {
       expect(screen.queryByPlaceholderText(/Project name/i)).not.toBeInTheDocument();
     });
+  });
+
+  it('limits renamed project names to 20 characters', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ProjectsPage />, {
+      authenticatedAs: mockUser
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: /Rename/i })[0]).toBeInTheDocument();
+    });
+
+    await user.click(screen.getAllByRole('button', { name: /Rename/i })[0]);
+
+    expect((screen.getByRole('textbox', { name: 'Project name' }) as HTMLInputElement).maxLength)
+      .toBe(INPUT_LIMITS.projectName);
   });
 
   it('allows setting active project', async () => {

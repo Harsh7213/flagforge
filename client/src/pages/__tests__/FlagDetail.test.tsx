@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test/utils';
 import FlagDetail from '../FlagDetail';
 import { mockUser, mockFlags } from '../../test/mocks/data';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('FlagDetail Page', () => {
   const targetFlag = mockFlags[0];
@@ -52,6 +53,10 @@ describe('FlagDetail Page', () => {
     await user.click(screen.getByRole('button', { name: /✏️ Edit/i }));
 
     const editInput = screen.getByDisplayValue(targetFlag.name);
+    expect((editInput as HTMLInputElement).maxLength).toBe(INPUT_LIMITS.flagName);
+    expect((screen.getByLabelText('Description') as HTMLTextAreaElement).maxLength).toBe(
+      INPUT_LIMITS.flagDescription
+    );
     await user.clear(editInput);
     await user.type(editInput, 'Updated Flag Name');
 

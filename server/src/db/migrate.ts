@@ -1,5 +1,6 @@
 import pool from './pool';
 import bcrypt from 'bcryptjs';
+import { INPUT_LIMITS } from '../config/inputLimits';
 
 const SQL = `
 -- Enable UUID extension
@@ -8,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Organizations table
 CREATE TABLE IF NOT EXISTS organizations (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name        VARCHAR(255) NOT NULL,
+  name        VARCHAR(${INPUT_LIMITS.organizationName}) NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -16,10 +17,10 @@ CREATE TABLE IF NOT EXISTS organizations (
 CREATE TABLE IF NOT EXISTS users (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  name            VARCHAR(255) NOT NULL,
-  email           VARCHAR(255) NOT NULL UNIQUE,
+  name            VARCHAR(${INPUT_LIMITS.userName}) NOT NULL,
+  email           VARCHAR(${INPUT_LIMITS.email}) NOT NULL UNIQUE,
   password_hash   VARCHAR(255) NOT NULL,
-  role            VARCHAR(20) NOT NULL DEFAULT 'owner' CHECK (role IN ('owner', 'admin', 'member')),
+  role            VARCHAR(8) NOT NULL DEFAULT 'owner' CHECK (role IN ('owner', 'admin', 'member')),
   session_version INTEGER NOT NULL DEFAULT 0,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -28,8 +29,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS organization_invitations (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  email           VARCHAR(255) NOT NULL,
-  role            VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  email           VARCHAR(${INPUT_LIMITS.email}) NOT NULL,
+  role            VARCHAR(8) NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
   token_hash      TEXT NOT NULL UNIQUE,
   expires_at      TIMESTAMPTZ NOT NULL,
   accepted_at     TIMESTAMPTZ,
@@ -41,8 +42,8 @@ CREATE TABLE IF NOT EXISTS organization_invitations (
 CREATE TABLE IF NOT EXISTS projects (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  name            VARCHAR(255) NOT NULL,
-  plan            VARCHAR(50) NOT NULL DEFAULT 'standard',
+  name            VARCHAR(${INPUT_LIMITS.projectName}) NOT NULL,
+  plan            VARCHAR(15) NOT NULL DEFAULT 'standard',
   api_key_id      TEXT UNIQUE,
   api_key_hash    TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -52,9 +53,9 @@ CREATE TABLE IF NOT EXISTS projects (
 CREATE TABLE IF NOT EXISTS feature_flags (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   project_id  UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-  key         VARCHAR(255) NOT NULL,
-  name        VARCHAR(255) NOT NULL,
-  description TEXT,
+  key         VARCHAR(${INPUT_LIMITS.flagKey}) NOT NULL,
+  name        VARCHAR(${INPUT_LIMITS.flagName}) NOT NULL,
+  description TEXT CHECK (LENGTH(description) <= ${INPUT_LIMITS.flagDescription}),
   archived    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -65,7 +66,7 @@ CREATE TABLE IF NOT EXISTS feature_flags (
 CREATE TABLE IF NOT EXISTS flag_environments (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   flag_id      UUID NOT NULL REFERENCES feature_flags(id) ON DELETE CASCADE,
-  environment  VARCHAR(50) NOT NULL CHECK (environment IN ('development', 'staging', 'production')),
+  environment  VARCHAR(15) NOT NULL CHECK (environment IN ('development', 'staging', 'production')),
   enabled      BOOLEAN NOT NULL DEFAULT FALSE,
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(flag_id, environment)
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS flag_environments (
 CREATE TABLE IF NOT EXISTS targeting_rules (
   id                   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   flag_environment_id  UUID NOT NULL REFERENCES flag_environments(id) ON DELETE CASCADE,
-  type                 VARCHAR(50) NOT NULL CHECK (type IN ('user_ids', 'groups', 'percentage')),
+  type                 VARCHAR(20) NOT NULL CHECK (type IN ('user_ids', 'groups', 'percentage')),
   value                TEXT NOT NULL,
   created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -85,10 +86,10 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   flag_id     UUID,
   project_id  UUID NOT NULL,
-  flag_key    VARCHAR(255) NOT NULL,
-  flag_name   VARCHAR(255) NOT NULL,
-  actor       VARCHAR(255) NOT NULL DEFAULT 'system',
-  actor_role  VARCHAR(20),
+  flag_key    VARCHAR(${INPUT_LIMITS.flagKey}) NOT NULL,
+  flag_name   VARCHAR(${INPUT_LIMITS.flagName}) NOT NULL,
+  actor       VARCHAR(${INPUT_LIMITS.userName}) NOT NULL DEFAULT 'system',
+  actor_role  VARCHAR(8),
   action      VARCHAR(50) NOT NULL,
   payload     JSONB,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),

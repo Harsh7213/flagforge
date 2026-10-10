@@ -5,6 +5,7 @@ import { setCredentials } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 import { useAcceptInvitationMutation } from '../store/api/organizationApi';
 import { getApiErrorMessage } from '../utils/errorMessage';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const AcceptInvitationPage: React.FC = () => {
   const { token = '' } = useParams<{ token: string }>();
@@ -74,6 +75,7 @@ const AcceptInvitationPage: React.FC = () => {
                 type="text"
                 required
                 minLength={2}
+                maxLength={INPUT_LIMITS.userName}
                 value={name}
                 onChange={event => setName(event.target.value)}
                 placeholder="Jane Doe"
@@ -91,7 +93,7 @@ const AcceptInvitationPage: React.FC = () => {
                 id="invite-password"
                 type="password"
                 required
-                minLength={14}
+                minLength={INPUT_LIMITS.passwordMinimum}
                 value={password}
                 onChange={event => setPassword(event.target.value)}
                 placeholder="At least 14 characters"

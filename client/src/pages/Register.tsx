@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -42,6 +43,7 @@ const Register: React.FC = () => {
     placeholder: string;
     required: boolean;
     minLength?: number;
+    maxLength?: number;
   };
 
   const fields: FormField[] = [
@@ -52,7 +54,8 @@ const Register: React.FC = () => {
       value: organizationName,
       onChange: setOrganizationName,
       placeholder: 'Acme Corp',
-      required: true
+      required: true,
+      maxLength: INPUT_LIMITS.organizationName
     },
     {
       id: 'name',
@@ -61,7 +64,8 @@ const Register: React.FC = () => {
       value: name,
       onChange: setName,
       placeholder: 'John Doe',
-      required: true
+      required: true,
+      maxLength: INPUT_LIMITS.userName
     },
     {
       id: 'email',
@@ -70,7 +74,8 @@ const Register: React.FC = () => {
       value: email,
       onChange: setEmail,
       placeholder: 'john@acme.com',
-      required: true
+      required: true,
+      maxLength: INPUT_LIMITS.email
     },
     {
       id: 'password',
@@ -80,7 +85,7 @@ const Register: React.FC = () => {
       onChange: setPassword,
       placeholder: '••••••',
       required: true,
-      minLength: 14
+      minLength: INPUT_LIMITS.passwordMinimum
     }
   ];
 
@@ -186,6 +191,7 @@ const Register: React.FC = () => {
                   value={field.value}
                   onChange={e => field.onChange(e.target.value)}
                   minLength={field.minLength}
+                  maxLength={field.maxLength}
                   className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all duration-200"
                 />
               </div>

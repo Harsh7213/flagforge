@@ -5,16 +5,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { clearAuthCookies, issueCsrfCookie, SESSION_COOKIE } from '../middleware/auth';
 import { JWT_SECRET } from '../config';
+import { INPUT_LIMITS } from '../config/inputLimits';
 
-const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(14),
-  organizationName: z.string().trim().min(2)
+export const registerSchema = z.object({
+  name: z.string().min(2).max(INPUT_LIMITS.userName),
+  email: z.string().email().max(INPUT_LIMITS.email),
+  password: z.string().min(INPUT_LIMITS.passwordMinimum),
+  organizationName: z.string().trim().min(2).max(INPUT_LIMITS.organizationName)
 });
 
-const loginSchema = z.object({
-  email: z.string().email(),
+export const loginSchema = z.object({
+  email: z.string().email().max(INPUT_LIMITS.email),
   password: z.string()
 });
 

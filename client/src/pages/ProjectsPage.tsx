@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const ProjectsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -176,6 +177,7 @@ const ProjectsPage: React.FC = () => {
             <input
               id="new-project-name"
               placeholder="Project name"
+              maxLength={INPUT_LIMITS.projectName}
               value={newName}
               onChange={e => setNewName(e.target.value)}
               autoFocus
@@ -238,7 +240,7 @@ const ProjectsPage: React.FC = () => {
                         id={`edit-project-name-${project.id}`}
                         value={editingName}
                         onChange={e => setEditingName(e.target.value)}
-                        maxLength={255}
+                        maxLength={INPUT_LIMITS.projectName}
                         autoFocus
                         aria-label="Project name"
                         className="px-3 py-1.5 rounded-lg bg-surface-elevated border border-brand-500/50 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/40"

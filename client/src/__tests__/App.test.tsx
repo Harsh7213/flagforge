@@ -50,6 +50,27 @@ describe('App Component', () => {
     });
   });
 
+  it('renders login after a protected route redirects for an invalid session', async () => {
+    server.use(
+      http.get('http://localhost/api/v1/auth/me', () =>
+        HttpResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      )
+    );
+
+    window.history.pushState({}, 'Test page', '/app');
+    const store = createTestStore();
+
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /Welcome back/i })).toBeInTheDocument();
+    });
+  });
+
   it('renders dashboard route /app when authenticated', async () => {
     window.history.pushState({}, 'Test page', '/app');
     const store = createTestStore({

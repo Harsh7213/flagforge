@@ -6,19 +6,20 @@ import { z } from 'zod';
 import pool from '../db/pool';
 import { JWT_SECRET } from '../config';
 import { SESSION_COOKIE } from '../middleware/auth';
+import { INPUT_LIMITS } from '../config/inputLimits';
 
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000;
 
-const invitationSchema = z.object({
-  email: z.string().email(),
+export const invitationSchema = z.object({
+  email: z.string().email().max(INPUT_LIMITS.email),
   role: z.enum(['admin', 'member']).default('member')
 });
 
-const acceptInvitationSchema = z.object({
+export const acceptInvitationSchema = z.object({
   token: z.string().min(32),
-  name: z.string().min(2),
-  password: z.string().min(14)
+  name: z.string().min(2).max(INPUT_LIMITS.userName),
+  password: z.string().min(INPUT_LIMITS.passwordMinimum)
 });
 
 const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');

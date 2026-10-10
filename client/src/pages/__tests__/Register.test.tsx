@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test/utils';
 import Register from '../Register';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('Register Page', () => {
   it('renders registration form fields', () => {
@@ -11,7 +12,18 @@ describe('Register Page', () => {
     expect(screen.getByRole('heading', { name: /Create your account/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Your Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Work Email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Organization Name/i)).toBeInTheDocument();
+    expect((screen.getByLabelText(/Organization Name/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.organizationName
+    );
+    expect((screen.getByLabelText(/Your Name/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.userName
+    );
+    expect((screen.getByLabelText(/Work Email/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.email
+    );
+    expect((screen.getByLabelText(/Password/i) as HTMLInputElement).minLength).toBe(
+      INPUT_LIMITS.passwordMinimum
+    );
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
   });
 

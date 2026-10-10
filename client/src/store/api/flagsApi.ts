@@ -47,7 +47,7 @@ export const flagsApi = createApi({
       { key: string; name: string; description?: string; projectId: string }
     >({
       query: body => ({ url: '/flags', method: 'POST', body }),
-      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats']
+      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats', 'AuditLog']
     }),
 
     // ── Update flag ─────────────────────────────────────────────────
@@ -59,14 +59,15 @@ export const flagsApi = createApi({
       invalidatesTags: (_result, _err, { id }) => [
         { type: 'Flag', id },
         { type: 'Flag', id: 'LIST' },
-        'Stats'
+        'Stats',
+        'AuditLog'
       ]
     }),
 
     // ── Delete flag ─────────────────────────────────────────────────
     deleteFlag: builder.mutation<void, string>({
       query: id => ({ url: `/flags/${id}`, method: 'DELETE' }),
-      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats']
+      invalidatesTags: [{ type: 'Flag', id: 'LIST' }, 'Stats', 'AuditLog']
     }),
 
     // ── Toggle environment ──────────────────────────────────────────

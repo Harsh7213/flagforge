@@ -3,7 +3,10 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test/utils';
 import CreateFlagModal from '../CreateFlagModal';
-import { mockUser } from '../../test/mocks/data';
+import { mockFlags, mockUser } from '../../test/mocks/data';
+import { http, HttpResponse } from 'msw';
+import { server } from '../../test/mocks/server';
+import { INPUT_LIMITS } from '../../../../server/src/config/inputLimits';
 
 describe('CreateFlagModal', () => {
   const onClose = vi.fn();
@@ -17,6 +20,15 @@ describe('CreateFlagModal', () => {
     expect(screen.getByLabelText(/Flag Name \*/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Flag Key \*/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+    expect((screen.getByLabelText(/Flag Name \*/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.flagName
+    );
+    expect((screen.getByLabelText(/Flag Key \*/i) as HTMLInputElement).maxLength).toBe(
+      INPUT_LIMITS.flagKey
+    );
+    expect((screen.getByLabelText(/Description/i) as HTMLTextAreaElement).maxLength).toBe(
+      INPUT_LIMITS.flagDescription
+    );
   });
 
   it('auto-generates flag key from flag name', async () => {
@@ -46,6 +58,56 @@ describe('CreateFlagModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it('clears required key validation when the name generates a key', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CreateFlagModal projectId="proj-1" onClose={onClose} />, {
+      authenticatedAs: mockUser
+    });
+
+    await user.click(screen.getByRole('button', { name: /Create Flag/i }));
+    await user.type(screen.getByLabelText(/Flag Name \*/i), 'test_flag');
+
+    expect(screen.queryByText('Flag key is required')).not.toBeInTheDocument();
+  });
+
+  it('keeps spaces in the name and removes special characters as typed', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CreateFlagModal projectId="proj-1" onClose={onClose} />, {
+      authenticatedAs: mockUser
+    });
+
+    const nameInput = screen.getByLabelText(/Flag Name \*/i) as HTMLInputElement;
+    await user.type(nameInput, 'New Beta! Feature@');
+
+    expect(nameInput.value).toBe('New Beta Feature');
+    expect((screen.getByLabelText(/Flag Key \*/i) as HTMLInputElement).value).toBe(
+      'new_beta_feature'
+    );
+  });
+
+  it('collapses repeated spaces in the name sent to the backend', async () => {
+    const user = userEvent.setup();
+    let submittedName = '';
+    server.use(
+      http.post('http://localhost/api/v1/flags', async ({ request }) => {
+        const body = (await request.json()) as { name: string };
+        submittedName = body.name;
+        return HttpResponse.json({ data: { ...mockFlags[0], name: body.name } });
+      })
+    );
+    renderWithProviders(<CreateFlagModal projectId="proj-1" onClose={onClose} />, {
+      authenticatedAs: mockUser
+    });
+
+    await user.type(screen.getByLabelText(/Flag Name \*/i), 'pico    ctf');
+    await user.click(screen.getByRole('button', { name: /Create Flag/i }));
+
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
+    expect(submittedName).toBe('pico ctf');
+  });
+
   it('calls onClose when close button or cancel is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CreateFlagModal projectId="proj-1" onClose={onClose} />, {
@@ -67,7 +129,7 @@ describe('CreateFlagModal', () => {
       authenticatedAs: mockUser
     });
 
-    await user.type(screen.getByLabelText(/Flag Name \*/i), 'Test Flag');
+    await user.type(screen.getByLabelText(/Flag Name \*/i), 'test_flag');
     await user.type(screen.getByLabelText(/Description/i), 'Optional description');
 
     const submitBtn = screen.getByRole('button', { name: /Create Flag/i });

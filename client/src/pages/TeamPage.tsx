@@ -7,6 +7,7 @@ import {
   useRemoveMemberMutation
 } from '../store/api/organizationApi';
 import { getApiErrorMessage } from '../utils/errorMessage';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const TeamPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -98,6 +99,7 @@ const TeamPage: React.FC = () => {
               id="invite-email"
               type="email"
               required
+              maxLength={INPUT_LIMITS.email}
               value={email}
               onChange={event => setEmail(event.target.value)}
               placeholder="teammate@company.com"

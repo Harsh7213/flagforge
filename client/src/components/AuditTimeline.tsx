@@ -47,7 +47,7 @@ const AuditTimeline: React.FC<Props> = ({ logs }) => {
           No audit events yet
         </h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-          Changes to feature flags and targeting rules will appear here in real-time.
+          Changes to feature flags and targeting rules will appear here.
         </p>
       </div>
     );

@@ -13,6 +13,7 @@ import { getApiErrorMessage } from '../utils/errorMessage';
 import type { Environment } from '../types';
 import RulesEditor from '../components/RulesEditor';
 import AuditTimeline from '../components/AuditTimeline';
+import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
 const ENV_CONFIG = [
   {
@@ -201,6 +202,7 @@ const FlagDetail: React.FC = () => {
               value={editName}
               onChange={e => setEditName(e.target.value)}
               id="edit-flag-name"
+              maxLength={INPUT_LIMITS.flagName}
               autoFocus
             />
           ) : (
@@ -283,6 +285,7 @@ const FlagDetail: React.FC = () => {
           <textarea
             id="edit-flag-desc"
             rows={2}
+            maxLength={INPUT_LIMITS.flagDescription}
             value={editDesc}
             onChange={e => setEditDesc(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-subtle text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-y"

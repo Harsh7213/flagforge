@@ -5,25 +5,26 @@ import { AppError } from '../middleware/errorHandler';
 import { z } from 'zod';
 import { Environment } from '../types';
 import type { PoolClient } from 'pg';
+import { INPUT_LIMITS } from '../config/inputLimits';
 
 const ENVIRONMENTS: Environment[] = ['development', 'staging', 'production'];
 
-const createFlagSchema = z.object({
+export const createFlagSchema = z.object({
   key: z
     .string()
     .min(1)
-    .max(255)
+    .max(INPUT_LIMITS.flagKey)
     .regex(/^[a-z0-9_-]+$/, {
       message: 'Flag key must only contain lowercase letters, numbers, underscores, or hyphens'
     }),
-  name: z.string().min(1).max(255),
-  description: z.string().optional(),
+  name: z.string().min(1).max(INPUT_LIMITS.flagName),
+  description: z.string().max(INPUT_LIMITS.flagDescription).optional(),
   projectId: z.string().uuid()
 });
 
-const updateFlagSchema = z.object({
-  name: z.string().min(1).max(255).optional(),
-  description: z.string().optional(),
+export const updateFlagSchema = z.object({
+  name: z.string().min(1).max(INPUT_LIMITS.flagName).optional(),
+  description: z.string().max(INPUT_LIMITS.flagDescription).optional(),
   archived: z.boolean().optional()
 });
 

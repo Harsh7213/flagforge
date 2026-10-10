@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 
 export function errorHandler(
   err: Error & { statusCode?: number; status?: number },
@@ -8,10 +9,13 @@ export function errorHandler(
 ): void {
   console.error('[Error]', err.message, err.stack);
 
-  const statusCode = err.statusCode ?? err.status ?? 500;
+  const isValidationError = err instanceof ZodError;
+  const statusCode = isValidationError ? 400 : (err.statusCode ?? err.status ?? 500);
   res.status(statusCode).json({
-    error: err.name || 'InternalServerError',
-    message: err.message || 'An unexpected error occurred',
+    error: isValidationError ? 'ValidationError' : (err.name || 'InternalServerError'),
+    message: isValidationError
+      ? err.issues.map(issue => issue.message).join(', ')
+      : (err.message || 'An unexpected error occurred'),
     statusCode
   });
 }

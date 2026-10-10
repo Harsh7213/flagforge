@@ -3,13 +3,14 @@ import pool from '../db/pool';
 import { z } from 'zod';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { INPUT_LIMITS } from '../config/inputLimits';
 
-const createProjectSchema = z.object({
-  name: z.string().min(1).max(255)
+export const createProjectSchema = z.object({
+  name: z.string().min(1).max(INPUT_LIMITS.projectName)
 });
 
-const updateProjectSchema = z.object({
-  name: z.string().min(1).max(255)
+export const updateProjectSchema = z.object({
+  name: z.string().min(1).max(INPUT_LIMITS.projectName)
 });
 
 export const getProjects = async (req: Request, res: Response, next: NextFunction) => {
