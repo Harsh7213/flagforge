@@ -64,7 +64,9 @@ export default {
         xs: '2px'
       },
       boxShadow: {
-        brand: '0 0 24px hsl(258,78%,52%,0.35)',
+        'brand-light': '0 0 24px hsl(258,78%,40%,0.70)',
+        brand: '0 0 24px hsl(258,78%,52%,0.70)',
+        amber: '0 0 0 1px hsl(38, 92%, 50%, 0.50), 0 0 12px hsl(38, 92%, 50%, 0.50)',
         'brand-lg': '0 0 48px hsl(258,78%,52%,0.5)',
         green: '0 0 20px hsl(143,72%,52%,0.3)',
         red: '0 0 20px hsl(4,85%,62%,0.3)',

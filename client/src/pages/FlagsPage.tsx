@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../store';
+import { useAppSelector } from '../store/store';
 import { useListFlagsQuery } from '../store/api/flagsApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import FlagCard from '../components/FlagCard';

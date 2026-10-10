@@ -7,7 +7,7 @@ import {
   useRotateApiKeyMutation,
   useRevokeApiKeyMutation
 } from '../store/api/projectsApi';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
 

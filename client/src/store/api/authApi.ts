@@ -1,42 +1,29 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-const csrfToken = () =>
-  document.cookie
-    .split('; ')
-    .find(cookie => cookie.startsWith('ff_csrf='))
-    ?.split('=')[1];
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { baseQuery } from './baseQuery';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost'}/api/v1/auth`,
-    credentials: 'include',
-    prepareHeaders: headers => {
-      const token = csrfToken();
-      if (token) headers.set('X-CSRF-Token', token);
-      return headers;
-    }
-  }),
+  baseQuery,
   endpoints: builder => ({
     login: builder.mutation({
       query: credentials => ({
-        url: '/login',
+        url: '/auth/login',
         method: 'POST',
         body: credentials
       })
     }),
     register: builder.mutation({
       query: userData => ({
-        url: '/register',
+        url: '/auth/register',
         method: 'POST',
         body: userData
       })
     }),
     me: builder.query({
-      query: () => '/me'
+      query: () => '/auth/me'
     }),
     logout: builder.mutation({
-      query: () => ({ url: '/logout', method: 'POST' })
+      query: () => ({ url: '/auth/logout', method: 'POST' })
     })
   })
 });

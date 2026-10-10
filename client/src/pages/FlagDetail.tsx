@@ -7,7 +7,7 @@ import {
   useToggleEnvironmentMutation,
   useGetFlagAuditLogsQuery
 } from '../store/api/flagsApi';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
 import type { Environment } from '../types';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import {
   useCreateInvitationMutation,

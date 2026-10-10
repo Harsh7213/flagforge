@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCreateFlagMutation } from '../store/api/flagsApi';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
 

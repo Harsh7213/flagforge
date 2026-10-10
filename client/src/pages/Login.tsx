@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLoginMutation } from '../store/api/authApi';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
+
+const features = [
+  'Multi-tenant isolation',
+  'Targeting rules & rollouts',
+  'Full audit trail',
+  '3-environment support'
+];
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -37,39 +44,39 @@ const Login: React.FC = () => {
       <div className="absolute top-6 right-6 z-20">
         <button
           onClick={() => dispatch(toggleTheme())}
-          className="p-2.5 rounded-xl bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-amber-400 hover:bg-slate-300 dark:hover:bg-white/20 transition-all shadow-sm"
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           aria-label="Toggle theme"
+          className="hover:border-amber-500 hover:shadow-amber w-9 h-9 rounded-xl flex items-center justify-center bg-surface-card border border-border-subtle transition-all"
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
       </div>
 
-      {/* Left decorative panel */}
-      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-linear-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-950/80 border-r border-border-subtle transition-colors duration-200">
+      {/* Left panel */}
+      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-linear-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-900/80 border-r border-border-subtle transition-colors duration-200">
         {/* Glow blobs */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-brand-500/15 dark:bg-brand-500/20 blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-cyan-500/15 dark:bg-cyan-500/15 blur-3xl pointer-events-none" />
         {/* Grid */}
         <div
-          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.04] pointer-events-none"
+          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage:
               'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
-            backgroundSize: '60px 60px'
+            backgroundSize: '80px 80px'
           }}
         />
 
-        <Link to="/" className="relative flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
             <img
               src="/flag-icon.svg"
               alt=""
               aria-hidden="true"
-              className="w-7 h-7 brightness-0 invert"
+              className="w-6 h-6 brightness-0 invert"
             />
           </div>
-          <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
             FlagForge
           </span>
         </Link>
@@ -83,37 +90,32 @@ const Login: React.FC = () => {
             </span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-md">
-            Toggle feature flags across Dev, Staging, and Production without touching your codebase.
+            Toggle feature flags across different environments without touching your codebase.
           </p>
           <div className="flex flex-col gap-3">
-            {[
-              'Multi-tenant isolation',
-              'Targeting rules & rollouts',
-              'Full audit trail',
-              '3-environment support'
-            ].map(item => (
-              <div
-                key={item}
-                className="flex items-center gap-3 text-slate-700 dark:text-slate-300"
-              >
-                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
-                  <span className="text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+            <ul className="py-5 list-none">
+              {features.map(item => (
+                <li
+                  key={item}
+                  className="flex items-center gap-3 py-2 text-slate-700 dark:text-slate-300"
+                >
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                     ✓
                   </span>
-                </div>
-                <span className="text-sm font-medium">{item}</span>
-              </div>
-            ))}
+                  <span className="text-sm font-medium">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* Right — Form */}
+      {/* Right Panel*/}
       <div className="flex-1 flex flex-col justify-center items-center p-8">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 justify-center">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+          <Link to="/" className="flex lg:hidden mb-10 items-center justify-center gap-3 group">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
               <img
                 src="/flag-icon.svg"
                 alt=""
@@ -121,7 +123,7 @@ const Login: React.FC = () => {
                 className="w-6 h-6 brightness-0 invert"
               />
             </div>
-            <span className="text-xl font-bold bg-linear-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
               FlagForge
             </span>
           </Link>

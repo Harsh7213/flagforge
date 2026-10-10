@@ -62,6 +62,23 @@ describe('Sidebar', () => {
       expect(screen.queryByText('FlagForge')).not.toBeInTheDocument();
       expect(screen.queryByText('Navigation')).not.toBeInTheDocument();
     });
+
+    it('toggles between expanded and collapsed from the user footer', async () => {
+      const user = userEvent.setup();
+      const { store } = renderSidebar(mockUser, true);
+
+      await user.click(screen.getByRole('button', { name: 'Collapse sidebar from user footer' }));
+      expect(store.getState().ui.sidebarOpen).toBe(false);
+      expect(
+        screen.getByRole('button', { name: 'Expand sidebar from user footer' })
+      ).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Expand sidebar from user footer' }));
+      expect(store.getState().ui.sidebarOpen).toBe(true);
+      expect(
+        screen.getByRole('button', { name: 'Collapse sidebar from user footer' })
+      ).toBeInTheDocument();
+    });
   });
 
   // ─── User Info ─────────────────────────────────────────────────────────────
@@ -92,6 +109,7 @@ describe('Sidebar', () => {
         expect(store.getState().auth.user).toBeNull();
         expect(mockNavigate).toHaveBeenCalledWith('/login', { replace: true });
       });
+      expect(store.getState().ui.sidebarOpen).toBe(true);
     });
   });
 });

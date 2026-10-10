@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { FlagEnvironment, Environment, RuleType, TargetingRule } from '../types';
 import { useAddRuleMutation, useDeleteRuleMutation } from '../store/api/flagsApi';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
 

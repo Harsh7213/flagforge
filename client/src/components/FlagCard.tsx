@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { FeatureFlag, Environment } from '../types';
 import { useToggleEnvironmentMutation } from '../store/api/flagsApi';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
 

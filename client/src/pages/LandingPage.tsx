@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { toggleTheme } from '../store/slices/uiSlice';
 
 const features = [
@@ -9,42 +9,42 @@ const features = [
     title: 'Multi-Tenant Isolation',
     desc: 'Every organization gets a completely isolated view. Your flags are never visible to other companies — enforced at the database layer.',
     color: 'from-violet-500/15 to-purple-500/15 border-violet-500/30',
-    iconBg: 'bg-violet-500/20 text-violet-600 dark:text-violet-300'
+    iconBg: 'bg-violet-500/20'
   },
   {
     icon: '🎯',
     title: 'Targeting Rules',
     desc: 'Roll out to specific user IDs, groups, or a percentage of traffic. Fine-grained control over who sees what.',
     color: 'from-cyan-500/15 to-teal-500/15 border-cyan-500/30',
-    iconBg: 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300'
+    iconBg: 'bg-cyan-500/20'
   },
   {
     icon: '🌍',
     title: '3 Environments',
     desc: 'Development, Staging, and Production environments per flag. Promote changes safely through your pipeline.',
     color: 'from-emerald-500/15 to-green-500/15 border-emerald-500/30',
-    iconBg: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300'
+    iconBg: 'bg-emerald-500/20'
   },
   {
     icon: '📋',
     title: 'Full Audit Trail',
     desc: 'Every toggle, rule change, and flag creation is logged with actor and timestamp. Compliance-ready out of the box.',
     color: 'from-amber-500/15 to-orange-500/15 border-amber-500/30',
-    iconBg: 'bg-amber-500/20 text-amber-600 dark:text-amber-300'
+    iconBg: 'bg-amber-500/20'
   },
   {
     icon: '⚡',
     title: 'Instant Toggles',
     desc: 'Enable or disable features with a single click. No deployments needed. Changes reflect immediately via the SDK.',
     color: 'from-yellow-500/15 to-amber-500/15 border-yellow-500/30',
-    iconBg: 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-300'
+    iconBg: 'bg-yellow-500/20'
   },
   {
     icon: '🔒',
     title: 'SQL Injection Safe',
     desc: 'All queries use parameterized statements. Zod validation on every input. JWT-secured endpoints with organization-scoped access.',
     color: 'from-red-500/15 to-rose-500/15 border-red-500/30',
-    iconBg: 'bg-red-500/20 text-red-600 dark:text-red-300'
+    iconBg: 'bg-red-500/20'
   }
 ];
 
@@ -83,8 +83,7 @@ const CodeSnippet = () => (
           <span className="text-brand-600 dark:text-brand-300 font-semibold">const</span>{' '}
           <span className="text-cyan-600 dark:text-cyan-300">result</span>
           {' = '}
-          <span className="text-slate-700 dark:text-slate-300">await</span>
-          {' client.'}
+          <span className="text-slate-700 dark:text-slate-300">await client.</span>
           {'\n'}
           {'  '}
           <span className="text-amber-600 dark:text-amber-300 font-semibold">evaluate</span>
@@ -115,23 +114,14 @@ const CodeSnippet = () => (
 const LandingPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(s => s.ui.theme);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handler);
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
 
   return (
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-slate-100 overflow-x-hidden transition-colors duration-200">
-      {/* ── Navbar ───────────────────────────────────────────────── */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-surface-elevated/90 backdrop-blur-xl border-b border-border-subtle shadow-sm' : 'bg-transparent'}`}
-      >
+      {/* Navbar */}
+      <nav className="border-b border-border-subtle bg-surface-elevated/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
               <img
                 src="/flag-icon.svg"
                 alt=""
@@ -139,59 +129,53 @@ const LandingPage: React.FC = () => {
                 className="w-6 h-6 brightness-0 invert"
               />
             </div>
-            <span className="text-xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
               FlagForge
             </span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
+          </Link>
+          <div className="hidden md:flex items-center gap-18 text-base font-bold text-slate-600 dark:text-slate-400 ">
             <a
               href="#features"
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               How It Works
             </a>
             <Link
               to="/about"
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               About
             </Link>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-4">
             {/* Theme Toggle Button */}
             <button
-              id="landing-theme-toggle"
               onClick={() => dispatch(toggleTheme())}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-              aria-label="Toggle color theme"
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-300 bg-surface-card border border-border-subtle shadow-sm hover:border-brand-500/40 transition-all text-base"
+              aria-label="Toggle theme"
+              className="hover:border-amber-500 hover:shadow-amber w-9 h-9 rounded-xl flex items-center justify-center bg-surface-card border border-border-subtle transition-all"
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
             <Link
-              to="/login"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors px-4 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              Sign In
-            </Link>
-            <Link
               to="/register"
-              className="text-sm font-semibold px-5 py-2.5 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-brand transition-all duration-200 hover:shadow-brand-lg hover:-translate-y-px"
+              className="text-sm font-semibold px-4 py-2 rounded-xl bg-linear-to-r from-brand-500 to-brand-600 text-white shadow-brand hover:shadow-brand-lg transition-all duration-200"
             >
-              Get Started →
+              Get Started
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+      {/* Hero */}
+      <section className="relative flex items-center justify-center overflow-hidden">
         {/* Background gradient mesh */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-brand-500/10 dark:bg-brand-500/15 blur-3xl" />
@@ -223,7 +207,7 @@ const LandingPage: React.FC = () => {
                 id="hero-get-started-btn"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-bold text-lg shadow-brand hover:shadow-brand-lg transition-all duration-200 hover:-translate-y-1"
               >
-                Get Started Free
+                Get Started 
                 <span>→</span>
               </Link>
               <Link
@@ -264,9 +248,9 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Features ─────────────────────────────────────────────── */}
-      <section id="features" className="relative py-32">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* Features */}
+      <section id="features" className="relative py-24">
+        <div className="max-w-7xl mx-auto px-6 py-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Everything you need to
@@ -305,9 +289,9 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── How It Works ─────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-32 relative">
-        <div className="relative max-w-5xl mx-auto px-6">
+      {/* How It Works */}
+      <section id="how-it-works" className="relative py-24">
+        <div className="relative max-w-5xl mx-auto px-6 py-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white">
               Up and running in
@@ -343,9 +327,9 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── CTA Banner ───────────────────────────────────────────── */}
-      <section className="py-24">
-        <div className="max-w-4xl mx-auto px-6">
+      {/* CTA Banner */}
+      <section className="relative py-24">
+        <div className="max-w-4xl mx-auto px-6 py-10">
           <div className="relative overflow-hidden rounded-3xl p-12 text-center shadow-xl">
             <div className="absolute inset-0 bg-linear-to-br from-brand-600 via-brand-700 to-violet-900 text-white rounded-3xl" />
             <div className="relative">
@@ -353,8 +337,7 @@ const LandingPage: React.FC = () => {
                 Ready to ship better?
               </h2>
               <p className="text-lg text-brand-100 mb-10 max-w-xl mx-auto">
-                Join teams already using FlagForge to roll out features safely, target users
-                precisely, and keep full audit visibility.
+                Forge your flag now
               </p>
               <Link
                 to="/register"
@@ -368,8 +351,8 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────── */}
-      <footer className="border-t border-border-subtle py-12">
+      {/* Footer */}
+      <footer className="border-t border-border-subtle py-10 bg-surface-elevated/50">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
@@ -385,30 +368,8 @@ const LandingPage: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <Link
-              to="/about"
-              className="hover:text-slate-900 dark:hover:text-white transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              to="/login"
-              className="hover:text-slate-900 dark:hover:text-white transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="hover:text-slate-900 dark:hover:text-white transition-colors"
-            >
-              Register
-            </Link>
+            <span>© 2026, FlagForge</span>
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
-            <span className="font-medium text-slate-700 dark:text-slate-300">
-              Created with ❤️ by Harsh
-            </span>
-          </p>
         </div>
       </footer>
     </div>

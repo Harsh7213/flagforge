@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../store';
+import { useAppSelector, useAppDispatch } from '../store/store';
 import { logout } from '../store/slices/authSlice';
-import { clearActiveProject } from '../store/slices/uiSlice';
+import { clearActiveProject, toggleSidebar } from '../store/slices/uiSlice';
 import { flagsApi } from '../store/api/flagsApi';
 import { projectsApi } from '../store/api/projectsApi';
 import { authApi, useLogoutMutation } from '../store/api/authApi';
@@ -47,11 +47,15 @@ const Sidebar: React.FC = () => {
         ${sidebarOpen ? 'w-64' : 'w-16'}
         bg-surface-elevated border-r border-border-subtle`}
     >
-      {/* Logo */}
-      <div
-        className={`flex items-center gap-3 px-4 h-16 border-b border-border-subtle ${!sidebarOpen && 'justify-center'}`}
+      <button
+        id="sidebar-toggle"
+        onClick={() => dispatch(toggleSidebar())}
+        aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        className={`w-full flex items-center gap-3 px-4 h-16 hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${!sidebarOpen && 'justify-center'}`}
       >
-        <div className="w-8 h-8 shrink-0 rounded-lg bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+        {/* Logo */}
+        <div className="w-9 h-9 shrink-0 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
           <img
             src="/flag-icon.svg"
             alt=""
@@ -60,19 +64,14 @@ const Sidebar: React.FC = () => {
           />
         </div>
         {sidebarOpen && (
-          <span className="font-bold text-lg bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent whitespace-nowrap">
+          <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
             FlagForge
           </span>
         )}
-      </div>
+      </button>
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {sidebarOpen && (
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-3 mb-3 block">
-            Navigation
-          </span>
-        )}
         {navItems
           .filter(
             item => item.to !== '/app/team' || user?.role === 'owner' || user?.role === 'admin'
@@ -113,7 +112,7 @@ const Sidebar: React.FC = () => {
       {/* User footer */}
       <div className={`p-3 border-t border-border-subtle ${!sidebarOpen && 'flex justify-center'}`}>
         {sidebarOpen ? (
-          <div className="flex items-center gap-3 px-2 py-2">
+          <div className="flex items-center gap-3 px-2">
             <div className="w-8 h-8 rounded-full shrink-0 bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand">
               {initials}
             </div>
@@ -134,12 +133,15 @@ const Sidebar: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div
-            className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand cursor-pointer"
+          <button
+            id="sidebar-footer-toggle"
+            onClick={() => dispatch(toggleSidebar())}
+            aria-label="Expand sidebar from user footer"
             title={user?.name || 'User'}
+            className="w-8 h-8 rounded-full bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center text-sm font-bold text-white shadow-brand cursor-pointer border-0 p-0"
           >
             {initials}
-          </div>
+          </button>
         )}
       </div>
     </aside>

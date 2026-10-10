@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { logout } from '../store/slices/authSlice';
 import { setCredentials } from '../store/slices/authSlice';
 import { useLogoutMutation, useMeQuery } from '../store/api/authApi';
@@ -13,12 +13,14 @@ const AuthGuard: React.FC = () => {
   const { data, isLoading, isError } = useMeQuery(undefined);
   const expiresAt = sessionExpiresAt ?? data?.data?.expiresAt ?? 0;
 
+  // Keep the Redux auth state in sync with the server's current session.
   useEffect(() => {
     if (data?.data) {
       dispatch(setCredentials(data.data));
     }
   }, [data, dispatch]);
 
+  // End the session at its expiry time, and replace the timer if the expiry changes.
   useEffect(() => {
     if (!expiresAt) return;
 
@@ -45,6 +47,7 @@ const AuthGuard: React.FC = () => {
   }
 
   if (isError || !user || !expiresAt) {
+    // Preserve the requested route so login can return the user to it.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return <Outlet />;

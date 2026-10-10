@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useAppDispatch } from '../store';
+import { useAppDispatch } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 import { useAcceptInvitationMutation } from '../store/api/organizationApi';
@@ -39,16 +39,16 @@ const AcceptInvitationPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center gap-3 mb-10 justify-center">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
             <img
               src="/flag-icon.svg"
               alt=""
               aria-hidden="true"
-              className="w-7 h-7 brightness-0 invert"
+              className="w-6 h-6 brightness-0 invert"
             />
           </div>
-          <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-500 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
             FlagForge
           </span>
         </Link>

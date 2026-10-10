@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRegisterMutation } from '../store/api/authApi';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
@@ -90,50 +90,52 @@ const Register: React.FC = () => {
       <div className="absolute top-6 right-6 z-20">
         <button
           onClick={() => dispatch(toggleTheme())}
-          className="p-2.5 rounded-xl bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-amber-400 hover:bg-slate-300 dark:hover:bg-white/20 transition-all shadow-sm"
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           aria-label="Toggle theme"
+          className="hover:border-amber-500 hover:shadow-amber w-9 h-9 rounded-xl flex items-center justify-center bg-surface-card border border-border-subtle transition-all"
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
       </div>
 
       {/* Left decorative panel */}
-      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-linear-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-950/80 border-r border-border-subtle transition-colors duration-200">
+      <div className="hidden lg:flex flex-col justify-center gap-12 w-1/2 p-16 relative overflow-hidden bg-linear-to-br from-brand-50/80 via-slate-100 to-cyan-50/70 dark:from-slate-900 dark:via-slate-950 dark:to-brand-900/80 border-r border-border-subtle transition-colors duration-200">
+        {/* Glow blobs */}
         <div className="absolute top-1/4 right-0 w-64 h-64 rounded-full bg-brand-500/15 dark:bg-brand-500/20 blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/3 left-0 w-48 h-48 rounded-full bg-cyan-500/15 dark:bg-cyan-500/15 blur-3xl pointer-events-none" />
+        {/* Grid */}
         <div
-          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.04] pointer-events-none"
+          className="absolute inset-0 opacity-[0.05] dark:opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage:
               'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
-            backgroundSize: '60px 60px'
+            backgroundSize: '80px 80px'
           }}
         />
 
-        <Link to="/" className="relative flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
             <img
               src="/flag-icon.svg"
               alt=""
               aria-hidden="true"
-              className="w-7 h-7 brightness-0 invert"
+              className="w-6 h-6 brightness-0 invert"
             />
           </div>
-          <span className="text-2xl font-bold bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-300 dark:to-cyan-300 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
             FlagForge
           </span>
         </Link>
 
-        <div className="relative">
-          <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">
+        <div className="relative space-y-6">
+          <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
             Start managing flags
             <br />
             <span className="bg-linear-to-r from-brand-600 to-cyan-600 dark:from-brand-400 dark:to-cyan-400 bg-clip-text text-transparent">
               in minutes.
             </span>
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-md">
             Create your organization account and get instant access to multi-environment feature
             flag management with full audit logging.
           </p>
@@ -143,8 +145,9 @@ const Register: React.FC = () => {
       {/* Right — Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-8 overflow-y-auto">
         <div className="w-full max-w-lg">
-          <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 justify-center">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand">
+          {/* Mobile logo */}
+          <Link to="/" className="flex lg:hidden mb-10 items-center justify-center gap-3 group">
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
               <img
                 src="/flag-icon.svg"
                 alt=""
@@ -152,7 +155,7 @@ const Register: React.FC = () => {
                 className="w-6 h-6 brightness-0 invert"
               />
             </div>
-            <span className="text-xl font-bold bg-linear-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-linear-to-r from-brand-500 to-cyan-500 dark:from-brand-300 dark:to-cyan-200 bg-clip-text text-transparent">
               FlagForge
             </span>
           </Link>
@@ -166,7 +169,7 @@ const Register: React.FC = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {fields.map(field => (
               <div key={field.id}>
                 <label

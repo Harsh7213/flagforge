@@ -48,21 +48,9 @@ describe('Header', () => {
     });
   });
 
-  // ─── Sidebar Toggle ────────────────────────────────────────────────────────
-  describe('sidebar toggle', () => {
-    it('renders the sidebar toggle button', () => {
-      renderHeader('/app');
-      expect(screen.getByLabelText('Toggle sidebar')).toBeInTheDocument();
-    });
-
-    it('dispatches toggleSidebar action when clicked', async () => {
-      const user = userEvent.setup();
-      const { store } = renderHeader('/app');
-
-      const initialOpen = store.getState().ui.sidebarOpen;
-      await user.click(screen.getByLabelText('Toggle sidebar'));
-      expect(store.getState().ui.sidebarOpen).toBe(!initialOpen);
-    });
+  it('does not render a sidebar toggle in the header', () => {
+    renderHeader('/app');
+    expect(screen.queryByLabelText(/sidebar/i)).not.toBeInTheDocument();
   });
 
   // ─── Theme Toggle ──────────────────────────────────────────────────────────

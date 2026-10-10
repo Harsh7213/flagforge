@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppSelector } from '../store';
+import { useAppSelector } from '../store/store';
 import { useGetAuditLogsQuery } from '../store/api/flagsApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import AuditTimeline from '../components/AuditTimeline';

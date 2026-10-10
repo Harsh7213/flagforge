@@ -4,7 +4,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import ToastContainer from './components/ToastContainer';
 import AuthGuard from './components/AuthGuard';
-import { useAppDispatch, useAppSelector } from './store';
+import { useAppDispatch, useAppSelector } from './store/store';
 import { setSystemTheme } from './store/slices/uiSlice';
 import { setCredentials } from './store/slices/authSlice';
 import { useMeQuery } from './store/api/authApi';
