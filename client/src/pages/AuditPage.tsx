@@ -1,11 +1,17 @@
 import React from 'react';
 import { useAppSelector } from '../store/store';
 import { useGetAuditLogsQuery } from '../store/api/flagsApi';
+import { useListProjectsQuery } from '../store/api/projectsApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import AuditTimeline from '../components/AuditTimeline';
 
 const AuditPage: React.FC = () => {
   const activeProjectId = useAppSelector(s => s.ui.activeProjectId);
+  const { data: projectsData } = useListProjectsQuery();
+  const activeProjectName = activeProjectId
+    ? projectsData?.data.find(project => project.id === activeProjectId)?.name
+    : null;
+
   const { data, isLoading } = useGetAuditLogsQuery(
     activeProjectId
       ? {
@@ -22,7 +28,9 @@ const AuditPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Audit Log</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Complete history of all flag changes in this project
+            {activeProjectName
+              ? `Complete history of all flag changes in ${activeProjectName} project`
+              : 'Complete history of all flag changes in the active project'}
           </p>
         </div>
         <span className="self-start sm:self-center inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-500/10 border border-brand-500/20 text-brand-700 dark:text-brand-300">

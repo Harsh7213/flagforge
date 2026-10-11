@@ -16,7 +16,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, icon, gradient, glow, delay = 0 }) => (
   <div
-    className={`relative overflow-hidden rounded-2xl p-6 border border-border-subtle hover:-translate-y-1 transition-all duration-300 shadow-sm ${glow}`}
+    className={`relative overflow-hidden rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 shadow-sm ${glow}`}
     style={{ background: gradient, animationDelay: `${delay}s` }}
   >
     <div className="text-2xl mb-3">{icon}</div>
@@ -58,14 +58,14 @@ const Dashboard: React.FC = () => {
     activeProjectId ?? skipToken
   );
   const { data: auditData, isLoading: auditLoading } = useGetAuditLogsQuery(
-    activeProjectId ? { projectId: activeProjectId, limit: 10 } : skipToken
+    activeProjectId ? { projectId: activeProjectId, limit: 5 } : skipToken
   );
   const { data: flagsData } = useListFlagsQuery(
     activeProjectId ? { projectId: activeProjectId } : skipToken
   );
 
   const stats = statsData?.data;
-  const recentFlags = flagsData?.data?.slice(0, 5) ?? [];
+  const recentFlags = flagsData?.data?.slice(0, 2) ?? [];
 
   const statCards: StatCardProps[] = [
     {
@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
       ),
       gradient: 'linear-gradient(135deg,hsl(258,78%,52%),hsl(258,78%,35%))',
       glow: 'hover:shadow-brand',
-      delay: 0
+      delay: 0.1
     },
     {
       label: 'Active Flags',
@@ -89,14 +89,14 @@ const Dashboard: React.FC = () => {
       icon: '✅',
       gradient: 'linear-gradient(135deg,hsl(143,65%,42%),hsl(143,65%,28%))',
       glow: 'hover:shadow-green',
-      delay: 0.05
+      delay: 0.1
     },
     {
       label: 'Archived',
       value: stats?.archived ?? 0,
       icon: '📦',
       gradient: 'linear-gradient(135deg,hsl(38,80%,45%),hsl(38,80%,30%))',
-      glow: '',
+      glow: 'hover:shadow-amber',
       delay: 0.1
     },
     {
@@ -104,8 +104,8 @@ const Dashboard: React.FC = () => {
       value: stats?.byEnvironment?.production ?? 0,
       icon: '🚀',
       gradient: 'linear-gradient(135deg,hsl(187,75%,42%),hsl(187,75%,28%))',
-      glow: '',
-      delay: 0.15
+      glow: 'hover:shadow-cyan',
+      delay: 0.1
     }
   ];
 
@@ -144,10 +144,7 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {statsLoading
               ? [...Array(4)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-2xl border border-border-subtle p-6 space-y-3 bg-surface-card shadow-sm"
-                  >
+                  <div key={i} className="rounded-2xl p-6 space-y-3 bg-surface-card shadow-sm">
                     <div className="skeleton h-7 w-10" />
                     <div className="skeleton h-10 w-16" />
                     <div className="skeleton h-4 w-24" />
@@ -175,10 +172,10 @@ const Dashboard: React.FC = () => {
                     src="/flag-icon.svg"
                     alt=""
                     aria-hidden="true"
-                    className="w-7 h-7 mx-auto mb-3"
+                    className="w-9 h-9 mx-auto mb-3"
                   />
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    No flags yet. Create your first one!
+                    your flags will appear here
                   </p>
                 </div>
               ) : (

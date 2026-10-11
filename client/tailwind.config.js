@@ -66,10 +66,11 @@ export default {
       boxShadow: {
         'brand-light': '0 0 24px hsl(258,78%,40%,0.70)',
         brand: '0 0 24px hsl(258,78%,52%,0.70)',
-        amber: '0 0 0 1px hsl(38, 92%, 50%, 0.50), 0 0 12px hsl(38, 92%, 50%, 0.50)',
+        amber: '0 0 24px hsl(38, 92%, 50%, 0.5)',
         'brand-lg': '0 0 48px hsl(258,78%,52%,0.5)',
-        green: '0 0 20px hsl(143,72%,52%,0.3)',
+        green: '0 0 24px hsl(143,72%,52%,0.5)',
         red: '0 0 20px hsl(4,85%,62%,0.3)',
+        cyan: '0 0 24px hsl(187,75%,42%,0.5)',
         glass: '0 8px 32px rgba(0,0,0,0.15)'
       }
     }

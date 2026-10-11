@@ -121,7 +121,7 @@ export const flagsApi = createApi({
       PaginatedResponse<AuditLog>,
       { projectId: string; limit?: number; offset?: number }
     >({
-      query: ({ projectId, limit = 100, offset = 0 }) =>
+      query: ({ projectId, limit = 5, offset = 0 }) =>
         `/audit?projectId=${projectId}&limit=${limit}&offset=${offset}`,
       providesTags: ['AuditLog']
     }),

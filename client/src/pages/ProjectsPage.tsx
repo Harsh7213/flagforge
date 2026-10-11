@@ -12,17 +12,21 @@ import { setActiveProject, clearActiveProject, addToast } from '../store/slices/
 import { getApiErrorMessage } from '../utils/errorMessage';
 import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
 
+const PROJECT_NAME_REGEX = /^[0-9a-zA-Z _-]+$/;
+
 const ProjectsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const activeProjectId = useAppSelector(s => s.ui.activeProjectId);
   const role = useAppSelector(s => s.auth.user?.role);
   const canManageProjects = role === 'owner' || role === 'admin';
+
   const { data, isLoading } = useListProjectsQuery();
   const [createProject, { isLoading: isCreating }] = useCreateProjectMutation();
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
-  const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation();
-  const [rotateApiKey, { isLoading: isRotatingKey }] = useRotateApiKeyMutation();
-  const [revokeApiKey, { isLoading: isRevokingKey }] = useRevokeApiKeyMutation();
+  const [deleteProject] = useDeleteProjectMutation();
+  const [rotateApiKey] = useRotateApiKeyMutation();
+  const [revokeApiKey] = useRevokeApiKeyMutation();
+
   const [newName, setNewName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -30,14 +34,43 @@ const ProjectsPage: React.FC = () => {
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
 
+  const [rotatingProjectId, setRotatingProjectId] = useState<string | null>(null);
+  const [revokingProjectId, setRevokingProjectId] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+
+  const [pendingConfirmation, setPendingConfirmation] = useState<{
+    action: 'rotate' | 'revoke' | 'delete';
+    id: string;
+    name: string;
+  } | null>(null);
+
+  const normalizeProjectName = (value: string) => value.trim().replace(/\s+/g, ' ');
+
+  const isValidProjectName = (value: string) => {
+    const name = normalizeProjectName(value);
+    return name.length > 0 && PROJECT_NAME_REGEX.test(name);
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+
+    const name = normalizeProjectName(newName);
+    if (!isValidProjectName(name)) return;
+
     try {
-      const result = await createProject({ name: newName.trim() }).unwrap();
-      dispatch(addToast({ type: 'success', message: `Project "${newName}" created!` }));
+      const result = await createProject({ name }).unwrap();
+      dispatch(
+        addToast({
+          type: 'success',
+          message: `Project "${name}" created!`
+        })
+      );
+
       if (result.data.api_key) {
-        setRevealedKeys(keys => ({ ...keys, [result.data.id]: result.data.api_key! }));
+        setRevealedKeys(keys => ({
+          ...keys,
+          [result.data.id]: result.data.api_key!
+        }));
       }
       setNewName('');
       setShowCreate(false);
@@ -51,13 +84,16 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
-  const handleRotateKey = async (id: string, name: string) => {
-    if (!window.confirm(`Rotate the API key for "${name}"? The current key will stop working.`))
-      return;
+  const handleRotateKey = async (id: string) => {
+    setRotatingProjectId(id);
+
     try {
       const result = await rotateApiKey(id).unwrap();
       if (result.data.api_key) {
-        setRevealedKeys(keys => ({ ...keys, [id]: result.data.api_key! }));
+        setRevealedKeys(keys => ({
+          ...keys,
+          [id]: result.data.api_key!
+        }));
       }
       dispatch(
         addToast({
@@ -72,16 +108,22 @@ const ProjectsPage: React.FC = () => {
           message: getApiErrorMessage(error, 'Failed to rotate API key')
         })
       );
+    } finally {
+      setRotatingProjectId(null);
     }
   };
 
-  const handleRevokeKey = async (id: string, name: string) => {
-    if (!window.confirm(`Revoke the API key for "${name}"? SDK requests will stop working.`))
-      return;
+  const handleRevokeKey = async (id: string) => {
+    setRevokingProjectId(id);
     try {
       await revokeApiKey(id).unwrap();
       setRevealedKeys(({ [id]: _removed, ...keys }) => keys);
-      dispatch(addToast({ type: 'success', message: 'API key revoked' }));
+      dispatch(
+        addToast({
+          type: 'success',
+          message: 'API key revoked'
+        })
+      );
     } catch (error) {
       dispatch(
         addToast({
@@ -89,6 +131,8 @@ const ProjectsPage: React.FC = () => {
           message: getApiErrorMessage(error, 'Failed to revoke API key')
         })
       );
+    } finally {
+      setRevokingProjectId(null);
     }
   };
 
@@ -110,11 +154,16 @@ const ProjectsPage: React.FC = () => {
 
   const handleRename = async (e: React.FormEvent, id: string) => {
     e.preventDefault();
-    const name = editingName.trim();
-    if (!name) return;
+    const name = normalizeProjectName(editingName);
+    if (!isValidProjectName(name)) return;
     try {
       await updateProject({ id, name }).unwrap();
-      dispatch(addToast({ type: 'success', message: 'Project renamed successfully' }));
+      dispatch(
+        addToast({
+          type: 'success',
+          message: 'Project renamed successfully'
+        })
+      );
       cancelEditing();
     } catch (error) {
       dispatch(
@@ -127,12 +176,15 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    const confirmed = window.confirm(`Delete project "${name}"? This cannot be undone.`);
-    if (!confirmed) return;
-
+    setDeletingProjectId(id);
     try {
       await deleteProject(id).unwrap();
-      dispatch(addToast({ type: 'success', message: `Project "${name}" deleted` }));
+      dispatch(
+        addToast({
+          type: 'success',
+          message: `Project "${name}" deleted`
+        })
+      );
       if (activeProjectId === id) {
         dispatch(clearActiveProject());
       }
@@ -143,12 +195,38 @@ const ProjectsPage: React.FC = () => {
           message: getApiErrorMessage(error, 'Failed to delete project')
         })
       );
+    } finally {
+      setDeletingProjectId(null);
     }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!pendingConfirmation) return;
+    const { action, id, name } = pendingConfirmation;
+    setPendingConfirmation(null);
+    if (action === 'rotate') {
+      await handleRotateKey(id);
+    } else if (action === 'revoke') {
+      await handleRevokeKey(id);
+    } else {
+      await handleDelete(id, name);
+    }
+  };
+
+  const getConfirmationMessage = () => {
+    if (!pendingConfirmation) return '';
+    const { action, name } = pendingConfirmation;
+    if (action === 'rotate') {
+      return `Rotate the API key for "${name}"? The current key will stop working.`;
+    }
+    if (action === 'revoke') {
+      return `Revoke the API key for "${name}"? This API key will no longer work.`;
+    }
+    return `Delete project "${name}"? This action cannot be undone.`;
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Projects</h1>
@@ -167,7 +245,6 @@ const ProjectsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Create form */}
       {canManageProjects && showCreate && (
         <div className="rounded-2xl border border-border-subtle bg-surface-card p-6 shadow-sm">
           <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">
@@ -181,12 +258,14 @@ const ProjectsPage: React.FC = () => {
               value={newName}
               onChange={e => setNewName(e.target.value)}
               autoFocus
+              aria-label="Project name"
+              aria-invalid={newName.length > 0 && !isValidProjectName(newName)}
               className="flex-1 min-w-48 px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-subtle text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition-all"
             />
             <button
               type="submit"
               id="submit-project-btn"
-              disabled={isCreating}
+              disabled={isCreating || !isValidProjectName(newName)}
               className="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-60 shadow-sm"
             >
               {isCreating ? 'Creating...' : 'Create'}
@@ -200,10 +279,14 @@ const ProjectsPage: React.FC = () => {
               Cancel
             </button>
           </form>
+          {newName.length > 0 && !isValidProjectName(newName) && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+              Use only letters, numbers, spaces, hyphens, and underscores.
+            </p>
+          )}
         </div>
       )}
 
-      {/* Projects list */}
       {isLoading ? (
         <div className="flex items-center justify-center gap-3 py-20 text-slate-500 dark:text-slate-400">
           <span className="spinner" /> Loading projects...
@@ -243,11 +326,12 @@ const ProjectsPage: React.FC = () => {
                         maxLength={INPUT_LIMITS.projectName}
                         autoFocus
                         aria-label="Project name"
+                        aria-invalid={editingName.length > 0 && !isValidProjectName(editingName)}
                         className="px-3 py-1.5 rounded-lg bg-surface-elevated border border-brand-500/50 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/40"
                       />
                       <button
                         type="submit"
-                        disabled={isUpdating || !editingName.trim()}
+                        disabled={isUpdating || !isValidProjectName(editingName)}
                         className="px-3 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-white text-xs font-semibold disabled:opacity-60"
                       >
                         {isUpdating ? 'Saving...' : 'Save'}
@@ -272,6 +356,15 @@ const ProjectsPage: React.FC = () => {
                       )}
                     </div>
                   )}
+
+                  {editingProjectId === project.id &&
+                    editingName.length > 0 &&
+                    !isValidProjectName(editingName) && (
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        Use only letters, numbers, spaces, hyphens, and underscores.
+                      </p>
+                    )}
+
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-500 dark:text-slate-400">API Key:</span>
                     {canManageProjects && revealedKeys[project.id] ? (
@@ -326,37 +419,103 @@ const ProjectsPage: React.FC = () => {
                   {canManageProjects && (
                     <button
                       id={`rotate-api-key-${project.id}`}
-                      disabled={isRotatingKey}
-                      onClick={() => handleRotateKey(project.id, project.name)}
+                      disabled={rotatingProjectId === project.id}
+                      onClick={() =>
+                        setPendingConfirmation({
+                          action: 'rotate',
+                          id: project.id,
+                          name: project.name
+                        })
+                      }
                       className="px-4 py-2 rounded-xl bg-surface-elevated hover:bg-amber-500/20 border border-border-subtle hover:border-amber-500/30 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                     >
-                      {isRotatingKey ? 'Rotating...' : 'Rotate key'}
+                      {rotatingProjectId === project.id ? 'Rotating...' : 'Rotate key'}
                     </button>
                   )}
                   {canManageProjects && (
                     <button
                       id={`revoke-api-key-${project.id}`}
-                      disabled={isRevokingKey}
-                      onClick={() => handleRevokeKey(project.id, project.name)}
+                      disabled={revokingProjectId === project.id}
+                      onClick={() =>
+                        setPendingConfirmation({
+                          action: 'revoke',
+                          id: project.id,
+                          name: project.name
+                        })
+                      }
                       className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                     >
-                      {isRevokingKey ? 'Revoking...' : 'Revoke key'}
+                      {revokingProjectId === project.id ? 'Revoking...' : 'Revoke key'}
                     </button>
                   )}
                   {canManageProjects && (
                     <button
                       id={`delete-project-${project.id}`}
-                      disabled={isDeleting}
-                      onClick={() => handleDelete(project.id, project.name)}
+                      disabled={deletingProjectId === project.id}
+                      onClick={() =>
+                        setPendingConfirmation({
+                          action: 'delete',
+                          id: project.id,
+                          name: project.name
+                        })
+                      }
                       className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-300 text-sm font-medium transition-all duration-200 disabled:opacity-60"
                     >
-                      {isDeleting ? 'Deleting...' : 'Delete'}
+                      {deletingProjectId === project.id ? 'Deleting...' : 'Delete'}
                     </button>
                   )}
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {pendingConfirmation && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="presentation"
+          onMouseDown={e => {
+            if (e.target === e.currentTarget) {
+              setPendingConfirmation(null);
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmation-title"
+            className="w-full max-w-md rounded-2xl border border-border-subtle bg-surface-card p-6 shadow-xl"
+          >
+            <h2
+              id="confirmation-title"
+              className="text-lg font-semibold text-slate-900 dark:text-white"
+            >
+              Confirm action
+            </h2>
+
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+              {getConfirmationMessage()}
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingConfirmation(null)}
+                className="px-4 py-2 rounded-xl bg-surface-elevated border border-border-subtle text-slate-700 dark:text-slate-300 text-sm font-medium"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirmAction}
+                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

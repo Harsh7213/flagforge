@@ -112,12 +112,12 @@ const FlagsPage: React.FC = () => {
             className="w-8 h-8 mx-auto mb-3"
           />
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-1">
-            {search ? 'No flags match your search' : 'No flags yet'}
+            {search ? 'No flags match your search' : 'No flags here'}
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
             {search
               ? 'Try a different keyword or clear the search input.'
-              : 'Create your first feature flag to start controlling feature rollouts across your environments.'}
+              : 'Active flags will appear here'}
           </p>
           {!search && (
             <button
@@ -125,7 +125,7 @@ const FlagsPage: React.FC = () => {
               onClick={() => setShowCreate(true)}
               id="empty-create-flag-btn"
             >
-              + Create First Flag
+              + Create Flag
             </button>
           )}
         </div>
