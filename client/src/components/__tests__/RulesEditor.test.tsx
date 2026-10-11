@@ -67,4 +67,20 @@ describe('RulesEditor', () => {
       expect(screen.queryByLabelText(/Rule Type/i)).not.toBeInTheDocument();
     });
   });
+
+  it('rejects user_ids and groups containing invalid characters not matching [a-zA-Z0-9-_]', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RulesEditor flagId={mockFlags[0].id} environment={mockEnvNoRules} />, {
+      authenticatedAs: mockUser
+    });
+
+    await user.click(screen.getByRole('button', { name: /\+ Add Rule/i }));
+    await user.type(screen.getByRole('textbox'), 'invalid@user');
+
+    await user.click(screen.getByRole('button', { name: /Add Rule/i }));
+
+    expect(screen.getByText(/invalid/i)).toBeInTheDocument();
+    // Form remains open due to validation error
+    expect(screen.getByLabelText(/Rule Type/i)).toBeInTheDocument();
+  });
 });

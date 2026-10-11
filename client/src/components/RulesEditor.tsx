@@ -24,8 +24,10 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
   const [showForm, setShowForm] = useState(false);
   const [ruleType, setRuleType] = useState<RuleType>('user_ids');
   const [ruleValue, setRuleValue] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const envLabel = environment.environment;
+  const IDENTIFIER_REGEX = /^[a-zA-Z0-9_-]+$/;
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,21 +38,40 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
     if (ruleType === 'percentage') {
       const pct = parseFloat(ruleValue);
       if (isNaN(pct) || pct < 0 || pct > 100) {
+        setError('Percentage must be 0–100');
         dispatch(addToast({ type: 'error', message: 'Percentage must be 0–100' }));
         return;
       }
       value = pct;
     } else {
-      value = ruleValue
+      const items = ruleValue
         .split(',')
         .map(v => v.trim())
         .filter(Boolean);
+
+      if (items.length === 0) {
+        setError('Please enter at least one value');
+        dispatch(addToast({ type: 'error', message: 'Please enter at least one value' }));
+        return;
+      }
+
+      const invalidItem = items.find(item => !IDENTIFIER_REGEX.test(item));
+      if (invalidItem) {
+        const label = ruleType === 'user_ids' ? 'User ID' : 'Group';
+        const msg = `${label} "${invalidItem}" is invalid. Only letters, numbers, hyphens (-), and underscores (_) are allowed.`;
+        setError(msg);
+        dispatch(addToast({ type: 'error', message: msg }));
+        return;
+      }
+
+      value = items;
     }
 
     try {
       await addRule({ flagId, env: envLabel as Environment, type: ruleType, value }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Targeting rule added' }));
       setRuleValue('');
+      setError(null);
       setShowForm(false);
     } catch (error) {
       dispatch(
@@ -177,6 +198,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
               onChange={e => {
                 setRuleType(e.target.value as RuleType);
                 setRuleValue('');
+                setError(null);
               }}
             >
               {RULE_TYPE_OPTIONS.map(opt => (
@@ -202,10 +224,24 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
               step={1}
               placeholder={selectedTypeOption.placeholder}
               value={ruleValue}
-              onChange={e => setRuleValue(e.target.value)}
+              onChange={e => {
+                setRuleValue(e.target.value);
+                if (error) setError(null);
+              }}
               autoFocus
-              className="w-full px-3 py-1.5 rounded-lg bg-surface-card border border-border-subtle text-xs text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              className={`w-full px-3 py-1.5 rounded-lg bg-surface-card border text-xs text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 ${
+                error ? 'border-red-500/50' : 'border-border-subtle'
+              }`}
             />
+            {error ? (
+              <span className="text-[11px] text-red-500 dark:text-red-400 mt-1 block">
+                {error}
+              </span>
+            ) : ruleType !== 'percentage' ? (
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                Letters, numbers, hyphens (-), and underscores (_) only. Comma-separated.
+              </span>
+            ) : null}
           </div>
 
           <div className="flex gap-2 pt-1">
@@ -223,6 +259,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
               onClick={() => {
                 setShowForm(false);
                 setRuleValue('');
+                setError(null);
               }}
               id={`cancel-rule-${envLabel}`}
             >

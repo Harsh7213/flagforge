@@ -32,10 +32,35 @@ const toggleEnvSchema = z.object({
   enabled: z.boolean()
 });
 
-const addRuleSchema = z.object({
-  type: z.enum(['user_ids', 'groups', 'percentage']),
-  value: z.union([z.array(z.string()), z.number().min(0).max(100)])
-});
+const IDENTIFIER_REGEX = /^[a-zA-Z0-9_-]+$/;
+
+export const addRuleSchema = z
+  .object({
+    type: z.enum(['user_ids', 'groups', 'percentage']),
+    value: z.union([
+      z.array(
+        z
+          .string()
+          .trim()
+          .min(1, 'Value cannot be empty')
+          .regex(IDENTIFIER_REGEX, {
+            message: 'Values must only contain letters, numbers, hyphens, and underscores'
+          })
+      ),
+      z.number().min(0).max(100)
+    ])
+  })
+  .refine(
+    data => {
+      if (data.type === 'percentage') {
+        return typeof data.value === 'number';
+      }
+      return Array.isArray(data.value) && data.value.length > 0;
+    },
+    {
+      message: 'Invalid rule value for the selected rule type'
+    }
+  );
 
 async function logAudit(
   client: PoolClient,
@@ -93,14 +118,16 @@ export async function listFlags(req: Request, res: Response, next: NextFunction)
     const { archived, search } = req.query as { archived?: string; search?: string };
 
     let query = `
-      SELECT ff.*,
-        json_agg(
-          json_build_object(
-            'id', fe.id,
-            'environment', fe.environment,
-            'enabled', fe.enabled,
-            'updated_at', fe.updated_at
-          ) ORDER BY fe.environment
+      SELECT ff.id, ff.project_id, ff.key, ff.name, ff.description, ff.archived, ff.created_at, ff.updated_at,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', fe.id,
+              'environment', fe.environment,
+              'enabled', fe.enabled,
+              'updated_at', fe.updated_at
+            ) ORDER BY fe.environment
+          ) FILTER (WHERE fe.id IS NOT NULL), '[]'
         ) AS environments
       FROM feature_flags ff
       LEFT JOIN flag_environments fe ON fe.flag_id = ff.id
@@ -117,12 +144,12 @@ export async function listFlags(req: Request, res: Response, next: NextFunction)
     }
 
     if (search) {
-      query += ` AND (ff.name ILIKE $${paramIdx} OR ff.key ILIKE $${paramIdx})`;
+      query += ` AND (ff.name ILIKE $${paramIdx} OR ff.key ILIKE $${paramIdx} OR ff.description ILIKE $${paramIdx})`;
       params.push(`%${search}%`);
       paramIdx++;
     }
 
-    query += ` GROUP BY ff.id ORDER BY ff.created_at DESC`;
+    query += ` GROUP BY ff.id, ff.project_id, ff.key, ff.name, ff.description, ff.archived, ff.created_at, ff.updated_at ORDER BY ff.created_at DESC`;
 
     const result = await pool.query(query, params);
     res.json({ data: result.rows });
@@ -184,21 +211,28 @@ export async function createFlag(req: Request, res: Response, next: NextFunction
     const flagResult = await client.query(
       `INSERT INTO feature_flags (id, project_id, key, name, description)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [flagId, projectId, key, name, description || null]
+      [flagId, projectId, key, name, description ? description.trim() : null]
     );
 
+    const createdEnvs: unknown[] = [];
     for (const env of ENVIRONMENTS) {
-      await client.query(
+      const envRes = await client.query(
         `INSERT INTO flag_environments (id, flag_id, environment, enabled)
-         VALUES ($1, $2, $3, false)`,
+         VALUES ($1, $2, $3, false) RETURNING id, environment, enabled, updated_at`,
         [uuidv4(), flagId, env]
       );
+      createdEnvs.push(envRes.rows[0]);
     }
 
-    await logAudit(client, flagId, actor, getActorRole(req), 'created', { key, name });
+    const createdFlag = flagResult.rows[0];
+    await logAudit(client, flagId, actor, getActorRole(req), 'created', {
+      key,
+      name,
+      description: createdFlag.description
+    });
     await client.query('COMMIT');
 
-    res.status(201).json({ data: flagResult.rows[0] });
+    res.status(201).json({ data: { ...createdFlag, environments: createdEnvs } });
   } catch (err) {
     await client.query('ROLLBACK');
     next(err);
@@ -232,7 +266,7 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
     }
     if (description !== undefined) {
       updates.push(`description = $${idx++}`);
-      params.push(description);
+      params.push(description ? description.trim() : null);
     }
     if (archived !== undefined) {
       updates.push(`archived = $${idx++}`);
@@ -246,10 +280,16 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
       params
     );
 
+    const updatedFlag = result.rows[0];
+    const envsResult = await client.query(
+      `SELECT id, environment, enabled, updated_at FROM flag_environments WHERE flag_id = $1 ORDER BY environment`,
+      [id]
+    );
+
     await logAudit(client, id, actor, getActorRole(req), 'updated', parsed.data);
     await client.query('COMMIT');
 
-    res.json({ data: result.rows[0] });
+    res.json({ data: { ...updatedFlag, environments: envsResult.rows } });
   } catch (err) {
     await client.query('ROLLBACK');
     next(err);

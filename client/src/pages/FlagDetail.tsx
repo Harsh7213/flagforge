@@ -291,9 +291,13 @@ const FlagDetail: React.FC = () => {
             className="w-full px-4 py-2.5 rounded-xl bg-surface-elevated border border-border-subtle text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-y"
           />
         </div>
-      ) : flag.description ? (
-        <p className="text-sm text-slate-600 dark:text-slate-400">{flag.description}</p>
-      ) : null}
+      ) : (
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          {flag.description || (
+            <span className="italic text-slate-400 dark:text-slate-500">No description provided</span>
+          )}
+        </p>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-border-subtle">
@@ -315,7 +319,7 @@ const FlagDetail: React.FC = () => {
 
       {/* Overview Tab — Environments */}
       {activeTab === 'overview' && (
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-6 items-start">
           {ENV_CONFIG.map(({ env, label, icon, badgeClass }) => {
             const envData = flag.environments?.find(e => e.environment === env);
             const enabled = getEnvEnabled(env);

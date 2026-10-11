@@ -54,10 +54,10 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
     const currentEnabled = getEnvEnabled(env);
     const nextEnabled = !currentEnabled;
 
-    // 1. Immediately update UI state for buttery smooth animation
+    // Immediately update UI state for smooth animation
     setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
 
-    // 2. Perform API request in background
+    // Perform API request in background
     try {
       await toggleEnv({ flagId: flag.id, env, enabled: nextEnabled }).unwrap();
       dispatch(
@@ -80,7 +80,7 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
 
   return (
     <article
-      className={`group relative rounded-2xl border p-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 ${
+      className={`group relative rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-1 ${
         hasActive
           ? 'border-brand-500/40 bg-surface-card shadow-sm hover:shadow-md'
           : 'border-border-subtle bg-surface-card hover:border-brand-500/30 hover:shadow-md'
@@ -91,11 +91,18 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
       onKeyDown={e => e.key === 'Enter' && navigate(`/app/flags/${flag.id}`)}
       aria-label={`Feature flag: ${flag.name}`}
     >
-      {/* Name + archived badge */}
-      <div className="flex items-start justify-between gap-2 mb-1">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">
-          {flag.name}
-        </h3>
+      {/* flag name, flag key, archived badge */}
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <div className="flex min-w-0 items-center gap-2">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+            {flag.name}
+          </h3>
+          <code className="text-xs font-mono text-brand-600 dark:text-brand-300 mt-1 block">
+            <span>(</span>
+            {flag.key}
+            <span>)</span>
+          </code>
+        </div>
         {flag.archived && (
           <span className="shrink-0 px-2 py-0.5 rounded-full text-xs bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
             Archived
@@ -103,34 +110,29 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
         )}
       </div>
 
-      {/* Flag key */}
-      <code className="text-xs font-mono text-brand-600 dark:text-brand-300 mb-2 block">
-        {flag.key}
-      </code>
-
       {/* Description */}
-      {flag.description && (
-        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3 line-clamp-2">
-          {flag.description}
-        </p>
-      )}
+      <p className="mb-3 line-clamp-2 min-h-2.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+        {flag.description || '\u00A0'}
+      </p>
 
       {/* Environment toggles */}
-      <div className="flex flex-wrap gap-3 mt-3" onClick={e => e.stopPropagation()}>
+      <div
+        className={`flex flex-wrap gap-3 mt-3 ${flag.archived ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+        onClick={e => e.stopPropagation()}
+      >
         {ENV_CONFIG.map(({ env, label, enabled: enabledCls, disabled: disabledCls }) => {
           const isEnabled = getEnvEnabled(env);
           return (
             <div
               key={env}
-              className="flex items-center gap-2 cursor-pointer select-none group/toggle"
+              className={`flex items-center gap-2 select-none group/toggle `}
               title={`${isEnabled ? 'Disable' : 'Enable'} in ${env}`}
               onClick={e => handleToggle(e, env)}
             >
-              {/* Smooth Hardware-Accelerated Toggle Track */}
               <div
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                   isEnabled ? 'bg-emerald-500 shadow-green' : 'bg-slate-300 dark:bg-slate-700'
-                } ${flag.archived ? 'opacity-40 cursor-not-allowed' : ''}`}
+                } `}
               >
                 <span
                   className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${

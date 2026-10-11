@@ -71,8 +71,8 @@ const FlagsPage: React.FC = () => {
 
         {/* Search */}
         <div className="relative min-w-65">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-            🔍
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm flex items-center justify-center w-4 h-4">
+            {isFetching ? <span className="spinner w-3.5 h-3.5 border-brand-500" /> : '🔍'}
           </span>
           <input
             type="search"
@@ -130,17 +130,10 @@ const FlagsPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-4">
-          {isFetching && (
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span className="spinner w-3.5 h-3.5" /> Refreshing...
-            </div>
-          )}
-          <div className="grid md:grid-cols-2 gap-4">
-            {flags.map(flag => (
-              <FlagCard key={flag.id} flag={flag} />
-            ))}
-          </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          {flags.map(flag => (
+            <FlagCard key={flag.id} flag={flag} />
+          ))}
         </div>
       )}
 

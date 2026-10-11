@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createProjectSchema, updateProjectSchema } from './projects.controller';
-import { createFlagSchema, updateFlagSchema } from './flags.controller';
+import { createFlagSchema, updateFlagSchema, addRuleSchema } from './flags.controller';
 import { registerSchema, loginSchema } from './auth.controller';
 import { acceptInvitationSchema, invitationSchema } from './organization.controller';
 import { INPUT_LIMITS } from '../config/inputLimits';
@@ -93,5 +93,51 @@ describe('database-backed input length limits', () => {
     ).toBe(false);
     expect(invitationSchema.safeParse({ email }).success).toBe(true);
     expect(invitationSchema.safeParse({ email: `a${email}` }).success).toBe(false);
+  });
+
+  it('validates user group and specific user identifiers against [a-zA-Z0-9-_]', () => {
+    // Valid identifiers
+    expect(
+      addRuleSchema.safeParse({
+        type: 'user_ids',
+        value: ['user-123', 'admin_456', 'BetaUser']
+      }).success
+    ).toBe(true);
+
+    expect(
+      addRuleSchema.safeParse({
+        type: 'groups',
+        value: ['beta-testers', 'group_1', 'INTERNAL_QA']
+      }).success
+    ).toBe(true);
+
+    // Invalid identifiers with spaces, special characters
+    expect(
+      addRuleSchema.safeParse({
+        type: 'user_ids',
+        value: ['user 123']
+      }).success
+    ).toBe(false);
+
+    expect(
+      addRuleSchema.safeParse({
+        type: 'user_ids',
+        value: ['user@example.com']
+      }).success
+    ).toBe(false);
+
+    expect(
+      addRuleSchema.safeParse({
+        type: 'groups',
+        value: ['group#1!']
+      }).success
+    ).toBe(false);
+
+    expect(
+      addRuleSchema.safeParse({
+        type: 'user_ids',
+        value: []
+      }).success
+    ).toBe(false);
   });
 });
