@@ -71,12 +71,9 @@ const FlagDetail: React.FC = () => {
     const currentEnabled = getEnvEnabled(env);
     const nextEnabled = !currentEnabled;
 
-    // 1. Instant local optimistic update for zero delay
-    setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
-
-    // 2. Fire mutation
     try {
       await toggleEnv({ flagId: flag.id, env, enabled: nextEnabled }).unwrap();
+      setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
       dispatch(
         addToast({
           type: 'success',
@@ -84,7 +81,6 @@ const FlagDetail: React.FC = () => {
         })
       );
     } catch (error) {
-      setOptimisticEnvs(prev => ({ ...prev, [env]: currentEnabled }));
       dispatch(
         addToast({
           type: 'error',
@@ -127,7 +123,8 @@ const FlagDetail: React.FC = () => {
           message: flag.archived ? 'Flag restored' : 'Flag archived'
         })
       );
-      navigate('/app/flags');
+
+      navigate(`/app/flags?status=${flag.archived ? 'archived' : 'active'}`);
     } catch (error) {
       dispatch(
         addToast({
@@ -171,7 +168,7 @@ const FlagDetail: React.FC = () => {
         </h3>
         <button
           className="px-4 py-2 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-300 border border-brand-500/20 text-sm font-medium hover:bg-brand-500/20 transition-all"
-          onClick={() => navigate('/app/flags')}
+          onClick={() => navigate('/app/flags/')}
           id="back-to-flags"
         >
           ← Back to Flags
@@ -186,7 +183,7 @@ const FlagDetail: React.FC = () => {
       <div>
         <button
           className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
-          onClick={() => navigate('/app/flags')}
+          onClick={() => navigate(`/app/flags?status=${flag.archived ? 'archived' : 'active'}`)}
           id="back-btn"
         >
           ← Back to Flags
@@ -294,7 +291,9 @@ const FlagDetail: React.FC = () => {
       ) : (
         <p className="text-sm text-slate-600 dark:text-slate-400">
           {flag.description || (
-            <span className="italic text-slate-400 dark:text-slate-500">No description provided</span>
+            <span className="italic text-slate-400 dark:text-slate-500">
+              No description provided
+            </span>
           )}
         </p>
       )}
@@ -306,9 +305,9 @@ const FlagDetail: React.FC = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             id={`tab-${tab}`}
-            className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-all capitalize ${
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors durantion-300 capitalize ${
               activeTab === tab
-                ? 'border-brand-500 text-brand-600 dark:text-brand-300 font-semibold'
+                ? 'border-brand-500 text-brand-600 dark:text-brand-300 '
                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -342,7 +341,6 @@ const FlagDetail: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Smooth Hardware-Accelerated Toggle switch */}
                   <button
                     id={`env-toggle-${env}`}
                     disabled={flag.archived}
@@ -376,7 +374,11 @@ const FlagDetail: React.FC = () => {
                 <div className="border-t border-border-subtle pt-4">
                   {/* Rules Editor */}
                   {envData && (
-                    <RulesEditor flagId={flag.id} environment={{ ...envData, enabled }} />
+                    <RulesEditor
+                      flagId={flag.id}
+                      environment={{ ...envData, enabled }}
+                      isArchived={flag.archived}
+                    />
                   )}
                 </div>
               </div>
@@ -395,7 +397,7 @@ const FlagDetail: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Delete Flag</h2>
             <p className="text-sm text-slate-600 dark:text-slate-300">
               Are you sure you want to permanently delete{' '}
-              <strong className="text-slate-900 dark:text-white">{flag.name}</strong>? This action
+              <strong className="text-slate-900 dark:text-white">{flag.name}</strong>{' '}? This action
               cannot be undone.
             </p>
             <div className="flex justify-end gap-3 pt-2">

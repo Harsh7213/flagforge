@@ -217,12 +217,12 @@ const ProjectsPage: React.FC = () => {
     if (!pendingConfirmation) return '';
     const { action, name } = pendingConfirmation;
     if (action === 'rotate') {
-      return `Rotate the API key for "${name}"? The current key will stop working.`;
+      return `Rotate the API key for "${name}" ? The current key will stop working.`;
     }
     if (action === 'revoke') {
-      return `Revoke the API key for "${name}"? This API key will no longer work.`;
+      return `Revoke the API key for "${name}" ? This API key will no longer work.`;
     }
-    return `Delete project "${name}"? This action cannot be undone.`;
+    return `Delete project "${name}" ? This action cannot be undone.`;
   };
 
   return (

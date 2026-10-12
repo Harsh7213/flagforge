@@ -40,7 +40,7 @@ const AcceptInvitationPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-surface-base text-slate-900 dark:text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center justify-center mb-10 gap-3 group">
           <div className="w-9 h-9 rounded-xl bg-linear-to-br from-brand-500 to-cyan-400 flex items-center justify-center shadow-brand-light dark:shadow-brand">
             <img
               src="/flag-icon.svg"

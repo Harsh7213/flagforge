@@ -8,6 +8,7 @@ import { getApiErrorMessage } from '../utils/errorMessage';
 interface Props {
   flagId: string;
   environment: FlagEnvironment;
+  isArchived:boolean;
 }
 
 const RULE_TYPE_OPTIONS: { value: RuleType; label: string; placeholder: string }[] = [
@@ -16,7 +17,7 @@ const RULE_TYPE_OPTIONS: { value: RuleType; label: string; placeholder: string }
   { value: 'percentage', label: 'Percentage Rollout', placeholder: '50' }
 ];
 
-const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
+const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
   const dispatch = useAppDispatch();
   const [addRule, { isLoading: isAdding }] = useAddRuleMutation();
   const [deleteRule, { isLoading: isDeleting }] = useDeleteRuleMutation();
@@ -126,6 +127,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment }) => {
           <button
             className="px-2.5 py-1 rounded-lg bg-surface-elevated hover:bg-surface-card border border-border-subtle text-xs text-brand-600 dark:text-brand-300 font-medium transition-all"
             onClick={() => setShowForm(true)}
+            disabled={isArchived}
             id={`add-rule-btn-${envLabel}`}
           >
             + Add Rule

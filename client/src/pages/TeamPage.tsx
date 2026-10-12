@@ -17,7 +17,11 @@ const TeamPage: React.FC = () => {
   const { data: membersData, isLoading: isLoadingMembers } = useListMembersQuery(undefined, {
     skip: !canManageMembers
   });
-  const [removeMember] = useRemoveMemberMutation();
+  const [memberToRemove, setMemberToRemove] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [removeMember, { isLoading: isRemovingMember }] = useRemoveMemberMutation();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'admin' | 'member'>('member');
   const [invitationLink, setInvitationLink] = useState('');
@@ -55,11 +59,11 @@ const TeamPage: React.FC = () => {
     );
   }
 
-  const handleRemoveMember = async (memberId: string, memberName: string) => {
-    if (!window.confirm(`Remove ${memberName} from the organization?`)) return;
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
     try {
-      await removeMember(memberId).unwrap();
-      dispatch(addToast({ type: 'success', message: `${memberName} was removed` }));
+      await removeMember(memberToRemove.id).unwrap();
+      dispatch(addToast({ type: 'success', message: `${memberToRemove.name} was removed` }));
     } catch (error: unknown) {
       dispatch(
         addToast({
@@ -67,6 +71,8 @@ const TeamPage: React.FC = () => {
           message: getApiErrorMessage(error, 'Failed to remove member')
         })
       );
+    } finally {
+      setMemberToRemove(null);
     }
   };
 
@@ -172,7 +178,7 @@ const TeamPage: React.FC = () => {
                     {canRemove && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveMember(member.id, member.name)}
+                        onClick={() => setMemberToRemove({ id: member.id, name: member.name })}
                         className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs font-semibold"
                       >
                         Remove
@@ -208,6 +214,50 @@ const TeamPage: React.FC = () => {
             {copied ? 'Copied' : 'Copy invitation link'}
           </button>
         </section>
+      )}
+
+      {memberToRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-organization-member"
+            className="w-full max-w-md p-6 rounded-2xl bg-surface-card border border-border-subtle space-y-4 shadow-2xl"
+          >
+            <h2
+              id="remove-organization-member"
+              className="text-xl font-bold text-slate-900 dark:text-white"
+            >
+              Remove member
+            </h2>
+
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Are you sure you want to remove{' '}
+              <strong className="text-slate-900 dark:text-white">{memberToRemove.name}</strong> from
+              the organization ?
+            </p>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setMemberToRemove(null)}
+                disabled={isRemovingMember}
+                className="px-4 py-2 rounded-xl border border-border-subtle text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleRemoveMember}
+                disabled={isRemovingMember}
+                className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white text-sm font-medium disabled:opacity-50"
+              >
+                {isRemovingMember ? 'Removing...' : 'Remove'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

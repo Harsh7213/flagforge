@@ -6,6 +6,7 @@ import { clearActiveProject, toggleSidebar } from '../store/slices/uiSlice';
 import { flagsApi } from '../store/api/flagsApi';
 import { projectsApi } from '../store/api/projectsApi';
 import { authApi, useLogoutMutation } from '../store/api/authApi';
+import { organizationApi } from '../store/api/organizationApi';
 
 const navItems = [
   { to: '/app', label: 'Dashboard', icon: '⬡', exact: true },
@@ -37,6 +38,7 @@ const Sidebar: React.FC = () => {
       dispatch(flagsApi.util.resetApiState());
       dispatch(projectsApi.util.resetApiState());
       dispatch(authApi.util.resetApiState());
+      dispatch(organizationApi.util.resetApiState());
       navigate('/login', { replace: true });
     }
   };
