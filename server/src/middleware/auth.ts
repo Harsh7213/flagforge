@@ -194,13 +194,15 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction) 
 
   const allowedOrigins = getAllowedOrigins();
   const origin = req.header('Origin');
-  const normalizedOrigin = origin ? (() => {
-    try {
-      return new URL(origin).origin;
-    } catch {
-      return undefined;
-    }
-  })() : undefined;
+  const normalizedOrigin = origin
+    ? (() => {
+        try {
+          return new URL(origin).origin;
+        } catch {
+          return undefined;
+        }
+      })()
+    : undefined;
   const csrfCookie = req.cookies?.[CSRF_COOKIE];
   const csrfHeader = req.header('X-CSRF-Token');
 

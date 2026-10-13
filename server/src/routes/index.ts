@@ -132,6 +132,12 @@ router.get('/audit', requireAuth, getAuditLogs);
 
 // SDK Evaluation Routes (Protected by API Key)
 router.post('/evaluate', apiKeyAuth, evaluationLimit, monthlyEvaluationLimit, evaluate);
-router.post('/evaluate/batch', apiKeyAuth, batchEvaluationLimit, monthlyEvaluationLimit, batchEvaluate);
+router.post(
+  '/evaluate/batch',
+  apiKeyAuth,
+  batchEvaluationLimit,
+  monthlyEvaluationLimit,
+  batchEvaluate
+);
 
 export default router;

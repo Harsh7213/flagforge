@@ -3,7 +3,7 @@ import pool from '../db/pool';
 import { z } from 'zod';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { INPUT_LIMITS } from '../config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 export const createProjectSchema = z.object({
   name: z.string().min(1).max(INPUT_LIMITS.projectName)

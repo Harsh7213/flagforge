@@ -12,10 +12,10 @@ export function errorHandler(
   const isValidationError = err instanceof ZodError;
   const statusCode = isValidationError ? 400 : (err.statusCode ?? err.status ?? 500);
   res.status(statusCode).json({
-    error: isValidationError ? 'ValidationError' : (err.name || 'InternalServerError'),
+    error: isValidationError ? 'ValidationError' : err.name || 'InternalServerError',
     message: isValidationError
       ? err.issues.map(issue => issue.message).join(', ')
-      : (err.message || 'An unexpected error occurred'),
+      : err.message || 'An unexpected error occurred',
     statusCode
   });
 }

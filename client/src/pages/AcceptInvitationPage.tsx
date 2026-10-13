@@ -5,7 +5,7 @@ import { setCredentials } from '../store/slices/authSlice';
 import { addToast } from '../store/slices/uiSlice';
 import { useAcceptInvitationMutation } from '../store/api/organizationApi';
 import { getApiErrorMessage } from '../utils/errorMessage';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const AcceptInvitationPage: React.FC = () => {
   const { token = '' } = useParams<{ token: string }>();

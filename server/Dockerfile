@@ -1,13 +1,17 @@
 FROM node:26-alpine
 
-WORKDIR /app
+WORKDIR /app/server
 
-COPY package*.json ./
+COPY server/package*.json ./
 RUN npm ci --include=dev
 
-COPY . .
+WORKDIR /app
+COPY server/ ./server/
+COPY shared/ ./shared/
+
+WORKDIR /app/server
 RUN npm run build && npm prune --omit=dev
 
 EXPOSE 4000
 
-CMD ["sh", "-c", "node dist/db/migrate.js && node dist/index.js"]
+CMD ["sh", "-c", "node dist/server/src/db/migrate.js && node dist/server/src/index.js"]

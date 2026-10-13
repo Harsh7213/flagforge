@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { clearAuthCookies, issueCsrfCookie, SESSION_COOKIE } from '../middleware/auth';
 import { JWT_SECRET } from '../config';
-import { INPUT_LIMITS } from '../config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 export const registerSchema = z.object({
   name: z.string().min(2).max(INPUT_LIMITS.userName),

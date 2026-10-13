@@ -6,7 +6,7 @@ import { z } from 'zod';
 import pool from '../db/pool';
 import { JWT_SECRET } from '../config';
 import { SESSION_COOKIE } from '../middleware/auth';
-import { INPUT_LIMITS } from '../config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const SESSION_DURATION_MS = 60 * 60 * 1000;
 const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000;

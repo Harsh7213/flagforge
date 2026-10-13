@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import { setCredentials } from '../store/slices/authSlice';
 import { addToast, toggleTheme } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');

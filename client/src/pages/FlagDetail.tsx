@@ -13,7 +13,7 @@ import { getApiErrorMessage } from '../utils/errorMessage';
 import type { Environment } from '../types';
 import RulesEditor from '../components/RulesEditor';
 import AuditTimeline from '../components/AuditTimeline';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const ENV_CONFIG = [
   {

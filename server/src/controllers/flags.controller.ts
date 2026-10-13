@@ -5,7 +5,7 @@ import { AppError } from '../middleware/errorHandler';
 import { z } from 'zod';
 import { Environment } from '../types';
 import type { PoolClient } from 'pg';
-import { INPUT_LIMITS } from '../config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const ENVIRONMENTS: Environment[] = ['development', 'staging', 'production'];
 
@@ -39,13 +39,9 @@ export const addRuleSchema = z
     type: z.enum(['user_ids', 'groups', 'percentage']),
     value: z.union([
       z.array(
-        z
-          .string()
-          .trim()
-          .min(1, 'Value cannot be empty')
-          .regex(IDENTIFIER_REGEX, {
-            message: 'Values must only contain letters, numbers, hyphens, and underscores'
-          })
+        z.string().trim().min(1, 'Value cannot be empty').regex(IDENTIFIER_REGEX, {
+          message: 'Values must only contain letters, numbers, hyphens, and underscores'
+        })
       ),
       z.number().min(0).max(100)
     ])

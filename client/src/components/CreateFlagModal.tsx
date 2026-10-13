@@ -3,7 +3,7 @@ import { useCreateFlagMutation } from '../store/api/flagsApi';
 import { useAppDispatch } from '../store/store';
 import { addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 interface Props {
   projectId: string;

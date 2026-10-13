@@ -10,7 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { setActiveProject, clearActiveProject, addToast } from '../store/slices/uiSlice';
 import { getApiErrorMessage } from '../utils/errorMessage';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const PROJECT_NAME_REGEX = /^[0-9a-zA-Z _-]+$/;
 

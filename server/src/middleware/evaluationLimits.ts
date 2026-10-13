@@ -144,12 +144,13 @@ export const batchEvaluationLimit = createEvaluationLimit(
   'flagforge:rate-limit:batch'
 );
 
-export const createMonthlyEvaluationLimit = (
-  limit: LimitValue,
-  namespace: string,
-  client: typeof redisClient = redisClient,
-  organizationLimit: LimitValue = limit
-): RequestHandler =>
+export const createMonthlyEvaluationLimit =
+  (
+    limit: LimitValue,
+    namespace: string,
+    client: typeof redisClient = redisClient,
+    organizationLimit: LimitValue = limit
+  ): RequestHandler =>
   async (req, res, next) => {
     const now = new Date(Date.now());
     const resetTime = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1);

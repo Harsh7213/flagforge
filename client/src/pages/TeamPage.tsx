@@ -7,7 +7,7 @@ import {
   useRemoveMemberMutation
 } from '../store/api/organizationApi';
 import { getApiErrorMessage } from '../utils/errorMessage';
-import { INPUT_LIMITS } from '../../../server/src/config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const TeamPage: React.FC = () => {
   const dispatch = useAppDispatch();

@@ -1,6 +1,6 @@
 import pool from './pool';
 import bcrypt from 'bcryptjs';
-import { INPUT_LIMITS } from '../config/inputLimits';
+import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const SQL = `
 -- Enable UUID extension

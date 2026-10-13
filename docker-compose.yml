@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       POSTGRES_DB: ${POSTGRES_DB:-feature_flags}
     ports:
-      - '127.0.0.1:${POSTGRES_PORT:-5433}:5432'
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
@@ -34,14 +34,15 @@ services:
 
   backend:
     build:
-      context: ./server
+      context: .
+      dockerfile: server/Dockerfile
     container_name: feature_flags_backend
     restart: unless-stopped
     environment:
       PORT: 4000
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-flaguser}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-feature_flags}
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://redis:${REDIS_PORT:-6379}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
     ports:
@@ -54,7 +55,8 @@ services:
 
   frontend:
     build:
-      context: ./client
+      context: .
+      dockerfile: client/Dockerfile
     container_name: feature_flags_frontend
     restart: unless-stopped
     depends_on:
