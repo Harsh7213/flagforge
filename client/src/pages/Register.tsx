@@ -22,11 +22,18 @@ const Register: React.FC = () => {
     try {
       const result = await register({ name, email, password, organizationName }).unwrap();
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
-      dispatch(addToast({ type: 'success', message: 'Account created successfully' }));
+      dispatch(
+        addToast({
+          id: crypto.randomUUID(),
+          type: 'success',
+          message: 'Account created successfully'
+        })
+      );
       navigate('/app');
     } catch (error: unknown) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to register')
         })

@@ -25,16 +25,22 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<{ user: User; expiresAt?: number }>) => {
-      const expiresAt = action.payload.expiresAt ?? Date.now() + SESSION_DURATION_MS;
-      state.user = action.payload.user;
-      state.sessionExpiresAt = expiresAt;
-      sessionStorage.setItem('sessionExpiresAt', String(expiresAt));
+    setCredentials: {
+      reducer: (state, action: PayloadAction<{ user: User; expiresAt: number }>) => {
+        state.user = action.payload.user;
+        state.sessionExpiresAt = action.payload.expiresAt;
+      },
+      prepare: ({ user, expiresAt }: { user: User; expiresAt?: number }) => ({
+        payload: {
+          user,
+          expiresAt: expiresAt ?? Date.now() + SESSION_DURATION_MS
+        }
+      })
     },
+
     logout: state => {
       state.user = null;
       state.sessionExpiresAt = null;
-      sessionStorage.removeItem('sessionExpiresAt');
     }
   }
 });

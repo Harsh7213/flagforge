@@ -76,6 +76,7 @@ const FlagDetail: React.FC = () => {
       setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'success',
           message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`
         })
@@ -83,6 +84,7 @@ const FlagDetail: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to toggle environment')
         })
@@ -101,11 +103,14 @@ const FlagDetail: React.FC = () => {
     if (!flag) return;
     try {
       await updateFlag({ id: flag.id, name: editName, description: editDesc }).unwrap();
-      dispatch(addToast({ type: 'success', message: 'Flag updated successfully' }));
+      dispatch(
+        addToast({ id: crypto.randomUUID(), type: 'success', message: 'Flag updated successfully' })
+      );
       setIsEditing(false);
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to update flag')
         })
@@ -119,6 +124,7 @@ const FlagDetail: React.FC = () => {
       await updateFlag({ id: flag.id, archived: !flag.archived }).unwrap();
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'success',
           message: flag.archived ? 'Flag restored' : 'Flag archived'
         })
@@ -128,6 +134,7 @@ const FlagDetail: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to archive flag')
         })
@@ -139,11 +146,18 @@ const FlagDetail: React.FC = () => {
     if (!flag) return;
     try {
       await deleteFlag(flag.id).unwrap();
-      dispatch(addToast({ type: 'success', message: `Flag "${flag.name}" deleted` }));
+      dispatch(
+        addToast({
+          id: crypto.randomUUID(),
+          type: 'success',
+          message: `Flag "${flag.name}" deleted`
+        })
+      );
       navigate('/app/flags');
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to delete flag')
         })
@@ -397,7 +411,7 @@ const FlagDetail: React.FC = () => {
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">Delete Flag</h2>
             <p className="text-sm text-slate-600 dark:text-slate-300">
               Are you sure you want to permanently delete{' '}
-              <strong className="text-slate-900 dark:text-white">{flag.name}</strong>{' '}? This action
+              <strong className="text-slate-900 dark:text-white">{flag.name}</strong> ? This action
               cannot be undone.
             </p>
             <div className="flex justify-end gap-3 pt-2">

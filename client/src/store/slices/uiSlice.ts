@@ -40,49 +40,34 @@ const initialState: UiState = {
   toasts: []
 };
 
-const applyTheme = (theme: Theme) => {
-  document.documentElement.setAttribute('data-theme', theme);
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark');
-    document.documentElement.classList.remove('light');
-  } else {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
-  }
-};
-
-// Apply theme immediately on script load
-applyTheme(initialState.theme);
-
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
     toggleTheme(state) {
       state.theme = state.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('ff-theme', state.theme);
-      applyTheme(state.theme);
     },
+
     setSystemTheme(state, action: PayloadAction<Theme>) {
-      if (!localStorage.getItem('ff-theme')) {
-        state.theme = action.payload;
-        applyTheme(state.theme);
-      }
+      state.theme = action.payload;
     },
+
     setActiveProject(state, action: PayloadAction<string>) {
       state.activeProjectId = action.payload;
-      sessionStorage.setItem('ff-project', action.payload);
     },
+
     clearActiveProject(state) {
       state.activeProjectId = null;
-      sessionStorage.removeItem('ff-project');
     },
+
     toggleSidebar(state) {
       state.sidebarOpen = !state.sidebarOpen;
     },
-    addToast(state, action: PayloadAction<Omit<Toast, 'id'>>) {
-      state.toasts.push({ ...action.payload, id: crypto.randomUUID() });
+
+    addToast(state, action: PayloadAction<Toast>) {
+      state.toasts.push(action.payload);
     },
+
     removeToast(state, action: PayloadAction<string>) {
       state.toasts = state.toasts.filter(t => t.id !== action.payload);
     }

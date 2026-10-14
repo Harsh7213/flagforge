@@ -6,6 +6,8 @@ import { authApi } from './api/authApi';
 import { organizationApi } from './api/organizationApi';
 import uiReducer from './slices/uiSlice';
 import authReducer from './slices/authSlice';
+import { authListenerMiddleware } from './slices/authListenerMiddleware';
+import { uiListenerMiddleware } from './slices/uiListenerMiddleware';
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +23,9 @@ export const store = configureStore({
       flagsApi.middleware,
       projectsApi.middleware,
       authApi.middleware,
-      organizationApi.middleware
+      organizationApi.middleware,
+      authListenerMiddleware.middleware,
+      uiListenerMiddleware.middleware
     )
 });
 

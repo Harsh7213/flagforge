@@ -16,7 +16,7 @@ describe('ToastContainer', () => {
   it('should render a success toast with the correct message', () => {
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'success', message: 'Flag updated!' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'success', message: 'Flag updated!' }));
     });
     expect(screen.getByText('Flag updated!')).toBeInTheDocument();
   });
@@ -24,7 +24,7 @@ describe('ToastContainer', () => {
   it('should render an error toast with the correct message', () => {
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'error', message: 'Something went wrong' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'error', message: 'Something went wrong' }));
     });
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
@@ -32,7 +32,7 @@ describe('ToastContainer', () => {
   it('should render an info toast with the correct message', () => {
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'info', message: 'Just an FYI' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'info', message: 'Just an FYI' }));
     });
     expect(screen.getByText('Just an FYI')).toBeInTheDocument();
   });
@@ -40,8 +40,8 @@ describe('ToastContainer', () => {
   it('should render multiple toasts at the same time', () => {
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'success', message: 'First' }));
-      store.dispatch(addToast({ type: 'error', message: 'Second' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'success', message: 'First' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'error', message: 'Second' }));
     });
     expect(screen.getByText('First')).toBeInTheDocument();
     expect(screen.getByText('Second')).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('ToastContainer', () => {
     const user = userEvent.setup();
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'success', message: 'Close me!' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'success', message: 'Close me!' }));
     });
 
     const closeBtn = screen.getByLabelText('Close notification');
@@ -69,7 +69,7 @@ describe('ToastContainer', () => {
 
     const { store } = renderWithProviders(<ToastContainer />);
     act(() => {
-      store.dispatch(addToast({ type: 'info', message: 'Auto dismiss me' }));
+      store.dispatch(addToast({id:crypto.randomUUID(), type: 'info', message: 'Auto dismiss me' }));
     });
 
     expect(screen.getByText('Auto dismiss me')).toBeInTheDocument();

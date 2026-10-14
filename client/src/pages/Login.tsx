@@ -27,11 +27,14 @@ const Login: React.FC = () => {
     try {
       const result = await login({ email, password }).unwrap();
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
-      dispatch(addToast({ type: 'success', message: 'Logged in successfully' }));
+      dispatch(
+        addToast({ id: crypto.randomUUID(), type: 'success', message: 'Logged in successfully' })
+      );
       navigate('/app');
     } catch (error: unknown) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to login')
         })

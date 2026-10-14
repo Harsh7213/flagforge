@@ -40,7 +40,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
       const pct = parseFloat(ruleValue);
       if (isNaN(pct) || pct < 0 || pct > 100) {
         setError('Percentage must be 0–100');
-        dispatch(addToast({ type: 'error', message: 'Percentage must be 0–100' }));
+        dispatch(addToast({ id: crypto.randomUUID(),type: 'error', message: 'Percentage must be 0–100' }));
         return;
       }
       value = pct;
@@ -52,7 +52,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
 
       if (items.length === 0) {
         setError('Please enter at least one value');
-        dispatch(addToast({ type: 'error', message: 'Please enter at least one value' }));
+        dispatch(addToast({id: crypto.randomUUID(), type: 'error', message: 'Please enter at least one value' }));
         return;
       }
 
@@ -61,7 +61,7 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
         const label = ruleType === 'user_ids' ? 'User ID' : 'Group';
         const msg = `${label} "${invalidItem}" is invalid. Only letters, numbers, hyphens (-), and underscores (_) are allowed.`;
         setError(msg);
-        dispatch(addToast({ type: 'error', message: msg }));
+        dispatch(addToast({ id: crypto.randomUUID(), type: 'error', message: msg }));
         return;
       }
 
@@ -70,13 +70,14 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
 
     try {
       await addRule({ flagId, env: envLabel as Environment, type: ruleType, value }).unwrap();
-      dispatch(addToast({ type: 'success', message: 'Targeting rule added' }));
+      dispatch(addToast({ id: crypto.randomUUID(), type: 'success', message: 'Targeting rule added' }));
       setRuleValue('');
       setError(null);
       setShowForm(false);
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to add rule')
         })
@@ -87,10 +88,11 @@ const RulesEditor: React.FC<Props> = ({ flagId, environment,isArchived }) => {
   const handleDelete = async (rule: TargetingRule) => {
     try {
       await deleteRule({ flagId, ruleId: rule.id }).unwrap();
-      dispatch(addToast({ type: 'success', message: 'Rule removed' }));
+      dispatch(addToast({id: crypto.randomUUID(), type: 'success', message: 'Rule removed' }));
     } catch (error) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to remove rule')
         })

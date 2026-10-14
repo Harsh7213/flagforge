@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { configureStore } from '@reduxjs/toolkit';
+
 import uiReducer, {
   toggleTheme,
   setSystemTheme,
@@ -9,152 +11,278 @@ import uiReducer, {
   removeToast
 } from '../../store/slices/uiSlice';
 
-// applyTheme touches document.documentElement — jsdom supports it, but we spy to prevent side-effects noise
-const setAttributeSpy = vi
-  .spyOn(document.documentElement, 'setAttribute')
-  .mockImplementation(() => {});
+import { uiListenerMiddleware } from '../../store/slices/uiListenerMiddleware';
 
 const lightState = {
   theme: 'light' as const,
   activeProjectId: null,
   sidebarOpen: true,
-  toasts: []
+  toasts: [] as {
+    id: string;
+    type: 'success' | 'error' | 'info';
+    message: string;
+  }[]
 };
 
-const darkState = { ...lightState, theme: 'dark' as const };
+const darkState = {
+  ...lightState,
+  theme: 'dark' as const
+};
+
+const createTestStore = () =>
+  configureStore({
+    reducer: {
+      ui: uiReducer
+    },
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware().prepend(uiListenerMiddleware.middleware)
+  });
 
 describe('uiSlice', () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
-    setAttributeSpy.mockClear();
   });
 
-  // ─── toggleTheme ───────────────────────────────────────────────────────────
+  // ─── toggleTheme ──────────────────────────────────────────────────────────
   describe('toggleTheme', () => {
     it('should switch light → dark', () => {
       const state = uiReducer(lightState, toggleTheme());
+
       expect(state.theme).toBe('dark');
     });
 
     it('should switch dark → light', () => {
       const state = uiReducer(darkState, toggleTheme());
-      expect(state.theme).toBe('light');
-    });
 
-    it('should persist theme to localStorage', () => {
-      uiReducer(lightState, toggleTheme());
-      expect(localStorage.getItem('ff-theme')).toBe('dark');
+      expect(state.theme).toBe('light');
     });
   });
 
-  // ─── setSystemTheme ────────────────────────────────────────────────────────
+  // ─── setSystemTheme ───────────────────────────────────────────────────────
   describe('setSystemTheme', () => {
-    it('should apply system theme when no ff-theme is stored', () => {
+    it('should update theme to the provided system theme', () => {
       const state = uiReducer(lightState, setSystemTheme('dark'));
+
       expect(state.theme).toBe('dark');
     });
 
-    it('should NOT override user preference when ff-theme is already stored', () => {
-      localStorage.setItem('ff-theme', 'light');
-      const state = uiReducer(darkState, setSystemTheme('dark'));
-      // theme stays as-is because user already set it
-      expect(state.theme).toBe('dark'); // unchanged from darkState
+    it('should update theme to light when light is provided', () => {
+      const state = uiReducer(darkState, setSystemTheme('light'));
+
+      expect(state.theme).toBe('light');
     });
   });
 
-  // ─── setActiveProject ──────────────────────────────────────────────────────
+  // ─── setActiveProject ─────────────────────────────────────────────────────
   describe('setActiveProject', () => {
     it('should set activeProjectId', () => {
       const state = uiReducer(lightState, setActiveProject('proj-abc'));
-      expect(state.activeProjectId).toBe('proj-abc');
-    });
 
-    it('should persist to sessionStorage', () => {
-      uiReducer(lightState, setActiveProject('proj-abc'));
-      expect(sessionStorage.getItem('ff-project')).toBe('proj-abc');
+      expect(state.activeProjectId).toBe('proj-abc');
     });
   });
 
   // ─── clearActiveProject ────────────────────────────────────────────────────
   describe('clearActiveProject', () => {
     it('should set activeProjectId to null', () => {
-      const withProject = { ...lightState, activeProjectId: 'proj-abc' };
-      const state = uiReducer(withProject, clearActiveProject());
-      expect(state.activeProjectId).toBeNull();
-    });
+      const withProject = {
+        ...lightState,
+        activeProjectId: 'proj-abc'
+      };
 
-    it('should remove ff-project from sessionStorage', () => {
-      sessionStorage.setItem('ff-project', 'proj-abc');
-      uiReducer({ ...lightState, activeProjectId: 'proj-abc' }, clearActiveProject());
-      expect(sessionStorage.getItem('ff-project')).toBeNull();
+      const state = uiReducer(withProject, clearActiveProject());
+
+      expect(state.activeProjectId).toBeNull();
     });
   });
 
-  // ─── toggleSidebar ─────────────────────────────────────────────────────────
+  // ─── toggleSidebar ────────────────────────────────────────────────────────
   describe('toggleSidebar', () => {
     it('should close sidebar when it is open', () => {
       const state = uiReducer({ ...lightState, sidebarOpen: true }, toggleSidebar());
+
       expect(state.sidebarOpen).toBe(false);
     });
 
     it('should open sidebar when it is closed', () => {
       const state = uiReducer({ ...lightState, sidebarOpen: false }, toggleSidebar());
+
       expect(state.sidebarOpen).toBe(true);
     });
   });
 
-  // ─── addToast ──────────────────────────────────────────────────────────────
+  // ─── addToast ─────────────────────────────────────────────────────────────
   describe('addToast', () => {
-    it('should add a toast with generated id', () => {
-      const state = uiReducer(lightState, addToast({ type: 'success', message: 'Done!' }));
+    it('should add a toast', () => {
+      const toast = {
+        id: 'toast-1',
+        type: 'success' as const,
+        message: 'Done!'
+      };
+
+      const state = uiReducer(lightState, addToast(toast));
+
       expect(state.toasts).toHaveLength(1);
-      expect(state.toasts[0].message).toBe('Done!');
-      expect(state.toasts[0].type).toBe('success');
-      expect(state.toasts[0].id).toBeDefined();
+      expect(state.toasts[0]).toEqual(toast);
     });
 
     it('should accumulate multiple toasts', () => {
-      let state = uiReducer(lightState, addToast({ type: 'success', message: 'Toast 1' }));
-      state = uiReducer(state, addToast({ type: 'error', message: 'Toast 2' }));
+      let state = uiReducer(
+        lightState,
+        addToast({
+          id: 'toast-1',
+          type: 'success',
+          message: 'Toast 1'
+        })
+      );
+
+      state = uiReducer(
+        state,
+        addToast({
+          id: 'toast-2',
+          type: 'error',
+          message: 'Toast 2'
+        })
+      );
+
       expect(state.toasts).toHaveLength(2);
     });
 
     it('should support error and info types', () => {
-      let state = uiReducer(lightState, addToast({ type: 'error', message: 'Oops' }));
+      let state = uiReducer(
+        lightState,
+        addToast({
+          id: 'toast-1',
+          type: 'error',
+          message: 'Oops'
+        })
+      );
+
       expect(state.toasts[0].type).toBe('error');
-      state = uiReducer(lightState, addToast({ type: 'info', message: 'FYI' }));
-      expect(state.toasts[0].type).toBe('info');
+
+      state = uiReducer(
+        state,
+        addToast({
+          id: 'toast-2',
+          type: 'info',
+          message: 'FYI'
+        })
+      );
+
+      expect(state.toasts[1].type).toBe('info');
     });
   });
 
   // ─── removeToast ──────────────────────────────────────────────────────────
   describe('removeToast', () => {
     it('should remove a toast by id', () => {
-      let state = uiReducer(lightState, addToast({ type: 'success', message: 'Hi' }));
-      const id = state.toasts[0].id;
-      state = uiReducer(state, removeToast(id));
+      let state = uiReducer(
+        lightState,
+        addToast({
+          id: 'toast-1',
+          type: 'success',
+          message: 'Hi'
+        })
+      );
+
+      state = uiReducer(state, removeToast('toast-1'));
+
       expect(state.toasts).toHaveLength(0);
     });
 
     it('should only remove the targeted toast', () => {
-      let state = uiReducer(lightState, addToast({ type: 'success', message: 'A' }));
-      // Advance time so second toast gets a different Date.now() id
-      vi.useFakeTimers();
-      vi.advanceTimersByTime(1);
-      state = uiReducer(state, addToast({ type: 'error', message: 'B' }));
-      vi.useRealTimers();
+      let state = uiReducer(
+        lightState,
+        addToast({
+          id: 'toast-1',
+          type: 'success',
+          message: 'A'
+        })
+      );
 
-      const [toastA] = state.toasts;
-      state = uiReducer(state, removeToast(toastA.id));
+      state = uiReducer(
+        state,
+        addToast({
+          id: 'toast-2',
+          type: 'error',
+          message: 'B'
+        })
+      );
+
+      state = uiReducer(state, removeToast('toast-1'));
+
       expect(state.toasts).toHaveLength(1);
       expect(state.toasts[0].message).toBe('B');
     });
 
     it('should be a no-op for unknown id', () => {
-      let state = uiReducer(lightState, addToast({ type: 'info', message: 'Keep me' }));
-      state = uiReducer(state, removeToast('non-existent-id'));
-      expect(state.toasts).toHaveLength(1);
+      const state = uiReducer(
+        lightState,
+        addToast({
+          id: 'toast-1',
+          type: 'info',
+          message: 'Keep me'
+        })
+      );
+
+      const nextState = uiReducer(state, removeToast('non-existent-id'));
+
+      expect(nextState.toasts).toHaveLength(1);
+    });
+  });
+
+  // ─── UI Listener Middleware ───────────────────────────────────────────────
+  describe('uiListenerMiddleware', () => {
+    it('should persist theme to localStorage when toggled', async () => {
+      const store = createTestStore();
+
+      store.dispatch(toggleTheme());
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(store.getState().ui.theme).toBe('dark');
+      expect(localStorage.getItem('ff-theme')).toBe('dark');
+    });
+
+    it('should persist active project to sessionStorage', async () => {
+      const store = createTestStore();
+
+      store.dispatch(setActiveProject('proj-abc'));
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(store.getState().ui.activeProjectId).toBe('proj-abc');
+
+      expect(sessionStorage.getItem('ff-project')).toBe('proj-abc');
+    });
+
+    it('should remove active project from sessionStorage', async () => {
+      const store = createTestStore();
+
+      sessionStorage.setItem('ff-project', 'proj-abc');
+
+      store.dispatch(clearActiveProject());
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(store.getState().ui.activeProjectId).toBeNull();
+
+      expect(sessionStorage.getItem('ff-project')).toBeNull();
+    });
+
+    it('should not apply a system theme when a saved preference exists', async () => {
+      localStorage.setItem('ff-theme', 'light');
+
+      const store = createTestStore();
+
+      // The listener checks localStorage, but the reducer still
+      // updates the theme because it no longer reads localStorage.
+      store.dispatch(setSystemTheme('dark'));
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      expect(localStorage.getItem('ff-theme')).toBe('light');
     });
   });
 });

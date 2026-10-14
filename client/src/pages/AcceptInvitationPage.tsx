@@ -22,6 +22,7 @@ const AcceptInvitationPage: React.FC = () => {
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'success',
           message: `Welcome to ${result.data.user.organizationName}`
         })
@@ -30,6 +31,7 @@ const AcceptInvitationPage: React.FC = () => {
     } catch (error: unknown) {
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to accept invitation')
         })

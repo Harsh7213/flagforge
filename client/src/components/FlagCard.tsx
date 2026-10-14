@@ -62,6 +62,7 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
       await toggleEnv({ flagId: flag.id, env, enabled: nextEnabled }).unwrap();
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'success',
           message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`
         })
@@ -71,6 +72,7 @@ const FlagCard: React.FC<Props> = ({ flag }) => {
       setOptimisticEnvs(prev => ({ ...prev, [env]: currentEnabled }));
       dispatch(
         addToast({
+          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to toggle flag')
         })

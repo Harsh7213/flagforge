@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from './store/store';
 import { setSystemTheme } from './store/slices/uiSlice';
 import { setCredentials } from './store/slices/authSlice';
 import { useMeQuery } from './store/api/authApi';
+import ThemeSync from './components/ThemeSync';
 
 // Lazy loading pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -89,6 +90,7 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
+      <ThemeSync />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/invite/:token" element={<AcceptInvitationPage />} />
