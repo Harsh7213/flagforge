@@ -89,11 +89,10 @@ const Sidebar: React.FC = () => {
                 to={item.to}
                 end={item.to === '/app'}
                 title={!sidebarOpen ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group
-                ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-300 ease-in-out ${
                   isActive
                     ? 'bg-brand-500/15 text-brand-600 dark:text-brand-300 border border-brand-500/30 font-semibold'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-black/5 dark:hover:bg-white/5'
+                    : 'border border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-black/5 dark:hover:bg-white/5'
                 }
                 ${!sidebarOpen && 'justify-center'}`}
               >

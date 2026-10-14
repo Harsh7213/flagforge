@@ -122,7 +122,7 @@ const FlagsPage: React.FC = () => {
               className={`m-0.5 rounded-lg border px-4 py-1.5 text-sm font-medium transition-colors duration-200 ${
                 filterTab === tab
                   ? 'bg-brand-500/15 text-brand-600 dark:text-brand-300 border-brand-500/30'
-                  : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-black/10 dark:hover:bg-white/5'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
