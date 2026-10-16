@@ -1,3 +1,4 @@
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const csrfToken = () =>
@@ -6,7 +7,7 @@ const csrfToken = () =>
     .find(cookie => cookie.startsWith('ff_csrf='))
     ?.split('=')[1];
 
-export const baseQuery = fetchBaseQuery({
+const baseQuery = fetchBaseQuery({
   baseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost'}/api/v1`,
   credentials: 'include',
   prepareHeaders: headers => {
@@ -14,4 +15,11 @@ export const baseQuery = fetchBaseQuery({
     if (token) headers.set('X-CSRF-Token', token);
     return headers;
   }
+});
+
+export const baseApi = createApi({
+  reducerPath: 'api',
+  baseQuery,
+  tagTypes: ['Flag', 'Stats', 'AuditLog', 'Member', 'Project'],
+  endpoints: () => ({})
 });

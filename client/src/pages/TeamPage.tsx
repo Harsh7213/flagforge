@@ -34,13 +34,10 @@ const TeamPage: React.FC = () => {
       const link = `${window.location.origin}/invite/${encodeURIComponent(result.data.token)}`;
       setInvitationLink(link);
       setEmail('');
-      dispatch(
-        addToast({ id: crypto.randomUUID(), type: 'success', message: 'Invitation created' })
-      );
+      dispatch(addToast({ type: 'success', message: 'Invitation created' }));
     } catch (error: unknown) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to create invitation')
         })
@@ -68,7 +65,6 @@ const TeamPage: React.FC = () => {
       await removeMember(memberToRemove.id).unwrap();
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: `${memberToRemove.name} was removed`
         })
@@ -76,7 +72,6 @@ const TeamPage: React.FC = () => {
     } catch (error: unknown) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to remove member')
         })

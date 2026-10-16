@@ -1,10 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
-const csrfToken = () =>
-  document.cookie
-    .split('; ')
-    .find(cookie => cookie.startsWith('ff_csrf='))
-    ?.split('=')[1];
+import { baseApi } from './baseApi';
 
 interface InvitationResponse {
   data: {
@@ -29,18 +23,7 @@ interface AcceptInvitationResponse {
   };
 }
 
-export const organizationApi = createApi({
-  reducerPath: 'organizationApi',
-  tagTypes: ['Member'],
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost'}/api/v1`,
-    credentials: 'include',
-    prepareHeaders: headers => {
-      const token = csrfToken();
-      if (token) headers.set('X-CSRF-Token', token);
-      return headers;
-    }
-  }),
+const organizationApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     listMembers: builder.query<{ data: Member[] }, void>({
       query: () => '/organizations/members',

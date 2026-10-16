@@ -1,5 +1,4 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseApi } from './baseApi';
 import type {
   FeatureFlag,
   FlagStats,
@@ -10,10 +9,7 @@ import type {
   RuleType
 } from '../../types';
 
-export const flagsApi = createApi({
-  reducerPath: 'flagsApi',
-  baseQuery: baseQuery,
-  tagTypes: ['Flag', 'Stats', 'AuditLog'],
+const flagsApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     // ── List flags ─────────────────────────────────────────────────
     listFlags: builder.query<

@@ -59,13 +59,12 @@ const CreateFlagModal: React.FC<Props> = ({ projectId, onClose }) => {
         projectId
       }).unwrap();
       dispatch(
-        addToast({ id: crypto.randomUUID(), type: 'success', message: `Flag "${name}" created!` })
+        addToast({ type: 'success', message: `Flag "${name}" created!` })
       );
       onClose();
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to create flag')
         })

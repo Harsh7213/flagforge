@@ -114,24 +114,27 @@ describe('uiSlice', () => {
 
   // ─── addToast ─────────────────────────────────────────────────────────────
   describe('addToast', () => {
-    it('should add a toast', () => {
-      const toast = {
-        id: 'toast-1',
-        type: 'success' as const,
-        message: 'Done!'
-      };
-
-      const state = uiReducer(lightState, addToast(toast));
+    it('should add a toast with a generated id', () => {
+      const state = uiReducer(
+        lightState,
+        addToast({
+          type: 'success',
+          message: 'Done!'
+        })
+      );
 
       expect(state.toasts).toHaveLength(1);
-      expect(state.toasts[0]).toEqual(toast);
+      expect(state.toasts[0]).toMatchObject({
+        type: 'success',
+        message: 'Done!'
+      });
+      expect(state.toasts[0].id).toEqual(expect.any(String));
     });
 
     it('should accumulate multiple toasts', () => {
       let state = uiReducer(
         lightState,
         addToast({
-          id: 'toast-1',
           type: 'success',
           message: 'Toast 1'
         })
@@ -140,20 +143,21 @@ describe('uiSlice', () => {
       state = uiReducer(
         state,
         addToast({
-          id: 'toast-2',
           type: 'error',
           message: 'Toast 2'
         })
       );
 
       expect(state.toasts).toHaveLength(2);
+      expect(state.toasts[0].message).toBe('Toast 1');
+      expect(state.toasts[1].message).toBe('Toast 2');
+      expect(state.toasts[0].id).not.toBe(state.toasts[1].id);
     });
 
     it('should support error and info types', () => {
       let state = uiReducer(
         lightState,
         addToast({
-          id: 'toast-1',
           type: 'error',
           message: 'Oops'
         })
@@ -164,7 +168,6 @@ describe('uiSlice', () => {
       state = uiReducer(
         state,
         addToast({
-          id: 'toast-2',
           type: 'info',
           message: 'FYI'
         })
@@ -180,13 +183,14 @@ describe('uiSlice', () => {
       let state = uiReducer(
         lightState,
         addToast({
-          id: 'toast-1',
           type: 'success',
           message: 'Hi'
         })
       );
 
-      state = uiReducer(state, removeToast('toast-1'));
+      const toastId = state.toasts[0].id;
+
+      state = uiReducer(state, removeToast(toastId));
 
       expect(state.toasts).toHaveLength(0);
     });
@@ -195,7 +199,6 @@ describe('uiSlice', () => {
       let state = uiReducer(
         lightState,
         addToast({
-          id: 'toast-1',
           type: 'success',
           message: 'A'
         })
@@ -204,13 +207,14 @@ describe('uiSlice', () => {
       state = uiReducer(
         state,
         addToast({
-          id: 'toast-2',
           type: 'error',
           message: 'B'
         })
       );
 
-      state = uiReducer(state, removeToast('toast-1'));
+      const firstToastId = state.toasts[0].id;
+
+      state = uiReducer(state, removeToast(firstToastId));
 
       expect(state.toasts).toHaveLength(1);
       expect(state.toasts[0].message).toBe('B');
@@ -220,7 +224,6 @@ describe('uiSlice', () => {
       const state = uiReducer(
         lightState,
         addToast({
-          id: 'toast-1',
           type: 'info',
           message: 'Keep me'
         })
@@ -229,6 +232,7 @@ describe('uiSlice', () => {
       const nextState = uiReducer(state, removeToast('non-existent-id'));
 
       expect(nextState.toasts).toHaveLength(1);
+      expect(nextState.toasts[0].message).toBe('Keep me');
     });
   });
 

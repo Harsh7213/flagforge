@@ -76,7 +76,6 @@ const FlagDetail: React.FC = () => {
       setOptimisticEnvs(prev => ({ ...prev, [env]: nextEnabled }));
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: `${flag.name} ${nextEnabled ? 'enabled' : 'disabled'} in ${env}`
         })
@@ -84,7 +83,6 @@ const FlagDetail: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to toggle environment')
         })
@@ -103,14 +101,11 @@ const FlagDetail: React.FC = () => {
     if (!flag) return;
     try {
       await updateFlag({ id: flag.id, name: editName, description: editDesc }).unwrap();
-      dispatch(
-        addToast({ id: crypto.randomUUID(), type: 'success', message: 'Flag updated successfully' })
-      );
+      dispatch(addToast({ type: 'success', message: 'Flag updated successfully' }));
       setIsEditing(false);
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to update flag')
         })
@@ -124,7 +119,6 @@ const FlagDetail: React.FC = () => {
       await updateFlag({ id: flag.id, archived: !flag.archived }).unwrap();
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: flag.archived ? 'Flag restored' : 'Flag archived'
         })
@@ -134,7 +128,6 @@ const FlagDetail: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to archive flag')
         })
@@ -148,7 +141,6 @@ const FlagDetail: React.FC = () => {
       await deleteFlag(flag.id).unwrap();
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: `Flag "${flag.name}" deleted`
         })
@@ -157,7 +149,6 @@ const FlagDetail: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to delete flag')
         })

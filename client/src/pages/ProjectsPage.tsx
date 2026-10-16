@@ -61,7 +61,6 @@ const ProjectsPage: React.FC = () => {
       const result = await createProject({ name }).unwrap();
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: `Project "${name}" created!`
         })
@@ -78,7 +77,6 @@ const ProjectsPage: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to create project')
         })
@@ -99,7 +97,6 @@ const ProjectsPage: React.FC = () => {
       }
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: 'New API key generated. Copy it now; it will not be shown again.'
         })
@@ -107,7 +104,6 @@ const ProjectsPage: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to rotate API key')
         })
@@ -122,11 +118,10 @@ const ProjectsPage: React.FC = () => {
     try {
       await revokeApiKey(id).unwrap();
       setRevealedKeys(({ [id]: _removed, ...keys }) => keys);
-      dispatch(addToast({ id: crypto.randomUUID(), type: 'success', message: 'API key revoked' }));
+      dispatch(addToast({ type: 'success', message: 'API key revoked' }));
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to revoke API key')
         })
@@ -160,7 +155,6 @@ const ProjectsPage: React.FC = () => {
       await updateProject({ id, name }).unwrap();
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: 'Project renamed successfully'
         })
@@ -169,7 +163,6 @@ const ProjectsPage: React.FC = () => {
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to rename project')
         })
@@ -181,16 +174,13 @@ const ProjectsPage: React.FC = () => {
     setDeletingProjectId(id);
     try {
       await deleteProject(id).unwrap();
-      dispatch(
-        addToast({ id: crypto.randomUUID(), type: 'success', message: `Project "${name}" deleted` })
-      );
+      dispatch(addToast({ type: 'success', message: `Project "${name}" deleted` }));
       if (activeProjectId === id) {
         dispatch(clearActiveProject());
       }
     } catch (error) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to delete project')
         })
@@ -406,7 +396,6 @@ const ProjectsPage: React.FC = () => {
                         dispatch(setActiveProject(project.id));
                         dispatch(
                           addToast({
-                            id: crypto.randomUUID(),
                             type: 'info',
                             message: `Switched to "${project.name}"`
                           })

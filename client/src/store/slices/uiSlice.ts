@@ -64,8 +64,16 @@ const uiSlice = createSlice({
       state.sidebarOpen = !state.sidebarOpen;
     },
 
-    addToast(state, action: PayloadAction<Toast>) {
-      state.toasts.push(action.payload);
+    addToast: {
+      reducer(state, action: PayloadAction<Toast>) {
+        state.toasts.push(action.payload);
+      },
+      prepare: (toast: Omit<Toast, 'id'>) => ({
+        payload: {
+          ...toast,
+          id: crypto.randomUUID()
+        }
+      })
     },
 
     removeToast(state, action: PayloadAction<string>) {

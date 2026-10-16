@@ -24,7 +24,6 @@ const Register: React.FC = () => {
       dispatch(setCredentials({ user: result.data.user, expiresAt: result.data.expiresAt }));
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'success',
           message: 'Account created successfully'
         })
@@ -33,7 +32,6 @@ const Register: React.FC = () => {
     } catch (error: unknown) {
       dispatch(
         addToast({
-          id: crypto.randomUUID(),
           type: 'error',
           message: getApiErrorMessage(error, 'Failed to register')
         })

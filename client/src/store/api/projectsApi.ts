@@ -1,11 +1,7 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQuery } from './baseQuery';
+import { baseApi } from './baseApi';
 import type { Project, ApiResponse } from '../../types';
 
-export const projectsApi = createApi({
-  reducerPath: 'projectsApi',
-  baseQuery: baseQuery,
-  tagTypes: ['Project'],
+const projectsApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     listProjects: builder.query<ApiResponse<Project[]>, void>({
       query: () => '/projects',
