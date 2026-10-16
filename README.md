@@ -14,18 +14,16 @@
 - **Multi-Environment Support**: Manage flags across Development, Staging, and Production environments independently.
 - **Targeting Rules**: Roll out features based on user IDs, user groups, or percentage-based rollouts.
 - **Evaluation API**: Evaluate individual flags or batches of flags with a project API key, user ID, and optional groups.
-- **Evaluation Limits**: Apply per-project request limits and monthly usage quotas across projects in each organization.
-- **Projects and API Keys**: Organize flags by project; rotate or revoke project keys. Keys are bcrypt-hashed at rest and shown only once when created or rotated.
-- **Organizations and Roles**: Workspaces support owner, admin, and member roles. Owners and admins can invite teammates with a single-use, 24-hour invitation link and manage eligible members.
-- **Authentication and Security**: Use HTTP-only cookie sessions, session expiry, CSRF protection for state-changing dashboard requests, role-based access control, Helmet, and validated environment configuration.
-- **Audit Logging**: Track flag and targeting-rule changes, including the acting user and role.
-- **Modern UI**: Responsive React dashboard with system theme detection and saved light/dark mode preference.
+- **Projects and API Keys**: Organize flags by project; rotate or revoke project keys as required.
+- **Organizations and Roles**: Invite your Team to flagforge to contribute, decide role of each member.
+- **Audit Logging**: See History of flag changes. 
+- **Distributed Rate Limiting**: Enforce consistent request limits across projects using Redis.
 
 ## Architecture
 
 - **Frontend**: React 18, TypeScript, Vite, Redux Toolkit, RTK Query, Tailwind CSS
-- **Backend**: Node.js, Express, TypeScript, Zod for validation, bcryptjs, cookie-parser, and Redis.
-- **Data Stores**: PostgreSQL with `pg` (node-postgres), plus Redis for shared rate-limit counters. PostgreSQL migrations run on server startup.
+- **Backend**: Node.js, Express, TypeScript, Zod .
+- **Data Stores**: PostgreSQL, Redis for shared rate-limit counters. 
 
 ## Getting Started
 
@@ -51,19 +49,9 @@
    ```bash
    docker compose up --build -d
    ```
+   If you want to run the app locally without containers for debugging, first setup PostgreSQL and Redis update the connection string in .env. Run `npm install` and `npm run dev` in the `server` and `client` directories. 
 
-   This starts four containers: PostgreSQL, Redis, the backend API, and the frontend dashboard. The API is available at `localhost:4000` and the dashboard at `localhost` (port 80). PostgreSQL and Redis data are persisted in Docker volumes; Redis uses AOF persistence. PostgreSQL and Redis are also available on host ports `5433` and `6379` for local development tools.
-
-   If you want to run the app locally without containers for debugging, run `npm install` and `npm run dev` in the `server` and `client` directories, and configure the server to use the PostgreSQL and Redis services started by Compose.
-
-   To run the backend on your host, start its required data stores from the repository root first:
-
-   ```bash
-   docker compose up -d postgres redis
-   docker compose ps
-   ```
-
-   Wait until both services report `healthy`, then run `npm run dev` from the `server` directory. The server's `REDIS_URL` must point to the host-mapped Redis port (by default, `redis://localhost:6379`). If Redis is stopped or the URL/port does not match, startup fails with `ECONNREFUSED` on port `6379`.
+    The server's `REDIS_URL` must point to the host-mapped Redis port. If Redis is stopped or the URL/port does not match, startup fails with `ECONNREFUSED` on port `6379`.
 
 3.  **Access the Application**
     - Dashboard (Docker Compose): [http://localhost](http://localhost)
@@ -74,15 +62,6 @@ _Note: The backend container automatically runs database migrations before start
 
 The server uses a shared Redis instance to enforce per-project request limits and monthly evaluation quotas at both project and organization levels. Individual and batch evaluations have separate limits, and each flag in a batch counts toward usage. Requests exceeding a limit receive HTTP `429`.
 
-### Dashboard workflow
-
-1. Register the first user to create an organization. The first user becomes the organization owner.
-2. Create projects and flags from the dashboard. Owners and admins can make changes; members have read access to the dashboard data.
-3. From **Team**, owners and admins can invite members or admins with a single-use link that expires after 24 hours.
-4. From **Projects**, create, rotate, or revoke an API key. A new key is returned only at creation or rotation time, so store it securely.
-
-The dashboard API uses an HTTP-only session cookie. The API also exposes `/api/v1/auth/me` for session discovery and `/api/v1/auth/logout` for session termination.
-
 ### API overview
 
 Dashboard routes are available under `/api/v1` and require an authenticated session. The main route groups are:
@@ -92,11 +71,11 @@ Dashboard routes are available under `/api/v1` and require an authenticated sess
 - `/projects`: project management and API-key rotation or revocation.
 - `/flags`: flag, environment, targeting-rule, and flag-audit management.
 - `/stats` and `/audit`: dashboard metrics and organization audit history.
-- `/evaluate` and `/evaluate/batch`: SDK-style flag evaluation using `X-API-Key`.
+- `/evaluate` and `/evaluate/batch`: flag evaluation using `X-API-Key`.
 
-## SDK Integration (Example)
+## Evaluating a Feature Flag via API
 
-To get an API key, open the **Projects** page in the dashboard and create or rotate a key. Copy it when it is displayed because it cannot be retrieved later. The API key identifies the project, so a `projectId` is not required. Then evaluate a feature flag from your client application with a `POST` request:
+To get an API key, open the **Projects** page in the dashboard and create or rotate a key. copy it when it is displayed because it cannot be retrieved later. Then evaluate a feature flag from your client application with a `POST` request:
 
 ```javascript
 const response = await fetch('http://localhost:4000/api/v1/evaluate', {
