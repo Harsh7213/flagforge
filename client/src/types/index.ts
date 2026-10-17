@@ -70,3 +70,34 @@ export interface PaginatedResponse<T> {
   limit: number;
   offset: number;
 }
+
+export interface Member {
+  id: string;
+  name: string;
+  email: string;
+  role: 'owner' | 'admin' | 'member';
+  created_at: string;
+}
+
+export interface InvitationResponse {
+  data: {
+    email: string;
+    role: 'admin' | 'member';
+    token: string;
+    expiresAt: string;
+  };
+}
+
+export interface AcceptInvitationResponse {
+  data: {
+    expiresAt: number;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      organizationId: string;
+      organizationName: string;
+      role: 'admin' | 'member';
+    };
+  };
+}

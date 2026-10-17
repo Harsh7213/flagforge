@@ -1,59 +1,43 @@
-import { createListenerMiddleware } from '@reduxjs/toolkit';
-
-import {
-  toggleTheme,
-  setSystemTheme,
-  setActiveProject,
-  clearActiveProject
-} from './uiSlice';
-
+import { startAppListening } from '../store';
+import { toggleTheme, setSystemTheme, setActiveProject, clearActiveProject } from './uiSlice';
 import { applyTheme } from '../../utils/applyTheme';
 
-export const uiListenerMiddleware = createListenerMiddleware();
-
-// Toggle theme: persist preference and apply theme
-uiListenerMiddleware.startListening({
-  actionCreator: toggleTheme,
-  effect: (_, listenerApi) => {
-    const state = listenerApi.getState() as {
-      ui: { theme: 'dark' | 'light' };
-    };
-
-    const theme = state.ui.theme;
-
-    localStorage.setItem('ff-theme', theme);
-    applyTheme(theme);
-  }
-});
-
-// Apply system theme only when no saved preference exists
-uiListenerMiddleware.startListening({
-  actionCreator: setSystemTheme,
-  effect: (_, listenerApi) => {
-    if (localStorage.getItem('ff-theme')) {
-      return;
+export const registerUiListeners= (startListening: typeof startAppListening) => {
+  // Toggle theme: persist preference and apply theme
+  startListening({
+    actionCreator: toggleTheme,
+    effect: (_, listenerApi) => {
+      const theme = listenerApi.getState().ui.theme;
+      localStorage.setItem('ff-theme', theme);
+      applyTheme(theme);
     }
+  });
 
-    const state = listenerApi.getState() as {
-      ui: { theme: 'dark' | 'light' };
-    };
+  // Apply system theme only when no saved preference exists
+  startListening({
+    actionCreator: setSystemTheme,
+    effect: (_, listenerApi) => {
+      if (localStorage.getItem('ff-theme')) {
+        return;
+      }
+      const theme = listenerApi.getState().ui.theme;
+      applyTheme(theme);
+    }
+  });
 
-    applyTheme(state.ui.theme);
-  }
-});
+  // Persist active project
+  startListening({
+    actionCreator: setActiveProject,
+    effect: action => {
+      sessionStorage.setItem('ff-project', action.payload);
+    }
+  });
 
-// Persist active project
-uiListenerMiddleware.startListening({
-  actionCreator: setActiveProject,
-  effect: (action) => {
-    sessionStorage.setItem('ff-project', action.payload);
-  }
-});
-
-// Remove persisted active project
-uiListenerMiddleware.startListening({
-  actionCreator: clearActiveProject,
-  effect: () => {
-    sessionStorage.removeItem('ff-project');
-  }
-});
+  // Remove persisted active project
+  startListening({
+    actionCreator: clearActiveProject,
+    effect: () => {
+      sessionStorage.removeItem('ff-project');
+    }
+  });
+};

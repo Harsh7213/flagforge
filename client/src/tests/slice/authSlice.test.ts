@@ -7,7 +7,7 @@ import authReducer, {
   SESSION_DURATION_MS
 } from '../../store/slices/authSlice';
 
-import { authListenerMiddleware } from '../../store/slices/authListenerMiddleware';
+import { listenerMiddleware } from '@/store/store';
 
 import type { User } from '../../store/slices/authSlice';
 
@@ -31,7 +31,7 @@ const createTestStore = () =>
       auth: authReducer
     },
     middleware: getDefaultMiddleware =>
-      getDefaultMiddleware().prepend(authListenerMiddleware.middleware)
+      getDefaultMiddleware().prepend(listenerMiddleware.middleware)
   });
 
 describe('authSlice', () => {

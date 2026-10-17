@@ -1,21 +1,18 @@
-import { createListenerMiddleware } from '@reduxjs/toolkit';
+import { startAppListening } from '../store';
 import { setCredentials, logout } from './authSlice';
 
-export const authListenerMiddleware = createListenerMiddleware();
+export const registerAuthListeners = (startListening: typeof startAppListening) => {
+  startListening({
+    actionCreator: setCredentials,
+    effect: action => {
+      sessionStorage.setItem('sessionExpiresAt', String(action.payload.expiresAt));
+    }
+  });
 
-authListenerMiddleware.startListening({
-  actionCreator: setCredentials,
-  effect: (action) => {
-    sessionStorage.setItem(
-      'sessionExpiresAt',
-      String(action.payload.expiresAt)
-    );
-  }
-});
-
-authListenerMiddleware.startListening({
-  actionCreator: logout,
-  effect: () => {
-    sessionStorage.removeItem('sessionExpiresAt');
-  }
-});
+  startListening({
+    actionCreator: logout,
+    effect: () => {
+      sessionStorage.removeItem('sessionExpiresAt');
+    }
+  });
+};

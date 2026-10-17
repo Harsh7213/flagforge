@@ -11,7 +11,7 @@ import uiReducer, {
   removeToast
 } from '../../store/slices/uiSlice';
 
-import { uiListenerMiddleware } from '../../store/slices/uiListenerMiddleware';
+import { listenerMiddleware } from '@/store/store';
 
 const lightState = {
   theme: 'light' as const,
@@ -35,7 +35,7 @@ const createTestStore = () =>
       ui: uiReducer
     },
     middleware: getDefaultMiddleware =>
-      getDefaultMiddleware().prepend(uiListenerMiddleware.middleware)
+      getDefaultMiddleware().prepend(listenerMiddleware.middleware)
   });
 
 describe('uiSlice', () => {

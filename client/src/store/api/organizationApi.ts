@@ -1,27 +1,5 @@
 import { baseApi } from './baseApi';
-
-interface InvitationResponse {
-  data: {
-    email: string;
-    role: 'admin' | 'member';
-    token: string;
-    expiresAt: string;
-  };
-}
-
-interface AcceptInvitationResponse {
-  data: {
-    expiresAt: number;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      organizationId: string;
-      organizationName: string;
-      role: 'admin' | 'member';
-    };
-  };
-}
+import { Member, InvitationResponse, AcceptInvitationResponse } from '../../types';
 
 const organizationApi = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -55,14 +33,6 @@ const organizationApi = baseApi.injectEndpoints({
     })
   })
 });
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  role: 'owner' | 'admin' | 'member';
-  created_at: string;
-}
 
 export const {
   useListMembersQuery,
