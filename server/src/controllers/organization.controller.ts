@@ -5,22 +5,23 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import pool from '../db/pool';
 import { JWT_SECRET } from '../config';
-import { SESSION_COOKIE } from '../middleware/auth';
+import { SESSION_COOKIE, issueCsrfCookie } from '../middleware/auth';
 import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
-const SESSION_DURATION_MS = 60 * 60 * 1000;
-const INVITATION_DURATION_MS = 24 * 60 * 60 * 1000;
+export const invitationSchema = z
+  .object({
+    email: z.string().email().max(INPUT_LIMITS.email),
+    role: z.enum(['admin', 'member']).default('member')
+  })
+  .strict();
 
-export const invitationSchema = z.object({
-  email: z.string().email().max(INPUT_LIMITS.email),
-  role: z.enum(['admin', 'member']).default('member')
-});
-
-export const acceptInvitationSchema = z.object({
-  token: z.string().min(32),
-  name: z.string().min(2).max(INPUT_LIMITS.userName),
-  password: z.string().min(INPUT_LIMITS.passwordMinimum)
-});
+export const acceptInvitationSchema = z
+  .object({
+    token: z.string().min(32),
+    name: z.string().min(2).max(INPUT_LIMITS.userName),
+    password: z.string().min(INPUT_LIMITS.passwordMinimum)
+  })
+  .strict();
 
 const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');
 
@@ -29,7 +30,7 @@ const setSessionCookie = (res: Response, token: string) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: SESSION_DURATION_MS,
+    maxAge: INPUT_LIMITS.SESSION_DURATION_MS,
     path: '/'
   });
 };
@@ -47,7 +48,7 @@ export const createInvitation = async (req: Request, res: Response, next: NextFu
     }
 
     const token = `invite_${crypto.randomBytes(32).toString('hex')}`;
-    const expiresAt = new Date(Date.now() + INVITATION_DURATION_MS);
+    const expiresAt = new Date(Date.now() + INPUT_LIMITS.INVITATION_DURATION_MS);
     await pool.query(
       `INSERT INTO organization_invitations
        (organization_id, email, role, token_hash, expires_at, invited_by)
@@ -151,7 +152,7 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
     await client.query('COMMIT');
 
     const userId = userResult.rows[0].id;
-    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    const expiresAt = Date.now() + INPUT_LIMITS.SESSION_DURATION_MS;
     const sessionToken = jwt.sign(
       {
         id: userId,
@@ -162,6 +163,7 @@ export const acceptInvitation = async (req: Request, res: Response, next: NextFu
       { expiresIn: '1h' }
     );
     setSessionCookie(res, sessionToken);
+    issueCsrfCookie(res);
 
     res.status(201).json({
       data: {

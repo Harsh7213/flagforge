@@ -21,11 +21,9 @@ export const createApp = () => {
   app.use(cookieParser());
   app.use('/api/v1/evaluate', express.json({ limit: '64kb' }));
   app.use(express.json({ limit: '1mb' }));
-
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
-
   app.use('/api/v1', router);
   app.use(notFound);
   app.use(errorHandler);

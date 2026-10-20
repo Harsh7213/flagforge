@@ -8,8 +8,8 @@ export const getAuditLogs = async (req: Request, res: Response, next: NextFuncti
 
     let query = `
       SELECT al.*,
-        CASE WHEN u.name IS NOT NULL THEN u.name ELSE al.actor END as actor,
-        COALESCE(al.actor_role, u.role, 'system') AS actor_role
+      COALESCE(u.name, 'unknown') AS actor,
+      COALESCE(al.actor_role, u.role, 'system') AS actor_role
       FROM audit_logs al
       JOIN projects p ON al.project_id = p.id
       LEFT JOIN users u ON al.actor = u.id::text

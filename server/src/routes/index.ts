@@ -57,7 +57,13 @@ router.post(
   requireRole('owner', 'admin'),
   createInvitation
 );
-router.get('/organizations/members', requireAuth, requireRole('owner', 'admin'), listMembers);
+router.get(
+  '/organizations/members',
+  requireAuth,
+  csrfProtection,
+  requireRole('owner', 'admin'),
+  listMembers
+);
 router.delete(
   '/organizations/members/:userId',
   requireAuth,
@@ -100,7 +106,7 @@ router.delete(
 
 router.get('/flags', requireAuth, listFlags);
 router.post('/flags', requireAuth, csrfProtection, requireRole('owner', 'admin'), createFlag);
-router.get('/flags/:id', requireAuth, getFlag);
+router.get('/flags/:id', requireAuth, csrfProtection, getFlag);
 router.patch('/flags/:id', requireAuth, csrfProtection, requireRole('owner', 'admin'), updateFlag);
 router.delete('/flags/:id', requireAuth, csrfProtection, requireRole('owner', 'admin'), deleteFlag);
 router.post(
@@ -110,7 +116,7 @@ router.post(
   requireRole('owner', 'admin'),
   toggleEnvironment
 );
-router.get('/flags/:id/audit', requireAuth, getFlagAuditLogs);
+router.get('/flags/:id/audit', requireAuth, csrfProtection, getFlagAuditLogs);
 router.post(
   '/flags/:id/rules',
   requireAuth,
@@ -126,14 +132,14 @@ router.delete(
   deleteRule
 );
 
-router.get('/stats', requireAuth, getStats);
+router.get('/stats', requireAuth, csrfProtection, getStats);
 
-router.get('/audit', requireAuth, getAuditLogs);
+router.get('/audit', requireAuth, csrfProtection, getAuditLogs);
 
-// SDK Evaluation Routes (Protected by API Key)
+// Flag Evaluation Routes (Protected by API Key)
 router.post('/evaluate', apiKeyAuth, evaluationLimit, monthlyEvaluationLimit, evaluate);
 router.post(
-  '/evaluate/batch',
+  '/batchEvaluate/',
   apiKeyAuth,
   batchEvaluationLimit,
   monthlyEvaluationLimit,

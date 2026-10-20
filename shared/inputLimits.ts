@@ -6,5 +6,7 @@ export const INPUT_LIMITS = {
   flagKey: 20,
   flagName: 20,
   flagDescription: 50,
-  passwordMinimum: 14
-} ;
+  passwordMinimum: 8,
+  SESSION_DURATION_MS: 60 * 60 * 1000,
+  INVITATION_DURATION_MS: 24 * 60 * 60 * 1000
+};

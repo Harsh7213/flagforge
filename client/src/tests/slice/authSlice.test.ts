@@ -1,11 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
-
-import authReducer, {
-  setCredentials,
-  logout,
-  SESSION_DURATION_MS
-} from '../../store/slices/authSlice';
+import authReducer, { setCredentials, logout } from '../../store/slices/authSlice';
+import { INPUT_LIMITS } from '../../../../shared/inputLimits';
 
 import { listenerMiddleware } from '@/store/store';
 
@@ -79,9 +75,11 @@ describe('authSlice', () => {
 
       const after = Date.now();
 
-      expect(state.sessionExpiresAt).toBeGreaterThanOrEqual(before + SESSION_DURATION_MS);
+      expect(state.sessionExpiresAt).toBeGreaterThanOrEqual(
+        before + INPUT_LIMITS.SESSION_DURATION_MS
+      );
 
-      expect(state.sessionExpiresAt).toBeLessThanOrEqual(after + SESSION_DURATION_MS);
+      expect(state.sessionExpiresAt).toBeLessThanOrEqual(after + INPUT_LIMITS.SESSION_DURATION_MS);
     });
 
     it('should update an existing user', () => {

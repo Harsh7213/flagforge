@@ -78,7 +78,7 @@ export interface FlagWithEnvironments extends FeatureFlag {
 
 export interface EvaluationRequest {
   flagKey: string;
-  userId?: string;
+  userName?: string[];
   groups?: string[];
   environment: Environment;
   projectId: string;
@@ -88,6 +88,8 @@ export interface EvaluationResult {
   flagKey: string;
   enabled: boolean;
   reason: string;
+  disallowedNames?:string[] | undefined;
+  disallowedGroups?:string[] | undefined;
   environment: Environment;
 }
 

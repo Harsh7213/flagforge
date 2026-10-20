@@ -18,11 +18,12 @@ describe('app', () => {
     const app = express();
     app.use(cookieParser());
     app.post('/csrf-check', csrfProtection, (_req, res) => res.status(204).send());
-
+    const csrfToken = 'a'.repeat(64);
     const response = await request(app)
       .post('/csrf-check')
-      .set('Cookie', [`${SESSION_COOKIE}=session-token`, `${CSRF_COOKIE}=csrf-token`])
-      .set('X-CSRF-Token', 'csrf-token');
+      .set('Origin', 'http://localhost:5173')
+      .set('Cookie', [`${SESSION_COOKIE}=session-token`, `${CSRF_COOKIE}=${csrfToken}`])
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(204);
   });
@@ -31,12 +32,12 @@ describe('app', () => {
     const app = express();
     app.use(cookieParser());
     app.post('/csrf-check', csrfProtection, (_req, res) => res.status(204).send());
-
+    const csrfToken = 'a'.repeat(64);
     const response = await request(app)
       .post('/csrf-check')
       .set('Origin', 'https://evil.example')
-      .set('Cookie', [`${SESSION_COOKIE}=session-token`, `${CSRF_COOKIE}=csrf-token`])
-      .set('X-CSRF-Token', 'csrf-token');
+      .set('Cookie', [`${SESSION_COOKIE}=session-token`, `${CSRF_COOKIE}=${csrfToken}`])
+      .set('X-CSRF-Token', csrfToken);
 
     expect(response.status).toBe(403);
     expect(response.body.error).toBe('CSRF validation failed');

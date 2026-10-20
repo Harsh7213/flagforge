@@ -7,26 +7,28 @@ import { clearAuthCookies, issueCsrfCookie, SESSION_COOKIE } from '../middleware
 import { JWT_SECRET } from '../config';
 import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
-export const registerSchema = z.object({
-  name: z.string().min(2).max(INPUT_LIMITS.userName),
-  email: z.string().email().max(INPUT_LIMITS.email),
-  password: z.string().min(INPUT_LIMITS.passwordMinimum),
-  organizationName: z.string().trim().min(2).max(INPUT_LIMITS.organizationName)
-});
+export const registerSchema = z
+  .object({
+    name: z.string().min(2).max(INPUT_LIMITS.userName),
+    email: z.string().email().max(INPUT_LIMITS.email),
+    password: z.string().min(INPUT_LIMITS.passwordMinimum),
+    organizationName: z.string().trim().min(2).max(INPUT_LIMITS.organizationName)
+  })
+  .strict();
 
-export const loginSchema = z.object({
-  email: z.string().email().max(INPUT_LIMITS.email),
-  password: z.string()
-});
-
-const SESSION_DURATION_MS = 60 * 60 * 1000;
+export const loginSchema = z
+  .object({
+    email: z.string().email().max(INPUT_LIMITS.email),
+    password: z.string()
+  })
+  .strict();
 
 const setSessionCookie = (res: Response, token: string) => {
   res.cookie(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: SESSION_DURATION_MS,
+    maxAge: INPUT_LIMITS.SESSION_DURATION_MS,
     path: '/'
   });
 };
@@ -76,7 +78,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await client.query('COMMIT');
 
     // Generate JWT token
-    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    const expiresAt = Date.now() + INPUT_LIMITS.SESSION_DURATION_MS;
     const token = jwt.sign({ id: userId, organizationId, sessionVersion: 0 }, JWT_SECRET, {
       expiresIn: '1h'
     });
@@ -128,7 +130,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const expiresAt = Date.now() + SESSION_DURATION_MS;
+    const expiresAt = Date.now() + INPUT_LIMITS.SESSION_DURATION_MS;
     const token = jwt.sign(
       {
         id: user.id,
@@ -181,7 +183,9 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
 
     res.json({
       data: {
-        expiresAt: req.user?.exp ? req.user.exp * 1000 : Date.now() + SESSION_DURATION_MS,
+        expiresAt: req.user?.exp
+          ? req.user.exp * 1000
+          : Date.now() + INPUT_LIMITS.SESSION_DURATION_MS,
         user: {
           id: user.id,
           name: user.name,

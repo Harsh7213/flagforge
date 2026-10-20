@@ -71,7 +71,7 @@ Dashboard routes are available under `/api/v1` and require an authenticated sess
 - `/projects`: project management and API-key rotation or revocation.
 - `/flags`: flag, environment, targeting-rule, and flag-audit management.
 - `/stats` and `/audit`: dashboard metrics and organization audit history.
-- `/evaluate` and `/evaluate/batch`: flag evaluation using `X-API-Key`.
+- `/evaluate` and `/batchEvaluate`: flag evaluation using `X-API-Key`.
 
 ## Evaluating a Feature Flag via API
 
@@ -87,7 +87,7 @@ const response = await fetch('http://localhost:4000/api/v1/evaluate', {
   body: JSON.stringify({
     flagKey: 'new_checkout_flow',
     environment: 'development', // 'development', 'staging', or 'production'
-    userId: 'user-123', // Optional: for user_ids or percentage targeting
+    userName: ['user-123'], // Optional: for userName check 
     groups: ['beta-testers'] // Optional: for groups targeting
   })
 });

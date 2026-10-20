@@ -1,5 +1,4 @@
 import pool from './pool';
-import bcrypt from 'bcryptjs';
 import { INPUT_LIMITS } from '../../../shared/inputLimits';
 
 const SQL = `
@@ -117,39 +116,6 @@ async function migrate() {
   try {
     console.log('🔄 Running database migrations...');
     await client.query(SQL);
-    const columns = await client.query(
-      `SELECT column_name FROM information_schema.columns
-       WHERE table_schema = 'public' AND table_name = 'projects'
-      AND column_name IN ('api_key', 'api_key_id', 'api_key_hash')`
-    );
-    const columnNames = new Set(columns.rows.map(row => row.column_name));
-
-    if (!columnNames.has('api_key_hash')) {
-      await client.query('ALTER TABLE projects ADD COLUMN api_key_hash TEXT');
-    }
-    if (!columnNames.has('api_key_id')) {
-      await client.query('ALTER TABLE projects ADD COLUMN api_key_id TEXT');
-    }
-
-    if (columnNames.has('api_key')) {
-      const legacyKeys = await client.query(
-        'SELECT id, api_key FROM projects WHERE api_key_hash IS NULL AND api_key IS NOT NULL'
-      );
-      for (const project of legacyKeys.rows) {
-        const apiKeyHash = await bcrypt.hash(String(project.api_key), 12);
-        await client.query('UPDATE projects SET api_key_id = $1, api_key_hash = $2 WHERE id = $3', [
-          project.api_key,
-          apiKeyHash,
-          project.id
-        ]);
-      }
-      await client.query('ALTER TABLE projects DROP COLUMN api_key');
-    }
-
-    await client.query(
-      'CREATE UNIQUE INDEX IF NOT EXISTS idx_projects_api_key_id ON projects(api_key_id) WHERE api_key_id IS NOT NULL'
-    );
-
     console.log('✅ Database migrations completed successfully');
   } catch (err) {
     console.error('❌ Migration failed:', err);

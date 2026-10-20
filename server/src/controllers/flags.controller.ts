@@ -76,7 +76,7 @@ async function logAudit(
 
 // Helpers for Multi-Tenancy Data Isolation
 async function verifyProjectAccess(projectId: string, req: Request) {
-  if (req.project) return; // SDK call with API key, already verified
+  if (req.project) return;
   if (!req.user) throw new AppError('Unauthorized', 401);
   const res = await pool.query('SELECT id FROM projects WHERE id = $1 AND organization_id = $2', [
     projectId,
@@ -368,11 +368,11 @@ export async function getFlagAuditLogs(req: Request, res: Response, next: NextFu
 
     const result = await pool.query(
       `SELECT al.*, ff.key AS flag_key,
-        CASE WHEN u.name IS NOT NULL THEN u.name ELSE al.actor END AS actor,
-        COALESCE(al.actor_role, u.role, 'system') AS actor_role
-       FROM audit_logs al
-       JOIN feature_flags ff ON ff.id = al.flag_id
-       LEFT JOIN users u ON al.actor = u.id::text
+      COALESCE(u.name, 'unknown') AS actor,
+      COALESCE(al.actor_role, u.role, 'system') AS actor_role
+      FROM audit_logs al
+      JOIN feature_flags ff ON ff.id = al.flag_id
+      LEFT JOIN users u ON al.actor = u.id::text
       WHERE al.flag_id = $1 ORDER BY al.created_at DESC`,
       [id]
     );
@@ -443,9 +443,7 @@ export async function deleteRule(req: Request, res: Response, next: NextFunction
   }
 }
 
-// POST /api/v1/flags/:id/rules (Not used heavily but good to have)
-// Delete Rule similarly protected
-// Let's implement getStats
+// GET /api/v1/stats?projectId=<projectId>
 export async function getStats(req: Request, res: Response, next: NextFunction) {
   try {
     const projectId = (req.query.projectId as string) || req.project?.id;

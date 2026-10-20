@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export const SESSION_DURATION_MS = 60 * 60 * 1000;
+import { INPUT_LIMITS } from '../../../../shared/inputLimits';
 
 export interface User {
   id: string;
@@ -33,7 +32,7 @@ const authSlice = createSlice({
       prepare: ({ user, expiresAt }: { user: User; expiresAt?: number }) => ({
         payload: {
           user,
-          expiresAt: expiresAt ?? Date.now() + SESSION_DURATION_MS
+          expiresAt: expiresAt ?? Date.now() + INPUT_LIMITS.SESSION_DURATION_MS
         }
       })
     },
