@@ -194,7 +194,7 @@ export async function createFlag(req: Request, res: Response, next: NextFunction
   const client = await pool.connect();
   try {
     const parsed = createFlagSchema.safeParse(req.body);
-    if (!parsed.success) throw new AppError(parsed.error.errors[0].message, 400);
+    if (!parsed.success) throw new AppError(parsed.error.issues[0].message, 400);
 
     const { key, name, description, projectId } = parsed.data;
     await verifyProjectAccess(projectId, req);
@@ -245,7 +245,7 @@ export async function updateFlag(req: Request, res: Response, next: NextFunction
     await verifyFlagAccess(id, req);
 
     const parsed = updateFlagSchema.safeParse(req.body);
-    if (!parsed.success) throw new AppError(parsed.error.errors[0].message, 400);
+    if (!parsed.success) throw new AppError(parsed.error.issues[0].message, 400);
 
     const { name, description, archived } = parsed.data;
     const actor = getActor(req);
@@ -390,7 +390,7 @@ export async function addRule(req: Request, res: Response, next: NextFunction) {
     if (!env) throw new AppError('env is required', 400);
     await verifyFlagAccess(id, req);
     const parsed = addRuleSchema.safeParse(req.body);
-    if (!parsed.success) throw new AppError(parsed.error.errors[0].message, 400);
+    if (!parsed.success) throw new AppError(parsed.error.issues[0].message, 400);
 
     await client.query('BEGIN');
     const environment = await client.query(

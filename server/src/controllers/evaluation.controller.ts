@@ -25,7 +25,7 @@ const batchEvaluateSchema = z
 export async function evaluate(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = evaluateSchema.safeParse(req.body);
-    if (!parsed.success) throw new AppError(parsed.error.errors[0].message, 400);
+    if (!parsed.success) throw new AppError(parsed.error.issues[0].message, 400);
 
     const result = await evaluateFlag({ ...parsed.data, projectId: req.project!.id });
     res.json({ data: result });
@@ -38,7 +38,7 @@ export async function evaluate(req: Request, res: Response, next: NextFunction) 
 export async function batchEvaluate(req: Request, res: Response, next: NextFunction) {
   try {
     const parsed = batchEvaluateSchema.safeParse(req.body);
-    if (!parsed.success) throw new AppError(parsed.error.errors[0].message, 400);
+    if (!parsed.success) throw new AppError(parsed.error.issues[0].message, 400);
 
     const { flagKeys, userName, groups, environment } = parsed.data;
     const projectId = req.project!.id;
